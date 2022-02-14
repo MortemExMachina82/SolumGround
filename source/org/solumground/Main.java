@@ -388,10 +388,14 @@ public class Main{
 
         unit_cube_colisionBox = new ColisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
-        DaemonChunkLoader chunkLoader = new DaemonChunkLoader();
+        ChunkLoader chunkLoader = new ChunkLoader();
         chunkLoader.loadAroundPlayer(3);
+        MeshBuilder meshBuilder = new MeshBuilder();
+        meshBuilder.Build();
         chunkLoader.setDaemon(true);
+        meshBuilder.setDaemon(true);
         chunkLoader.start();
+        meshBuilder.start();
 
         Font DefaultFont = new Font(FontPath);
         Text fpsText = new Text("",DefaultFont, .03f, new Vec3(-1f,1f-0.06f,0));
@@ -459,6 +463,7 @@ public class Main{
         }
 
         chunkLoader.close();
+        meshBuilder.close();
         System.out.print("Saving...");
         for(int X=0;X<ChunkCount;X++){
             ChunkArray[X].Unload();
