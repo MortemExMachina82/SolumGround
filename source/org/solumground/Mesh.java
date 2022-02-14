@@ -1,7 +1,6 @@
 package org.solumground;
 
 
-
 import java.io.*;
 import java.nio.*;
 import java.nio.file.*;
@@ -11,11 +10,8 @@ import javax.imageio.*;
 import java.awt.Image.*;
 import java.awt.image.BufferedImage;
 
-
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
-
-
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -46,6 +42,14 @@ public class Mesh{
     float ZRot;
     boolean is_skyBox;
     boolean FullLight = false;
+
+    enum MeshStatus {
+        NotDone,
+        Uploaded,
+        Completed
+    }
+
+    public MeshStatus status = MeshStatus.NotDone;
 
     public static int MESH_TEXTURE = 1;
     public static int MESH_SMOBJ = 2;
@@ -660,6 +664,7 @@ public class Mesh{
             //}
 
         }
+        status = MeshStatus.Completed;
     }
     public void setColor(int color){
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);

@@ -29,6 +29,10 @@ class MeshBuilder extends Thread{
     public void run(){
         System.out.println("Starting Mesh Builder");
         while(!shouldClose){
+            try{
+                Thread.sleep(10);
+            }
+            catch(Exception e){}
             Build();
         }
     }
