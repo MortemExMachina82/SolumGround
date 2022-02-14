@@ -1,5 +1,5 @@
 set -e
-cd source
+cd src
 javac --release 8 org/solumground/Main.java -d ../classes
 cd ../classes
 jar cfm ../SolumGround.jar ../assets/MANIFEST.MF ./*
