@@ -1,0 +1,33 @@
+SolumGround Version 2.0 alpha
+www.solumground.org
+
+Key Bindings:
+    • Move Forward Press W
+    • Move Left Press A
+    • Move Backward Press S
+    • Move Right Press D
+    
+    • Jump Press Space
+    • Sprint Press Left Shift
+    
+    • Turn Left Press Left Arrow Key
+    • Turn Right Press Right Arrow Key
+    • Turn Up Press Up Arrow Key
+    • Turn Down Press Down Arrow Key
+    
+    • Turn Move Mouse
+    • Place Block Press Right Mouse Button
+    • Break Block Press Left Mouse Button
+    
+    • Change Hotbar Block To The Left Press O
+    • Change Hotbar Block To The Right Press P
+    
+    • Toggle Fullscreen Press ALT And F
+    • Toggle Show Sky Box Press ALT And S
+    
+    • ReSpawn Press ALT+R
+    
+    • Increse Render Distance Press ALT And +
+    • Decrese Render Distance Press CTRL And -
+    
+    • Quit And Save Press Escape

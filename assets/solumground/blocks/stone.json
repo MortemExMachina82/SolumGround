@@ -1,0 +1,15 @@
+{
+    "Name":"stone",
+    "ID":2,
+    "Full":true,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Model":[
+        ["Right", "Right.smobj", "stone.png"],
+        ["Left", "Left.smobj", "stone.png"],
+        ["Top", "Top.smobj", "stone.png"],
+        ["Bottom", "Bottom.smobj", "stone.png"],
+        ["Front", "Front.smobj", "stone.png"],
+        ["Back", "Back.smobj", "stone.png"]
+    ]
+}

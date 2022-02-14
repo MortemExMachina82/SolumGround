@@ -1,0 +1,15 @@
+{
+    "Name":"dirt",
+    "ID":3,
+    "Full":true,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Model":[
+        ["Right", "Right.smobj", "dirt.png"],
+        ["Left", "Left.smobj", "dirt.png"],
+        ["Top", "Top.smobj", "dirt.png"],
+        ["Bottom", "Bottom.smobj", "dirt.png"],
+        ["Front", "Front.smobj", "dirt.png"],
+        ["Back", "Back.smobj", "dirt.png"]
+    ]
+}

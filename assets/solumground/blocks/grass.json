@@ -1,0 +1,15 @@
+{
+    "Name":"grass",
+    "ID":1,
+    "Full":true,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Model":[
+        ["Right", "Right.smobj", "grass_side.png"],
+        ["Left", "Left.smobj", "grass_side.png"],
+        ["Top", "Top.smobj", "grass_top.png"],
+        ["Bottom", "Bottom.smobj", "dirt.png"],
+        ["Front", "Front.smobj", "grass_side.png"],
+        ["Back", "Back.smobj", "grass_side.png"]
+    ]
+}

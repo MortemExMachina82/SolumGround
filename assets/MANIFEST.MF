@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: 14.0.2 (Private Build)
+Main-Class: org.solumground.Main
+Class-Path: .
+

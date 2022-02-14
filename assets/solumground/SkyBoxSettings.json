@@ -1,0 +1,16 @@
+{
+    "Generated":false,
+    "OneTexture":false,
+    "DirectoryModelPath":"assets/solumground/models/SkyBox",
+    "DirectoryTexturePath":"assets/solumground/textures/ulukai",
+    "ModelName":"SkyBox.smobj",
+    "TextureName":"SkyBox3.png",
+    "Model":[
+        ["Right", "Right.smobj", "corona_rt.png"],
+        ["Left", "Left.smobj", "corona_lf.png"],
+        ["Top", "Top.smobj", "corona_up.png"],
+        ["Bottom", "Bottom.smobj", "corona_dn.png"],
+        ["Front", "Front.smobj", "corona_ft.png"],
+        ["Back", "Back.smobj", "corona_bk.png"]
+    ]
+}
