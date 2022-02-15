@@ -58,7 +58,7 @@ public class Player{
             }
 
             try {
-                if(bytesRead > 28) {
+                if(bytesRead == 28) {
                     ByteBuffer bb = ByteBuffer.wrap(data);
                     bb.order(ByteOrder.LITTLE_ENDIAN);
                     position.X = bb.getFloat(0);
