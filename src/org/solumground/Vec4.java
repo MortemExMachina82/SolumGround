@@ -37,23 +37,17 @@ public class Vec4 {
         this.Z = pos.Z;
         this.W = 0f;
     }
-    public void print(){
-        System.out.print(this.X);
-        System.out.print("  ");
-        System.out.print(this.Y);
-        System.out.print("  ");
-        System.out.print(this.Z);
-        System.out.print("  ");
-        System.out.println(this.W);
+    @Override
+    public String toString() {
+        return String.format("(%.2f, %.2f, %.2f, %.2f)", this.X, this.Y, this.Z, this.W);
     }
+
     public static boolean Equal(Vec4 pos1, Vec4 pos2){
         if(pos1 == null | pos2 == null){return false;}
         if(pos1.X == pos2.X){
             if(pos1.Y == pos2.Y){
                 if(pos1.Z == pos2.Z){
-                    if(pos1.W == pos2.W){
-                        return true;
-                    }
+                    return pos1.W == pos2.W;
                 }
             }
         }

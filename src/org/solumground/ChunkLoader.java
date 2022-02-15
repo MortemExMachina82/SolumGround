@@ -1,10 +1,5 @@
 package org.solumground;
 
-import java.io.*;
-import org.lwjgl.opengl.*;
-import static org.lwjgl.glfw.GLFW.*;
-
-
 public class ChunkLoader extends Thread{
     public boolean ShouldClose = false;
 
@@ -20,9 +15,11 @@ public class ChunkLoader extends Thread{
             try{
                 Thread.sleep(1);
             }
-            catch(Exception e){}
+            catch(Exception e){
+                e.printStackTrace();
+            }
             Vec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-            if (Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) == false | Player.ChunkReload) {
+            if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) | Player.ChunkReload) {
                 Player.StandingInChunk = CurentStandingInChunk;
                 loadAroundPlayer(Main.RenderDistance);
                 Player.ChunkReload = false;
@@ -35,7 +32,7 @@ public class ChunkLoader extends Thread{
         for(int R=0;R<RenderDist+1;R++){
             if(ShouldClose){break;}
             Vec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-            if (Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) == false){
+            if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                 Player.StandingInChunk = CurentStandingInChunk;
                 R = 0;
                 Player.ChunkReload = true;
@@ -55,7 +52,7 @@ public class ChunkLoader extends Thread{
             for(int X=(-R);X<R+1;X++){
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) == false){
+                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;
@@ -84,7 +81,7 @@ public class ChunkLoader extends Thread{
             for(int Y=(-RY)+1;Y<RY;Y++){
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) == false){
+                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;
@@ -113,7 +110,7 @@ public class ChunkLoader extends Thread{
             for(int X=(-R);X<R+1;X++) {
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) == false){
+                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;

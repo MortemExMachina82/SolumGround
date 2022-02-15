@@ -1,19 +1,17 @@
 package org.solumground;
 
-import java.io.*;
-import java.math.BigDecimal;
-import java.nio.file.*;
-import javax.imageio.*;
-import java.awt.Image.*;
-import java.awt.image.BufferedImage;
-
-import com.github.cliftonlabs.json_simple.JsonException;
-import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.JsonArray;
+import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 
-import org.lwjgl.opengl.*;
-import static org.lwjgl.glfw.GLFW.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.lwjgl.opengl.GL21.*;
 
 public class Block {
@@ -38,9 +36,10 @@ public class Block {
     public static void Init() {
         File blocks_dir = new File(Main.jar_folder_path+"/assets/solumground/blocks");
         String [] filenames = blocks_dir.list();
+        assert filenames != null;
         Blocks = new Block[filenames.length];
-        for(int X=0;X<filenames.length;X++){
-            Block block = new Block(Main.jar_folder_path+"/assets/solumground/blocks/"+filenames[X]);
+        for (String filename : filenames) {
+            Block block = new Block(Main.jar_folder_path + "/assets/solumground/blocks/" + filename);
             Blocks[block.ID] = block;
             Number++;
         }
@@ -48,41 +47,39 @@ public class Block {
 
         String [] NewTex = new String[Textures.length];
         int NewTexCount = 0;
-        for(int X=0;X<Textures.length;X++){
-            String Tex = Textures[X];
+        for (String Tex : Textures) {
             boolean exists = false;
-            for(int Y=0;Y<NewTexCount;Y++){
-                if(Tex.equals(NewTex[Y])){
+            for (int Y = 0; Y < NewTexCount; Y++) {
+                if (Tex.equals(NewTex[Y])) {
                     exists = true;
                     break;
                 }
             }
-            if(!exists){
+            if (!exists) {
                 NewTex[NewTexCount] = Tex;
                 NewTexCount++;
             }
         }
         Textures = new String[NewTexCount];
-        for(int X=0;X<NewTexCount;X++){
-            Textures[X] = NewTex[X];
-        }
+        System.arraycopy(NewTex, 0, Textures, 0, NewTexCount);
         int FullTexMaxSizeX = 0;
         int FullTexMaxSizeY = 0;
 
 
         BufferedImage img = null;
-        for(int X=0;X<Textures.length;X++){
+        for (String texture : Textures) {
             try {
-                img = ImageIO.read(new File(Textures[X]));
+                img = ImageIO.read(new File(texture));
             } catch (IOException e) {
                 System.out.print("Failed to load Texture: ");
-                System.out.println(Textures[X]);
+                System.out.println(texture);
                 e.printStackTrace();
             }
+            assert img != null;
             int Texture_width = img.getTileWidth();
             int Texture_hight = img.getTileHeight();
             FullTexMaxSizeX += Texture_width;
-            if(Texture_hight > FullTexMaxSizeY){
+            if (Texture_hight > FullTexMaxSizeY) {
                 FullTexMaxSizeY = Texture_hight;
             }
         }
@@ -139,14 +136,14 @@ public class Block {
                     int SizeY = TexSizeY[index];
 
                     for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
-                        float U = mesh.VTcords_array[Z*2 + 0];
+                        float U = mesh.VTcords_array[Z*2];
                         float V = mesh.VTcords_array[Z*2 + 1];
                         U = U * ((float)SizeX/CompTextureSizeX);
                         V = V * ((float)SizeY/CompTextureSizeY);
                         U += ((float)Pos/CompTextureSizeX);
                         //U=0;
                         //V=0;
-                        mesh.VTcords_array[Z*2 + 0] = U;
+                        mesh.VTcords_array[Z*2] = U;
                         mesh.VTcords_array[Z*2 + 1] = V;
                     }
                 }
@@ -186,9 +183,7 @@ public class Block {
                 JsonArray modelarray = (JsonArray)object.get("Model");
                 int OldLength = Textures.length;
                 String [] paths = new String[OldLength+6];
-                for(int X=0;X< Textures.length;X++){
-                    paths[X] = Textures[X];
-                }
+                System.arraycopy(Textures, 0, paths, 0, Textures.length);
 
                 Textures = paths;
                 for (int Y = 0; Y < 6; Y++) {
@@ -196,10 +191,11 @@ public class Block {
                     String Side = (String) sidearray.get(0);
                     String FileName = (String) sidearray.get(1);
                     String TexturePath = (String) sidearray.get(2);
+
                     if(Side.equals("Right")){
                         Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+0] = Texture[0];
+                        Textures[OldLength] = Texture[0];
                     }
 
                     if(Side.equals("Left")){
@@ -234,11 +230,6 @@ public class Block {
                 Sides = new Mesh[1];
                 JsonArray modelarray = (JsonArray)object.get("Model");
                 if(modelarray != null) {
-                    int OldLength = Textures.length;
-                    String [] paths = new String[OldLength+1];
-                    for(int X=0;X< Textures.length;X++){
-                        paths[X] = Textures[X];
-                    }
                     JsonArray sidearray = (JsonArray) modelarray.get(0);
                     String Side = (String) sidearray.get(0);
                     String FileName = (String) sidearray.get(1);
@@ -246,7 +237,7 @@ public class Block {
                     Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
                     if(Side.equals("Model")){
                         Models[0] = FileName;
-                        Textures[OldLength] = Texture[0];
+                        Textures[0] = Texture[0];
                     }
                 }
             }
@@ -255,7 +246,6 @@ public class Block {
             System.out.print("Error While Parseing Block: ");
             System.out.println(File);
             e.printStackTrace();
-            return;
         }
     }
 

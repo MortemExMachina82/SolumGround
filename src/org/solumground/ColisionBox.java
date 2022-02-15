@@ -1,11 +1,6 @@
 package org.solumground;
 
-import java.io.*;
-import org.lwjgl.opengl.*;
 import static org.lwjgl.opengl.GL21.*;
-
-
-
 
 public class ColisionBox{
     Vec3 position;
@@ -44,18 +39,6 @@ public class ColisionBox{
             this.wiremesh.Scale((this.BondPX-this.BondNX)*.501f, (this.BondPY-this.BondNY)*.501f, (this.BondPZ-this.BondNZ)*.501f);
         }
     }
-    public ColisionBox(ColisionBox box, Vec3 position){
-        this.position = position;
-        this.is_player = false;
-        this.wiremesh = box.wiremesh;
-        this.BondPX = box.BondPX;
-        this.BondPY = box.BondPY;
-        this.BondPZ = box.BondPZ;
-        this.BondNX = box.BondNX;
-        this.BondNY = box.BondNY;
-        this.BondNZ = box.BondNZ;
-
-    }
 
     public boolean detect_colision(ColisionBox box){
         boolean fits_X = false;
@@ -77,8 +60,7 @@ public class ColisionBox{
                 fits_Z = true;
             }
         }
-        if(fits_X&&fits_Z&&fits_Y){return true;}
-        else{return false;}
+        return fits_X && fits_Z && fits_Y;
     }
     public void set_Is_player(boolean b){
         this.is_player = b;
@@ -104,26 +86,23 @@ public class ColisionBox{
             ontop = true;
         }
 
-        if(fits_X && fits_Z && ontop){return true;}
-        else{return false;}
+        return fits_X && fits_Z && ontop;
 
     }
 
     public boolean On_Ground(){
-        boolean On_Ground = false;
         Vec3[] VecArray = Get_Near();
 
         ColisionBox box = Main.unit_cube_colisionBox;
-        for (int B = 0; B < VecArray.length; B++) {
-            if (VecArray[B] != null) {
-                box.position = VecArray[B];
-                if(detect_if_ontop(box)){
-                    On_Ground = true;
-                    return On_Ground;
+        for (Vec3 vec3 : VecArray) {
+            if (vec3 != null) {
+                box.position = vec3;
+                if (detect_if_ontop(box)) {
+                    return true;
                 }
             }
         }
-        return On_Ground;
+        return false;
     }
 
     public Vec3[] Get_Near(){
@@ -189,10 +168,10 @@ public class ColisionBox{
         Vec3[] VecArray = Get_Near();
 
         ColisionBox box = Main.unit_cube_colisionBox;
-        for (int B = 0; B < VecArray.length; B++) {
-            if(VecArray[B] != null){
-                box.position = VecArray[B];
-                if(Main.showColisionBox){
+        for (Vec3 vec3 : VecArray) {
+            if (vec3 != null) {
+                box.position = vec3;
+                if (Main.showColisionBox) {
                     box.draw();
                 }
                 if (box != this && box.position != null) {
@@ -266,9 +245,8 @@ public class ColisionBox{
                                 if (A[X] == ZNd) {
                                     this.position.Z = (box.position.Z + box.BondNZ) - this.BondPZ;
                                 }
-                                
-                            }
-                            else{
+
+                            } else {
                                 break;
                             }
                         }

@@ -1,24 +1,15 @@
 package org.solumground;
 
-
-
-import java.io.*;
-import java.nio.*;
-import java.nio.file.*;
-import java.lang.*;
-import java.lang.Math.*;
-import javax.imageio.*;
-import java.awt.Image.*;
-import java.awt.image.BufferedImage;
-
-import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.JsonArray;
+import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 
-import org.lwjgl.*;
-import org.lwjgl.opengl.*;
-
-
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -70,29 +61,29 @@ public class SkyBox {
                 JsonArray modelarray = (JsonArray) object.get("Model");
                 for (int X = 0; X < 6; X++) {
                     JsonArray side = (JsonArray) modelarray.get(X);
-                    if ("Right".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Right".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
-                    if ("Left".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Left".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
-                    if ("Top".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Top".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
-                    if ("Bottom".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Bottom".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
-                    if ("Front".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Front".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
-                    if ("Back".equals((String) side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+(String) side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+(String) side.get(2);
+                    if ("Back".equals(side.get(0))) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
                     }
                 }
             }
@@ -135,6 +126,7 @@ public class SkyBox {
                 System.out.println(TextureNames[X]);
                 e.printStackTrace();
             }
+            assert img != null;
             int Texture_width = img.getTileWidth();
             int Texture_hight = img.getTileHeight();
             FullTexMaxSizeX += Texture_width;
@@ -167,8 +159,8 @@ public class SkyBox {
             img.getRGB(0, 0, Texture_width, Texture_hight, Texture_data, 0, Texture_width);
 
             for (int Y = 0; Y < Texture_hight; Y++) {
-                for (int Z = 0; Z < Texture_width; Z++) {
-                    CompTexture[Y * CompTextureSizeX + (Z + TexOffset)] = Texture_data[Y * Texture_width + Z];
+                if (Texture_width >= 0) {
+                    System.arraycopy(Texture_data, Y * Texture_width, CompTexture, Y * CompTextureSizeX + (TexOffset), Texture_width);
                 }
             }
             TexPos[X] = TexOffset;
@@ -192,12 +184,12 @@ public class SkyBox {
             int SizeY = TexSizeY[Y];
 
             for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
-                float U = mesh.VTcords_array[Z*2 + 0];
+                float U = mesh.VTcords_array[Z*2];
                 float V = mesh.VTcords_array[Z*2 + 1];
                 U = U * ((float)SizeX/CompTextureSizeX);
                 V = V * ((float)SizeY/CompTextureSizeY);
                 U += ((float)Pos/CompTextureSizeX);
-                mesh.VTcords_array[Z*2 + 0] = U;
+                mesh.VTcords_array[Z*2] = U;
                 mesh.VTcords_array[Z*2 + 1] = V;
             }
             skyBoxMesh.add(mesh);

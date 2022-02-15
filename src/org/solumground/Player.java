@@ -24,7 +24,6 @@ public class Player{
     public static int looking_at_X;
     public static int looking_at_Y;
     public static int looking_at_Z;
-    public static int looking_side;
     public static Mesh wireframe;
     public static int hotbar_selected;
     public static ColisionBox colisionBox;
@@ -179,20 +178,16 @@ public class Player{
 
     public static void Move_X(float distance){
         position.X -= (float)Math.cos(YRot*3.1415/180)*distance;
-        position.Y = position.Y;
         position.Z += (float)Math.sin(YRot*3.1415/180)*distance;
         test_if_on_ground();
     }
     public static void Move_Y(float distance){
-        position.X = position.X;
         position.Y -= distance;
-        position.Z = position.Z;
         test_if_on_ground();
 
     }
     public static void Move_Z(float distance){
         position.X -= (float)Math.sin(YRot*3.1415/180)*distance;
-        position.Y = position.Y;
         position.Z -= (float)Math.cos(YRot*3.1415/180)*distance;
         test_if_on_ground();
 
@@ -214,7 +209,7 @@ public class Player{
         float TimeElapsed = Main.TimeElapsed;
         if(TimeElapsed > 0.3f){TimeElapsed = 0.3f;}
         test_if_on_ground();
-        if(is_onGround == false && is_flying == false){
+        if(!is_onGround && !is_flying){
             float time = (float)glfwGetTime() - fall_time;
             if(time > 3f){time = 3f;}
             float dist = (9.8f*time)*TimeElapsed;
@@ -236,7 +231,7 @@ public class Player{
             }
             else{
                 is_jumping = false;
-            };
+            }
         }
         if(position.Y < -100){
             reSpawn();
@@ -245,7 +240,7 @@ public class Player{
     }
     public static void jump(){
         test_if_on_ground();
-        if(is_jumping == false && is_onGround == true) {
+        if(!is_jumping && is_onGround) {
             is_jumping = true;
             jump_time = (float) glfwGetTime();
         }
@@ -293,7 +288,6 @@ public class Player{
         catch(Exception e){
             System.out.println("Error Saving Player.dat");
             e.printStackTrace();
-            return;
         }
 
 

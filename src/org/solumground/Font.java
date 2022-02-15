@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.nio.file.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.JsonArray;
@@ -42,13 +43,11 @@ public class Font {
             JsonObject object = (JsonObject)Jsoner.deserialize(fileContents);
 
             this.name = (String)object.get("name");
-            this.texpath = Main.jar_folder_path+"/"+(String)object.get("texturePath");
+            this.texpath = Main.jar_folder_path+"/"+ object.get("texturePath");
             boolean fixedWidth = (boolean)object.get("fixed-width");
             if(fixedWidth){
                 int width = ((BigDecimal)object.get("widths")).intValue();
-                for(int X=0;X<this.widths.length;X++){
-                    this.widths[X] = width;
-                }
+                Arrays.fill(this.widths, width);
             }
             else{
                 JsonArray array = (JsonArray)object.get("widths");
@@ -84,7 +83,7 @@ public class Font {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-        BufferedImage img = null;
+        BufferedImage img;
         try {
             img = ImageIO.read(new File(this.texpath));
         } catch (IOException e) {

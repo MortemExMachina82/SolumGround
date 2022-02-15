@@ -1,15 +1,11 @@
 package org.solumground;
 
 import java.io.*;
-import java.nio.*;
 import java.nio.file.*;
 
-import com.github.cliftonlabs.json_simple.JsonException;
 import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.JsonArray;
 import com.github.cliftonlabs.json_simple.Jsoner;
 
-import org.lwjgl.*;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
 
@@ -83,17 +79,6 @@ public class Main{
     public static boolean glDeleteBuffers_Ready = false;
     public static int glDeleteBuffers_In1;
 
-
-    public static int GL_GenBuffers(){
-        glGenBuffers_Ready = true;
-        System.out.println(glGenBuffers_Ready);
-        int X = 0;
-        while(Main.glGenBuffers_Ready){
-            System.out.println(Main.glGenBuffers_Ready);
-        }
-        System.out.println(glGenBuffers_Ready);
-        return glGenBuffers_Out;
-    }
 
     public static int Init_shader(){
 
@@ -203,15 +188,11 @@ public class Main{
         if(action == GLFW_PRESS){
             if((mods & 0x0004) > 0) {
                 if (key == GLFW_KEY_F) {
-                    if(FullScreen){FullScreen = false;}
-                    else{FullScreen = true;}
+                    FullScreen = !FullScreen;
                     update_fullscreen();
                 }
                 if(key == GLFW_KEY_S){
-                    if(DrawSkyBox){
-                        DrawSkyBox = false;}
-                    else{
-                        DrawSkyBox = true;}
+                    DrawSkyBox = !DrawSkyBox;
                 }
                 if(key == GLFW_KEY_R){
                     Player.reSpawn();
@@ -242,13 +223,9 @@ public class Main{
     }
     public static void update_fullscreen(){
         if(FullScreen) {
-            //win_X = monitor_W;
-            //win_Y = monitor_H;
             glfwSetWindowMonitor(win, monitor, 0,0, monitor_W,monitor_H, 0);
         }
         else{
-            //win_X = (int)(monitor_W/1.2);
-            //win_Y = (int)(monitor_H/1.2);
             glfwSetWindowMonitor(win, 0, (monitor_W/2)-(win_X/2), (monitor_H/2)-(win_Y/2), win_X, win_Y, 0);
         }
     }
@@ -265,7 +242,7 @@ public class Main{
         try {
             JsonObject object = (JsonObject) Jsoner.deserialize(fileContents);
 
-            SaveFolder = jar_folder_path+"/"+(String)object.get("SaveFolder");
+            SaveFolder = jar_folder_path+"/"+ object.get("SaveFolder");
             FOV = Float.parseFloat((String)object.get("FOV"));
             nearPlane = Float.parseFloat((String)object.get("NearClippingPlane"));
             farPlane = Float.parseFloat((String)object.get("FarClippingPlane"));
@@ -284,13 +261,12 @@ public class Main{
             playerRotateSpeedMouse = Float.parseFloat((String)object.get("playerRotateSpeedMouse"));
             RenderDistance = Integer.parseInt((String)object.get("RenderDistance"));
 
-            FontPath = jar_folder_path+"/"+(String)object.get("Font");
+            FontPath = jar_folder_path+"/"+ object.get("Font");
 
         } catch (Exception e) {
             System.out.print("Error While Parseing Settings: ");
             System.out.println(Path);
             e.printStackTrace();
-            return;
         }
     }
     public static void MakeGLCalls(){
@@ -351,6 +327,7 @@ public class Main{
         monitor = glfwGetPrimaryMonitor();
         //GLFWVidMode.Buffer modes = glfwGetVideoModes(monitor);
         GLFWVidMode mode = glfwGetVideoMode(monitor);
+        assert mode != null;
         monitor_W = mode.width();
         monitor_H = mode.height();
 
@@ -454,7 +431,7 @@ public class Main{
                     }
                 }
             }
-            fpsText.updateText("FPS:"+String.valueOf(Math.round(fps)));
+            fpsText.updateText("FPS:"+ Math.round(fps));
             fpsText.render();
             SelectedBlockText.updateText("Selected Block:"+Block.Blocks[Player.hotbar_selected].Name);
             SelectedBlockText.render();
@@ -468,7 +445,7 @@ public class Main{
         meshBuilder.close();
         System.out.print("Saving...");
         for(int X=0;X<ChunkCount;X++){
-            ChunkArray[X].Unload();
+            ChunkArray[X].Save();
         }
         Player.Save();
         System.out.println("Saved");

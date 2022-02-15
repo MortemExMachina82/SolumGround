@@ -1,9 +1,5 @@
 package org.solumground;
 
-import java.lang.Math.*;
-
-
-
 public class Math3D{
     public static void Matrix44_Multiply(float [] mat1, float [] mat2, float [] mat){
         mat[0] = mat1[0]*mat2[0] + mat1[1]*mat2[4] + mat1[2]*mat2[8] + mat1[3]*mat2[12];
@@ -30,9 +26,9 @@ public class Math3D{
     }
     public static void Make3DRotationMatrix44(float RX, float RY, float RZ, float [] mat){
         //float mat [] = new float[4*4];
-        float mat_x [] = new float[4*4];
-        float mat_y [] = new float[4*4];
-        float mat_z [] = new float[4*4];
+        float [] mat_x = new float[4*4];
+        float [] mat_y = new float[4*4];
+        float [] mat_z = new float[4*4];
 
         mat_x[0] = 1;
         mat_x[5] = (float)Math.cos(RX*3.1415/180);
@@ -56,18 +52,16 @@ public class Math3D{
         mat_z[15] = 1;
 
         Matrix44_Multiply(mat_y, mat_x, mat);
-        for(int X=0;X<16;X++){
-            mat_x[X] = mat[X];
-        }
+        System.arraycopy(mat, 0, mat_x, 0, 16);
         Matrix44_Multiply(mat_x, mat_z, mat);
 
 
     }
     public static Vec3 Vec3X44MatrixMultiply(Vec3 pos, float [] mat){
         Vec3 output = new Vec3(0,0,0);
-        output.X = pos.X*mat[0*4 + 0] + pos.Y*mat[0*4 + 1] + pos.Z*mat[0*4 + 2];
-        output.Y = pos.X*mat[1*4 + 0] + pos.Y*mat[1*4 + 1] + pos.Z*mat[1*4 + 2];
-        output.Z = pos.X*mat[2*4 + 0] + pos.Y*mat[2*4 + 1] + pos.Z*mat[2*4 + 2];
+        output.X = pos.X*mat[4] + pos.Y*mat[1] + pos.Z*mat[2];
+        output.Y = pos.X*mat[4] + pos.Y*mat[5] + pos.Z*mat[6];
+        output.Z = pos.X*mat[8] + pos.Y*mat[9] + pos.Z*mat[10];
 
         return output;
     }

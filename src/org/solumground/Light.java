@@ -1,8 +1,5 @@
 package org.solumground;
 
-import java.io.*;
-import java.lang.Math.*;
-
 class Light{
     public Vec3 position;
     public float Strength;

@@ -1,16 +1,16 @@
 package org.solumground;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.file.*;
-import java.lang.*;
-import java.lang.Math.*;
-import javax.imageio.*;
-import java.awt.Image.*;
-import java.awt.image.BufferedImage;
+import org.lwjgl.opengl.GL;
 
-import org.lwjgl.*;
-import org.lwjgl.opengl.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -26,7 +26,6 @@ public class Mesh{
     int Number_of_vtcords;
     float [] Original_VertexArray;
     float [] VTcords_array;
-    byte [] LightLevel;
     int [] TriFaceArray;
     int [] QuadFaceArray;
     int Texture_width;
@@ -43,7 +42,6 @@ public class Mesh{
 
     enum MeshStatus {
         NotDone,
-        Uploaded,
         Completed
     }
 
@@ -59,12 +57,7 @@ public class Mesh{
             if(b1.get(X) == b2[b2count]){bytestrue++;}
             b2count++;
         }
-        if(bytestrue == (end-start)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return bytestrue == (end - start);
     }
     public static int get_pos(ByteBuffer bb, int curent_pos, byte [] serchfor){
         int count = curent_pos;
@@ -83,7 +76,7 @@ public class Mesh{
     }
 
     public void LoadSMOBJ(String model_Path) {
-        if(model_Path == ""){
+        if(Objects.equals(model_Path, "")){
             this.has_triangles = true;
             this.has_quads = true;
 
@@ -108,7 +101,6 @@ public class Mesh{
         try {
             model_data = Files.readAllBytes(Paths.get(model_Path));
         } catch (Exception e) {
-            model_data = new byte[1];
             e.printStackTrace();
             return;
         }
@@ -129,7 +121,7 @@ public class Mesh{
         byte[] QUADFACES3 = "QUADFACES3{".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         bb.order(ByteOrder.LITTLE_ENDIAN);
         //bb.get(line, 0, 15);
-        if (compareByteArray(bb, 0, 14, smobj) == false) {
+        if (!compareByteArray(bb, 0, 14, smobj)) {
             System.out.println("Failed To Load smobj: wrong data");
             return;
         }
@@ -149,24 +141,12 @@ public class Mesh{
 
         this.Number_of_Verts = bb.getInt(position + 7 + 13 * 3 + 1);
         byte t_or_f = bb.get(position + 7 + 13 * 3 + 17);
-        if (t_or_f == 't') {
-            this.has_tex = true;
-        } else {
-            this.has_tex = false;
-        }
+        this.has_tex = t_or_f == 't';
         this.Number_of_vtcords = bb.getInt(position + 7 + 13 * 3 + 1 + 17 + 17);
         this.Number_of_TriFaces = bb.getInt(position + 7 + 13 * 3 + 1 + 17 + 17 + 22);
         this.Number_of_QuadFaces = bb.getInt(position + 7 + 13 * 3 + 1 + 17 + 17 + 22 + 18);
-        if (this.Number_of_TriFaces != 0) {
-            this.has_triangles = true;
-        } else {
-            this.has_triangles = false;
-        }
-        if (this.Number_of_QuadFaces != 0) {
-            this.has_quads = true;
-        } else {
-            this.has_quads = false;
-        }
+        this.has_triangles = this.Number_of_TriFaces != 0;
+        this.has_quads = this.Number_of_QuadFaces != 0;
 
 
         count = position + 7 + 13 * 3 + 1 + 17 + 17 + 22;
@@ -184,7 +164,7 @@ public class Mesh{
         }
 
         for (int VertC = 0; VertC < this.Number_of_Verts; VertC++) {
-            this.Original_VertexArray[VertC * 3 + 0] = ((float) bb.getShort(position + (VertC * 6) + 0) * MaxX / 32767.0f);
+            this.Original_VertexArray[VertC * 3] = ((float) bb.getShort(position + (VertC * 6)) * MaxX / 32767.0f);
             this.Original_VertexArray[VertC * 3 + 1] = ((float) bb.getShort(position + (VertC * 6) + 2) * MaxY / 32767.0f) * -1;
             this.Original_VertexArray[VertC * 3 + 2] = ((float) bb.getShort(position + (VertC * 6) + 4) * MaxZ / 32767.0f);
         }
@@ -193,7 +173,7 @@ public class Mesh{
         position = get_pos(bb, count, TEXTURECORDS);
 
         for (int VTC = 0; VTC < this.Number_of_vtcords; VTC++) {
-            this.VTcords_array[VTC * 2 + 0] = (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4) + 0))) / 65535.0f;
+            this.VTcords_array[VTC * 2] = (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4)))) / 65535.0f;
             this.VTcords_array[VTC * 2 + 1] = 1 - (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4) + 2))) / 65535.0f;
         }
 
@@ -204,28 +184,26 @@ public class Mesh{
         if (position == -1) {
             position = get_pos(bb, count, TRIANGLEFACES2);
             if (position == -1) {
-                position = get_pos(bb, count, TRIANGLEFACES2);
+                position = get_pos(bb, count, TRIANGLEFACES3);
                 facesize = 3;
             } else {
                 facesize = 2;
             }
-        } else {
-            facesize = 1;
         }
 
         for (int FaceC = 0; FaceC < this.Number_of_TriFaces; FaceC++) {
             if (this.has_tex) {
                 if (facesize == 1) {
-                    this.TriFaceArray[FaceC * 6 + 0] = bb.get(position + (FaceC * facesize * 6) + facesize * 0);
-                    this.TriFaceArray[FaceC * 6 + 1] = bb.get(position + (FaceC * facesize * 6) + facesize * 1);
+                    this.TriFaceArray[FaceC * 6] = bb.get(position + (FaceC * facesize * 6));
+                    this.TriFaceArray[FaceC * 6 + 1] = bb.get(position + (FaceC * facesize * 6) + facesize);
                     this.TriFaceArray[FaceC * 6 + 2] = bb.get(position + (FaceC * facesize * 6) + facesize * 2);
                     this.TriFaceArray[FaceC * 6 + 3] = bb.get(position + (FaceC * facesize * 6) + facesize * 3);
                     this.TriFaceArray[FaceC * 6 + 4] = bb.get(position + (FaceC * facesize * 6) + facesize * 4);
                     this.TriFaceArray[FaceC * 6 + 5] = bb.get(position + (FaceC * facesize * 6) + facesize * 5);
                 }
                 if (facesize == 2) {
-                    this.TriFaceArray[FaceC * 6 + 0] = bb.getShort(position + (FaceC * facesize * 6) + facesize * 0);
-                    this.TriFaceArray[FaceC * 6 + 1] = bb.getShort(position + (FaceC * facesize * 6) + facesize * 1);
+                    this.TriFaceArray[FaceC * 6] = bb.getShort(position + (FaceC * facesize * 6));
+                    this.TriFaceArray[FaceC * 6 + 1] = bb.getShort(position + (FaceC * facesize * 6) + facesize);
                     this.TriFaceArray[FaceC * 6 + 2] = bb.getShort(position + (FaceC * facesize * 6) + facesize * 2);
                     this.TriFaceArray[FaceC * 6 + 3] = bb.getShort(position + (FaceC * facesize * 6) + facesize * 3);
                     this.TriFaceArray[FaceC * 6 + 4] = bb.getShort(position + (FaceC * facesize * 6) + facesize * 4);
@@ -234,13 +212,13 @@ public class Mesh{
 
             } else {
                 if (facesize == 1) {
-                    this.TriFaceArray[FaceC * 3 + 0] = bb.get(position + (FaceC * facesize * 3) + facesize * 0);
-                    this.TriFaceArray[FaceC * 3 + 1] = bb.get(position + (FaceC * facesize * 3) + facesize * 1);
+                    this.TriFaceArray[FaceC * 3] = bb.get(position + (FaceC * facesize * 3));
+                    this.TriFaceArray[FaceC * 3 + 1] = bb.get(position + (FaceC * facesize * 3) + facesize);
                     this.TriFaceArray[FaceC * 3 + 2] = bb.get(position + (FaceC * facesize * 3) + facesize * 2);
                 }
                 if (facesize == 2) {
-                    this.TriFaceArray[FaceC * 3 + 0] = bb.getShort(position + (FaceC * facesize * 3) + facesize * 0);
-                    this.TriFaceArray[FaceC * 3 + 1] = bb.getShort(position + (FaceC * facesize * 3) + facesize * 1);
+                    this.TriFaceArray[FaceC * 3] = bb.getShort(position + (FaceC * facesize * 3));
+                    this.TriFaceArray[FaceC * 3 + 1] = bb.getShort(position + (FaceC * facesize * 3) + facesize);
                     this.TriFaceArray[FaceC * 3 + 2] = bb.getShort(position + (FaceC * facesize * 3) + facesize * 2);
                 }
             }
@@ -260,8 +238,8 @@ public class Mesh{
         for (int FaceC = 0; FaceC < this.Number_of_QuadFaces; FaceC++) {
             if (this.has_tex) {
                 if (facesize == 1) {
-                    this.QuadFaceArray[FaceC * 8 + 0] = bb.get(position + (FaceC * facesize * 8) + facesize * 0);
-                    this.QuadFaceArray[FaceC * 8 + 1] = bb.get(position + (FaceC * facesize * 8) + facesize * 1);
+                    this.QuadFaceArray[FaceC * 8] = bb.get(position + (FaceC * facesize * 8));
+                    this.QuadFaceArray[FaceC * 8 + 1] = bb.get(position + (FaceC * facesize * 8) + facesize);
                     this.QuadFaceArray[FaceC * 8 + 2] = bb.get(position + (FaceC * facesize * 8) + facesize * 2);
                     this.QuadFaceArray[FaceC * 8 + 3] = bb.get(position + (FaceC * facesize * 8) + facesize * 3);
                     this.QuadFaceArray[FaceC * 8 + 4] = bb.get(position + (FaceC * facesize * 8) + facesize * 4);
@@ -270,8 +248,8 @@ public class Mesh{
                     this.QuadFaceArray[FaceC * 8 + 7] = bb.get(position + (FaceC * facesize * 8) + facesize * 7);
                 }
                 if (facesize == 2) {
-                    this.QuadFaceArray[FaceC * 8 + 0] = bb.getShort(position + (FaceC * facesize * 8) + facesize * 0);
-                    this.QuadFaceArray[FaceC * 8 + 1] = bb.getShort(position + (FaceC * facesize * 8) + facesize * 1);
+                    this.QuadFaceArray[FaceC * 8] = bb.getShort(position + (FaceC * facesize * 8));
+                    this.QuadFaceArray[FaceC * 8 + 1] = bb.getShort(position + (FaceC * facesize * 8) + facesize);
                     this.QuadFaceArray[FaceC * 8 + 2] = bb.getShort(position + (FaceC * facesize * 8) + facesize * 2);
                     this.QuadFaceArray[FaceC * 8 + 3] = bb.getShort(position + (FaceC * facesize * 8) + facesize * 3);
                     this.QuadFaceArray[FaceC * 8 + 4] = bb.getShort(position + (FaceC * facesize * 8) + facesize * 4);
@@ -281,14 +259,14 @@ public class Mesh{
                 }
             } else {
                 if (facesize == 1) {
-                    this.QuadFaceArray[FaceC * 4 + 0] = bb.get(position + (FaceC * facesize * 4) + facesize * 0);
-                    this.QuadFaceArray[FaceC * 4 + 1] = bb.get(position + (FaceC * facesize * 4) + facesize * 1);
+                    this.QuadFaceArray[FaceC * 4] = bb.get(position + (FaceC * facesize * 4));
+                    this.QuadFaceArray[FaceC * 4 + 1] = bb.get(position + (FaceC * facesize * 4) + facesize);
                     this.QuadFaceArray[FaceC * 4 + 2] = bb.get(position + (FaceC * facesize * 4) + facesize * 2);
                     this.QuadFaceArray[FaceC * 4 + 3] = bb.get(position + (FaceC * facesize * 4) + facesize * 3);
                 }
                 if (facesize == 2) {
-                    this.QuadFaceArray[FaceC * 4 + 0] = bb.getShort(position + (FaceC * facesize * 4) + facesize * 0);
-                    this.QuadFaceArray[FaceC * 4 + 1] = bb.getShort(position + (FaceC * facesize * 4) + facesize * 1);
+                    this.QuadFaceArray[FaceC * 4] = bb.getShort(position + (FaceC * facesize * 4));
+                    this.QuadFaceArray[FaceC * 4 + 1] = bb.getShort(position + (FaceC * facesize * 4) + facesize);
                     this.QuadFaceArray[FaceC * 4 + 2] = bb.getShort(position + (FaceC * facesize * 4) + facesize * 2);
                     this.QuadFaceArray[FaceC * 4 + 3] = bb.getShort(position + (FaceC * facesize * 4) + facesize * 3);
                 }
@@ -307,7 +285,7 @@ public class Mesh{
 
 
 
-        if(texture_Path != "") {
+        if(!texture_Path.equals("")) {
 
             BufferedImage img = null;
             try {
@@ -317,6 +295,7 @@ public class Mesh{
                 System.out.println(texture_Path);
                 e.printStackTrace();
             }
+            assert img != null;
             this.Texture_width = img.getTileWidth();
             this.Texture_hight = img.getTileHeight();
 
@@ -336,8 +315,7 @@ public class Mesh{
     public Mesh(String model_Path,String texture_Path){
         this.modelPath = model_Path;
         this.texturePath = texture_Path;
-        if(texture_Path == ""){this.has_tex = false;}
-        else{this.has_tex = true;}
+        this.has_tex = !texture_Path.equals("");
 
         Init_VBO();
         LoadSMOBJ(this.modelPath);
@@ -400,12 +378,9 @@ public class Mesh{
         this.has_tex = mesh.has_tex;
         this.has_triangles = mesh.has_triangles;
         this.has_quads = mesh.has_quads;
-
-
         this.Number_of_Verts = mesh.Number_of_Verts;
         this.Number_of_TriFaces = mesh.Number_of_TriFaces;
         this.Number_of_QuadFaces = mesh.Number_of_QuadFaces;
-
         this.Number_of_vtcords = mesh.Number_of_vtcords;
         this.Original_VertexArray = mesh.Original_VertexArray;
         this.VTcords_array = mesh.VTcords_array;
@@ -413,10 +388,10 @@ public class Mesh{
         this.QuadFaceArray = mesh.QuadFaceArray;
         this.Texture_width = mesh.Texture_width;
         this.Texture_hight = mesh.Texture_width;
-
         this.VertexBufferObject = mesh.VertexBufferObject;
         this.Texture_Buffer_Object = mesh.Texture_Buffer_Object;
         this.TBO_gen = false;
+        this.FullLight = mesh.FullLight;
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glEnableVertexAttribArray(Main.shader_vertex_position);
@@ -449,7 +424,9 @@ public class Mesh{
             try {
                 Thread.sleep(75);
             }
-            catch(Exception e1){}
+            catch(Exception e1){
+                e1.printStackTrace();
+            }
             //while(Main.glGenBuffers_Ready){}
             this.VertexBufferObject = Main.glGenBuffers_Out;
             //this.VertexBufferObject = Main.GL_GenBuffers();
@@ -461,7 +438,9 @@ public class Mesh{
             try {
                 Thread.sleep(75);
             }
-            catch(Exception e1){}
+            catch(Exception e1){
+                e1.printStackTrace();
+            }
             //while(Main.glEnableVertexAttribArray_Ready){}
             if (this.has_tex) {
                 Main.glEnableVertexAttribArray_In1 = Main.shader_vtcord_position;
@@ -479,27 +458,19 @@ public class Mesh{
 
         int [] New_TriFaceArray;
         int [] New_QuadFaceArray;
-        int NtexTri;
-        int NtexQuad;
         if(this.has_tex){
             New_TriFaceArray = new int[this.Number_of_TriFaces * 6 + mesh.Number_of_TriFaces * 6];
-            NtexTri = 6;
             New_QuadFaceArray = new int[this.Number_of_QuadFaces * 8 + mesh.Number_of_QuadFaces * 8];
-            NtexQuad = 8;
         }
         else {
             New_TriFaceArray = new int[this.Number_of_TriFaces * 3 + mesh.Number_of_TriFaces * 3];
-            NtexTri = 3;
             New_QuadFaceArray = new int[this.Number_of_QuadFaces * 4 + mesh.Number_of_QuadFaces * 4];
-            NtexQuad = 4;
         }
 
         float [] New_VertexArray = new float[this.Original_VertexArray.length + mesh.Original_VertexArray.length];
-        for(int X=0;X<this.Original_VertexArray.length;X++){
-            New_VertexArray[X] = this.Original_VertexArray[X];
-        }
+        System.arraycopy(this.Original_VertexArray, 0, New_VertexArray, 0, this.Original_VertexArray.length);
         for(int X=0;X<mesh.Original_VertexArray.length/3;X++){
-            New_VertexArray[this.Original_VertexArray.length+ X*3 + 0] = mesh.Original_VertexArray[X*3 + 0] + (mesh.position.X);
+            New_VertexArray[this.Original_VertexArray.length+ X*3] = mesh.Original_VertexArray[X*3] + (mesh.position.X);
             New_VertexArray[this.Original_VertexArray.length+ X*3 + 1] = mesh.Original_VertexArray[X*3 + 1] + (mesh.position.Y);
             New_VertexArray[this.Original_VertexArray.length+ X*3 + 2] = mesh.Original_VertexArray[X*3 + 2] + (mesh.position.Z);
         }
@@ -507,48 +478,36 @@ public class Mesh{
 
 
         float [] New_VTcordsArray = new float[this.VTcords_array.length + mesh.VTcords_array.length];
-        for(int X=0;X<this.VTcords_array.length;X++){
-            New_VTcordsArray[X] = this.VTcords_array[X];
-        }
-        for(int X=0;X<mesh.VTcords_array.length;X++){
-            New_VTcordsArray[this.VTcords_array.length+X] = mesh.VTcords_array[X];
-        }
+        System.arraycopy(this.VTcords_array, 0, New_VTcordsArray, 0, this.VTcords_array.length);
+        System.arraycopy(mesh.VTcords_array, 0, New_VTcordsArray, this.VTcords_array.length, mesh.VTcords_array.length);
         this.VTcords_array = New_VTcordsArray;
 
 
 
 
         if(this.has_tex) {
-            for (int X = 0; X < this.TriFaceArray.length; X++) {
-                New_TriFaceArray[X] = this.TriFaceArray[X];
-            }
+            System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
             for (int X = 0; X < mesh.TriFaceArray.length/2;X++) {
-                New_TriFaceArray[this.TriFaceArray.length + X*2 + 0] = this.Number_of_Verts + mesh.TriFaceArray[X*2 + 0];
+                New_TriFaceArray[this.TriFaceArray.length + X*2] = this.Number_of_Verts + mesh.TriFaceArray[X*2];
                 New_TriFaceArray[this.TriFaceArray.length + X*2 + 1] = this.Number_of_vtcords + mesh.TriFaceArray[X*2 + 1];
             }
             this.TriFaceArray = New_TriFaceArray;
 
-            for(int X=0;X<this.QuadFaceArray.length;X++){
-                New_QuadFaceArray[X] = this.QuadFaceArray[X];
-            }
+            System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
             for(int X=0;X<mesh.QuadFaceArray.length/2;X++){
-                New_QuadFaceArray[this.QuadFaceArray.length+ X*2 + 0] = this.Number_of_Verts + mesh.QuadFaceArray[X*2 + 0];
+                New_QuadFaceArray[this.QuadFaceArray.length+ X*2] = this.Number_of_Verts + mesh.QuadFaceArray[X*2];
                 New_QuadFaceArray[this.QuadFaceArray.length+ X*2 + 1] = this.Number_of_vtcords + mesh.QuadFaceArray[X*2 + 1];
             }
             this.QuadFaceArray = New_QuadFaceArray;
         }
         else{
-            for (int X = 0; X < this.TriFaceArray.length; X++) {
-                New_TriFaceArray[X] = this.TriFaceArray[X];
-            }
+            System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
             for (int X = 0; X < mesh.TriFaceArray.length;X++) {
                 New_TriFaceArray[this.TriFaceArray.length + X] = this.Number_of_Verts + mesh.TriFaceArray[X];
             }
             this.TriFaceArray = New_TriFaceArray;
 
-            for(int X=0;X<this.QuadFaceArray.length;X++){
-                New_QuadFaceArray[X] = this.QuadFaceArray[X];
-            }
+            System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
             for(int X=0;X<mesh.QuadFaceArray.length;X++){
                 New_QuadFaceArray[this.QuadFaceArray.length+ X] = this.Number_of_Verts + mesh.QuadFaceArray[X];
             }
@@ -574,13 +533,13 @@ public class Mesh{
                 for (int V = 0; V < 3; V++) {
                     int VPos = vert_count * 8;
                     if (this.has_tex) {
-                        VertexArray[VPos + 0] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 0];
+                        VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
-                        VertexArray[VPos + 3] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 0];
+                        VertexArray[VPos + 3] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2];
                         VertexArray[VPos + 4] = 1 - this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 1];
                     } else {
-                        VertexArray[VPos + 0] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 0];
+                        VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
                         VertexArray[VPos + 3] = .5f;
@@ -592,7 +551,7 @@ public class Mesh{
                         VertexArray[VPos + 7] = 1.0f;
                     }
                     else {
-                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos + 0]+this.position.X,
+                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
                         VertexArray[VPos + 5] = light.X*light.W;
@@ -609,14 +568,14 @@ public class Mesh{
                 for(int V=0;V<4;V++){
                     int VPos = vert_count * 8;
                     if(this.has_tex){
-                        VertexArray[VPos + 0] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 0];
+                        VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
-                        VertexArray[VPos + 3] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 0];
+                        VertexArray[VPos + 3] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2];
                         VertexArray[VPos + 4] = 1-this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 1];
                     }
                     else{
-                        VertexArray[VPos + 0] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 0];
+                        VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
                         VertexArray[VPos + 3] = .5f;
@@ -628,7 +587,7 @@ public class Mesh{
                         VertexArray[VPos + 7] = 1.0f;
                     }
                     else {
-                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos + 0]+this.position.X,
+                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
                         VertexArray[VPos + 5] = light.X*light.W;
@@ -656,7 +615,9 @@ public class Mesh{
             try {
                 Thread.sleep(100);
             }
-            catch(Exception e1){}
+            catch(Exception e1){
+                e1.printStackTrace();
+            }
             //while(Main.glBufferData_Ready){
                 //System.out.println("hello");
             //}
@@ -672,7 +633,7 @@ public class Mesh{
     }
     public void Scale(float X,float Y,float Z){
         for(int V=0;V<this.Number_of_Verts;V++){
-            this.Original_VertexArray[V*3 + 0] *= X;
+            this.Original_VertexArray[V*3] *= X;
             this.Original_VertexArray[V*3 + 1] *= Y;
             this.Original_VertexArray[V*3 + 2] *= Z;
         }
@@ -688,7 +649,7 @@ public class Mesh{
         upload_Vertex_data();
     }
     public void draw(){
-        if(this.is_skyBox==true){
+        if(this.is_skyBox){
             float [] mat = new float[4*4];
             mat[0]=1;mat[5]=1;mat[10]=1;mat[15]=1;
             glUniformMatrix4fv(Main.shader_translation_position, false, mat);
@@ -759,14 +720,18 @@ public class Mesh{
             try {
                 Thread.sleep(50);
             }
-            catch(Exception e1){}
+            catch(Exception e1){
+                e.printStackTrace();
+            }
             //while(Main.glDeleteBuffers_Ready){}
             Main.glDeleteBuffers_In1 = this.Texture_Buffer_Object;
             Main.glDeleteBuffers_Ready = true;
             try {
                 Thread.sleep(50);
             }
-            catch(Exception e1){}
+            catch(Exception e1){
+                e.printStackTrace();
+            }
             //while(Main.glDeleteBuffers_Ready){}
 
         }

@@ -1,8 +1,5 @@
 package org.solumground;
 
-import java.awt.image.BufferedImage;
-import java.lang.Math.*;
-
 public class Noise {
     public static int Width = 300;
     public static int Hight = 300;
@@ -20,7 +17,7 @@ public class Noise {
             float DB = .5f;
             for(int w=0;w<Width;w++){
                 for(int h=0;h<Hight;h++){
-                    float dist = (mountain_pos[X*2 + 0]*Width-w)*(mountain_pos[X*2 + 0]*Width-w) + (mountain_pos[X*2 + 1]*Hight-h)*(mountain_pos[X*2 + 1]*Hight-h);
+                    float dist = (mountain_pos[X*2]*Width-w)*(mountain_pos[X*2]*Width-w) + (mountain_pos[X*2 + 1]*Hight-h)*(mountain_pos[X*2 + 1]*Hight-h);
                     dist = (float)Math.sqrt(dist)*1/Width;
                     if(dist < DB) {
                         byte fdist = (byte) (int) (127 - dist * (Width / 255.0f));

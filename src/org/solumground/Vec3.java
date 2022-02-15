@@ -20,13 +20,6 @@ public class Vec3 {
         this.Y = pos.Y;
         this.Z = pos.Z;
     }
-    public void print() {
-        System.out.print(this.X);
-        System.out.print("  ");
-        System.out.print(this.Y);
-        System.out.print("  ");
-        System.out.println(this.Z);
-    }
 
     @Override
     public String toString() {
@@ -37,9 +30,7 @@ public class Vec3 {
         if(pos1 == null || pos2 == null){return false;}
         if(pos1.X == pos2.X){
             if(pos1.Y == pos2.Y){
-                if(pos1.Z == pos2.Z){
-                    return true;
-                }
+                return pos1.Z == pos2.Z;
             }
         }
         return false;

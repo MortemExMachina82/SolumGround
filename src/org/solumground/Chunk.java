@@ -1,14 +1,9 @@
 package org.solumground;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.file.*;
-import java.lang.Math.*;
-import java.awt.image.BufferedImage;
-
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.JsonArray;
-import com.github.cliftonlabs.json_simple.Jsoner;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Chunk{
     public static int Size = 10;
@@ -32,7 +27,7 @@ public class Chunk{
         this.position = new Vec3(Xpos * Size, Ypos * Size, Zpos * Size);
         this.chunkPosition = new Vec3(Xpos, Ypos, Zpos);
         this.MegaChunkPosition = convert_to_Megachunk_pos(this.position);
-        this.FilePath = Path + "/world_data_" + Integer.toString((int) this.chunkPosition.X) + "_" + Integer.toString((int) this.chunkPosition.Y) + "_" + Integer.toString((int) this.chunkPosition.Z) + ".dat";
+        this.FilePath = Path + "/world_data_" + (int) this.chunkPosition.X + "_" + (int) this.chunkPosition.Y + "_" + (int) this.chunkPosition.Z + ".dat";
 
 
         this.Exists = true;
@@ -153,55 +148,9 @@ public class Chunk{
         return selected_chunk;
     }
     public static Vec3 convert_to_chunk_pos(Vec3 pos){
-        int X = (int)pos.X;
-        int cX = 0;
-        if(X>0) {
-            while (X >= Size) {
-                X -= Size;
-                cX++;
-            }
-            X = cX;
-        }
-        else{
-            while(X < 0){
-                X += Size;
-                cX--;
-            }
-            X = cX;
-        }
-        int Y = (int)pos.Y;
-        int cY = 0;
-        if(Y>0) {
-            while (Y >= Size) {
-                Y -= Size;
-                cY++;
-            }
-            Y = cY;
-        }
-        else{
-            while(Y <= 0){
-                Y += Size;
-                cY--;
-            }
-            Y = cY;
-        }
-        int Z = (int)pos.Z;
-        int cZ = 0;
-        if(Z>0) {
-            while (Z >= Size) {
-                Z -= Size;
-                cZ++;
-            }
-            Z = cZ;
-        }
-        else{
-            while(Z < 0){
-                Z += Size;
-                cZ--;
-            }
-            Z = cZ;
-        }
-
+        int X = (int)(pos.X)/Size;
+        int Y = (int)(pos.Y)/Size;
+        int Z = (int)(pos.Z)/Size;
 
         return new Vec3(X,Y,Z);
     }
@@ -416,9 +365,7 @@ public class Chunk{
             }
         }
         if(index != -1) {
-            for (int X = index; X < Main.ChunkCount; X++) {
-                Main.ChunkArray[X] = Main.ChunkArray[X + 1];
-            }
+            System.arraycopy(Main.ChunkArray, index + 1, Main.ChunkArray, index, Main.ChunkCount - index);
             Main.ChunkCount--;
         }
         this.blocks = null;
@@ -429,7 +376,7 @@ public class Chunk{
 
     public void Save(){
         if(this.is_empty){
-            //return;
+            return;
         }
 
         try{
@@ -482,8 +429,6 @@ public class Chunk{
 
 
         try{
-            File file = new File(this.FilePath);
-
             FileOutputStream outputStream = new FileOutputStream(this.FilePath);
             outputStream.write(data, 0, datacount);
             outputStream.close();

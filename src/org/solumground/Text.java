@@ -1,11 +1,6 @@
 package org.solumground;
 
-import java.io.*;
-import org.lwjgl.*;
-import org.lwjgl.opengl.*;
-
 import static org.lwjgl.opengl.GL21.*;
-
 
 public class Text {
     public Font font;
@@ -21,49 +16,50 @@ public class Text {
 
         float offset = 0;
         for(int X=0;X<this.text.length;X++){
-            float width = ((this.font.getWidth(this.text[X])/(float)this.font.Texture_width)*128*(float)this.Size);
+            float width = ((this.font.getWidth(this.text[X])/(float)this.font.Texture_width)*128*this.Size);
             float texWidth1 = this.font.getAcumWidth(this.text[X]-1)/(float)this.font.Texture_width;
             float texWidth2 = this.font.getAcumWidth(this.text[X])/(float)this.font.Texture_width;
 
-            this.VertexArray[X*4*9 + 0] = offset;
-            this.VertexArray[X*4*9+ 1] = 0;
-            this.VertexArray[X*4*9 + 2] = 0;
-            this.VertexArray[X*4*9 + 3] = texWidth1;
-            this.VertexArray[X*4*9 + 4] = 1;
-            this.VertexArray[X*4*9 + 5] = 1.0f;
-            this.VertexArray[X*4*9 + 6] = 1.0f;
-            this.VertexArray[X*4*9 + 7] = 1.0f;
-            this.VertexArray[X*4*9 + 8] = 1.0f;
+            int arrayStart = X*4*9;
+            this.VertexArray[arrayStart] = offset;
+            this.VertexArray[arrayStart + 1] = 0;
+            this.VertexArray[arrayStart + 2] = 0;
+            this.VertexArray[arrayStart + 3] = texWidth1;
+            this.VertexArray[arrayStart + 4] = 1;
+            this.VertexArray[arrayStart + 5] = 1.0f;
+            this.VertexArray[arrayStart + 6] = 1.0f;
+            this.VertexArray[arrayStart + 7] = 1.0f;
+            this.VertexArray[arrayStart + 8] = 1.0f;
 
-            this.VertexArray[X*4*9 + 9] = offset;
-            this.VertexArray[X*4*9 + 10] = this.Size;
-            this.VertexArray[X*4*9 + 11] = 0;
-            this.VertexArray[X*4*9 + 12] = texWidth1;
-            this.VertexArray[X*4*9 + 13] = 0;
-            this.VertexArray[X*4*9 + 14] = 1.0f;
-            this.VertexArray[X*4*9 + 15] = 1.0f;
-            this.VertexArray[X*4*9 + 16] = 1.0f;
-            this.VertexArray[X*4*9 + 17] = 1.0f;
+            this.VertexArray[arrayStart + 9] = offset;
+            this.VertexArray[arrayStart + 10] = this.Size;
+            this.VertexArray[arrayStart + 11] = 0;
+            this.VertexArray[arrayStart + 12] = texWidth1;
+            this.VertexArray[arrayStart + 13] = 0;
+            this.VertexArray[arrayStart + 14] = 1.0f;
+            this.VertexArray[arrayStart + 15] = 1.0f;
+            this.VertexArray[arrayStart + 16] = 1.0f;
+            this.VertexArray[arrayStart + 17] = 1.0f;
 
-            this.VertexArray[X*4*9 + 18] = (offset + width);
-            this.VertexArray[X*4*9 + 19] = this.Size;
-            this.VertexArray[X*4*9 + 20] = 0;
-            this.VertexArray[X*4*9 + 21] = texWidth2;
-            this.VertexArray[X*4*9 + 22] = 0;
-            this.VertexArray[X*4*9 + 23] = 1.0f;
-            this.VertexArray[X*4*9 + 24] = 1.0f;
-            this.VertexArray[X*4*9 + 25] = 1.0f;
-            this.VertexArray[X*4*9 + 26] = 1.0f;
+            this.VertexArray[arrayStart + 18] = (offset + width);
+            this.VertexArray[arrayStart + 19] = this.Size;
+            this.VertexArray[arrayStart + 20] = 0;
+            this.VertexArray[arrayStart + 21] = texWidth2;
+            this.VertexArray[arrayStart + 22] = 0;
+            this.VertexArray[arrayStart + 23] = 1.0f;
+            this.VertexArray[arrayStart + 24] = 1.0f;
+            this.VertexArray[arrayStart + 25] = 1.0f;
+            this.VertexArray[arrayStart + 26] = 1.0f;
 
-            this.VertexArray[X*4*9 + 27] = (offset + width);
-            this.VertexArray[X*4*9 + 28] = 0;
-            this.VertexArray[X*4*9 + 29] = 0;
-            this.VertexArray[X*4*9 + 30] = texWidth2;
-            this.VertexArray[X*4*9 + 31] = 1;
-            this.VertexArray[X*4*9 + 32] = 1.0f;
-            this.VertexArray[X*4*9 + 33] = 1.0f;
-            this.VertexArray[X*4*9 + 34] = 1.0f;
-            this.VertexArray[X*4*9 + 35] = 1.0f;
+            this.VertexArray[arrayStart + 27] = (offset + width);
+            this.VertexArray[arrayStart + 28] = 0;
+            this.VertexArray[arrayStart + 29] = 0;
+            this.VertexArray[arrayStart + 30] = texWidth2;
+            this.VertexArray[arrayStart + 31] = 1;
+            this.VertexArray[arrayStart + 32] = 1.0f;
+            this.VertexArray[arrayStart + 33] = 1.0f;
+            this.VertexArray[arrayStart + 34] = 1.0f;
+            this.VertexArray[arrayStart + 35] = 1.0f;
 
             offset += width;
         }
@@ -76,6 +72,7 @@ public class Text {
 
     public Text(String newtext, Font font, float Size, Vec3 pos){
         this.text = newtext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        this.SText = newtext;
         this.font = font;
         this.Size = Size*2;
         this.position = pos;
@@ -85,9 +82,10 @@ public class Text {
         BuildAndUploadVertexData();
     }
     public void updateText(String newText){
-        if(this.text.equals(newText)){
+        if(this.SText.equals(newText)){
             return;
         }
+        this.SText = newText;
         byte [] newTextByte = newText.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         if(newTextByte == this.text){
             return;
