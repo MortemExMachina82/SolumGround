@@ -26,6 +26,16 @@ public class ChunkLoader extends Thread{
             }
         }
     }
+    public void makeChunk(Vec3 pos){
+        Chunk chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
+        if(MeshBuilder.bufferCount == MeshBuilder.bufferSize){
+            chunk.buildMesh();
+        }
+        else {
+            MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
+            MeshBuilder.bufferCount++;
+        }
+    }
     public void loadAroundPlayer(int RenderDist){
         Vec3 pos;
         Chunk chunk;
@@ -41,9 +51,7 @@ public class ChunkLoader extends Thread{
                 pos = new Vec3(Player.StandingInChunk);
                 chunk = Chunk.FromChunkPos(pos);
                 if(chunk == null) {
-                    chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-                    MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                    MeshBuilder.bufferCount++;
+                    makeChunk(pos);
                 }
                 continue;
             }
@@ -65,16 +73,12 @@ public class ChunkLoader extends Thread{
                     pos.Z += Z;
                     chunk = Chunk.FromChunkPos(pos);
                     if(chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                     pos.Y -= RY+RY;
                     chunk = Chunk.FromChunkPos(pos);
                     if(chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                 }
             }
@@ -94,16 +98,12 @@ public class ChunkLoader extends Thread{
                     pos.Z += Z;
                     chunk = Chunk.FromChunkPos(pos);
                     if(chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                     pos.X -= R+R;
                     chunk = Chunk.FromChunkPos(pos);
                     if(chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                 }
             }
@@ -123,16 +123,12 @@ public class ChunkLoader extends Thread{
                     pos.Z += R;
                     chunk = Chunk.FromChunkPos(pos);
                     if (chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int) pos.X, (int) pos.Y, (int) pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                     pos.Z -= R+R;
                     chunk = Chunk.FromChunkPos(pos);
                     if (chunk == null) {
-                        chunk = new Chunk(Main.SaveFolder, (int) pos.X, (int) pos.Y, (int) pos.Z);
-                        MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-                        MeshBuilder.bufferCount++;
+                        makeChunk(pos);
                     }
                 }
             }

@@ -1,7 +1,8 @@
 package org.solumground;
 
 class MeshBuilder extends Thread{
-    public static Chunk [] buffer = new Chunk[1000];
+    public static int bufferSize = 1000;
+    public static Chunk [] buffer = new Chunk[bufferSize];
     public static int bufferCount = 0;
 
     public boolean shouldClose = false;
