@@ -493,62 +493,68 @@ public class Mesh{
     }
     public void add(Mesh mesh){
 
-        int [] New_TriFaceArray;
-        int [] New_QuadFaceArray;
-        if(this.has_tex){
-            New_TriFaceArray = new int[this.Number_of_TriFaces * 6 + mesh.Number_of_TriFaces * 6];
-            New_QuadFaceArray = new int[this.Number_of_QuadFaces * 8 + mesh.Number_of_QuadFaces * 8];
+        if(this.Number_of_Verts*3 + mesh.Number_of_Verts*3 > this.Original_VertexArray.length){
+            float [] New_VertexArray = new float[(this.Original_VertexArray.length + mesh.Original_VertexArray.length)*2];
+            System.arraycopy(this.Original_VertexArray, 0, New_VertexArray, 0, this.Original_VertexArray.length);
+            this.Original_VertexArray = New_VertexArray;
         }
-        else {
-            New_TriFaceArray = new int[this.Number_of_TriFaces * 3 + mesh.Number_of_TriFaces * 3];
-            New_QuadFaceArray = new int[this.Number_of_QuadFaces * 4 + mesh.Number_of_QuadFaces * 4];
+        if(this.Number_of_vtcords*2 + mesh.Number_of_vtcords*2 > this.VTcords_array.length){
+            float [] New_VTcordsArray = new float[(this.VTcords_array.length + mesh.VTcords_array.length)*2];
+            System.arraycopy(this.VTcords_array, 0, New_VTcordsArray, 0, this.VTcords_array.length);
+            this.VTcords_array = New_VTcordsArray;
         }
-
-        float [] New_VertexArray = new float[this.Original_VertexArray.length + mesh.Original_VertexArray.length];
-        System.arraycopy(this.Original_VertexArray, 0, New_VertexArray, 0, this.Original_VertexArray.length);
-        for(int X=0;X<mesh.Original_VertexArray.length/3;X++){
-            New_VertexArray[this.Original_VertexArray.length+ X*3] = mesh.Original_VertexArray[X*3] + (mesh.position.X);
-            New_VertexArray[this.Original_VertexArray.length+ X*3 + 1] = mesh.Original_VertexArray[X*3 + 1] + (mesh.position.Y);
-            New_VertexArray[this.Original_VertexArray.length+ X*3 + 2] = mesh.Original_VertexArray[X*3 + 2] + (mesh.position.Z);
-        }
-        this.Original_VertexArray = New_VertexArray;
-
-
-        float [] New_VTcordsArray = new float[this.VTcords_array.length + mesh.VTcords_array.length];
-        System.arraycopy(this.VTcords_array, 0, New_VTcordsArray, 0, this.VTcords_array.length);
-        System.arraycopy(mesh.VTcords_array, 0, New_VTcordsArray, this.VTcords_array.length, mesh.VTcords_array.length);
-        this.VTcords_array = New_VTcordsArray;
-
-
-
-
         if(this.has_tex) {
-            System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
-            for (int X = 0; X < mesh.TriFaceArray.length/2;X++) {
-                New_TriFaceArray[this.TriFaceArray.length + X*2] = this.Number_of_Verts + mesh.TriFaceArray[X*2];
-                New_TriFaceArray[this.TriFaceArray.length + X*2 + 1] = this.Number_of_vtcords + mesh.TriFaceArray[X*2 + 1];
+            if (this.Number_of_TriFaces * 6 + mesh.Number_of_TriFaces * 6 > this.TriFaceArray.length) {
+                int [] New_TriFaceArray = new int[(this.TriFaceArray.length + mesh.TriFaceArray.length)*2];
+                System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
+                this.TriFaceArray = New_TriFaceArray;
             }
-            this.TriFaceArray = New_TriFaceArray;
-
-            System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
-            for(int X=0;X<mesh.QuadFaceArray.length/2;X++){
-                New_QuadFaceArray[this.QuadFaceArray.length+ X*2] = this.Number_of_Verts + mesh.QuadFaceArray[X*2];
-                New_QuadFaceArray[this.QuadFaceArray.length+ X*2 + 1] = this.Number_of_vtcords + mesh.QuadFaceArray[X*2 + 1];
+            if(this.Number_of_QuadFaces * 8 + mesh.Number_of_QuadFaces * 8 > this.QuadFaceArray.length){
+                int [] New_QuadFaceArray = new int[(this.QuadFaceArray.length + mesh.QuadFaceArray.length)*2];
+                System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
+                this.QuadFaceArray = New_QuadFaceArray;
             }
-            this.QuadFaceArray = New_QuadFaceArray;
         }
         else{
-            System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
-            for (int X = 0; X < mesh.TriFaceArray.length;X++) {
-                New_TriFaceArray[this.TriFaceArray.length + X] = this.Number_of_Verts + mesh.TriFaceArray[X];
+            if(this.Number_of_TriFaces * 3 + mesh.Number_of_TriFaces * 3 > this.TriFaceArray.length){
+                int [] New_TriFaceArray = new int[(this.TriFaceArray.length + mesh.TriFaceArray.length)*2];
+                System.arraycopy(this.TriFaceArray, 0, New_TriFaceArray, 0, this.TriFaceArray.length);
+                this.TriFaceArray = New_TriFaceArray;
             }
-            this.TriFaceArray = New_TriFaceArray;
+            if(this.Number_of_QuadFaces * 4 + mesh.Number_of_QuadFaces * 4 > this.QuadFaceArray.length){
+                int [] New_QuadFaceArray = new int[(this.QuadFaceArray.length + mesh.QuadFaceArray.length)*2];
+                System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
+                this.QuadFaceArray = New_QuadFaceArray;
+            }
+        }
 
-            System.arraycopy(this.QuadFaceArray, 0, New_QuadFaceArray, 0, this.QuadFaceArray.length);
-            for(int X=0;X<mesh.QuadFaceArray.length;X++){
-                New_QuadFaceArray[this.QuadFaceArray.length+ X] = this.Number_of_Verts + mesh.QuadFaceArray[X];
+
+        for(int X=0;X<mesh.Number_of_Verts;X++){
+            this.Original_VertexArray[this.Number_of_Verts*3 + X*3] = mesh.Original_VertexArray[X*3] + (mesh.position.X);
+            this.Original_VertexArray[this.Number_of_Verts*3 + X*3 + 1] = mesh.Original_VertexArray[X*3 + 1] + (mesh.position.Y);
+            this.Original_VertexArray[this.Number_of_Verts*3 + X*3 + 2] = mesh.Original_VertexArray[X*3 + 2] + (mesh.position.Z);
+        }
+        System.arraycopy(mesh.VTcords_array, 0, this.VTcords_array, this.Number_of_vtcords*2, mesh.VTcords_array.length);
+
+        if(this.has_tex) {
+            for (int X = 0; X < mesh.Number_of_TriFaces*3;X++) {
+                this.TriFaceArray[this.Number_of_TriFaces*6 + X*2] = this.Number_of_Verts + mesh.TriFaceArray[X*2];
+                this.TriFaceArray[this.Number_of_TriFaces*6 + X*2 + 1] = this.Number_of_vtcords + mesh.TriFaceArray[X*2 + 1];
             }
-            this.QuadFaceArray = New_QuadFaceArray;
+            for(int X=0;X<mesh.Number_of_QuadFaces*4;X++){
+                this.QuadFaceArray[this.Number_of_QuadFaces*8 + X*2] = this.Number_of_Verts + mesh.QuadFaceArray[X*2];
+                this.QuadFaceArray[this.Number_of_QuadFaces*8 + X*2 + 1] = this.Number_of_vtcords + mesh.QuadFaceArray[X*2 + 1];
+            }
+        }
+        else{
+            for (int X = 0; X < mesh.Number_of_TriFaces*3;X++) {
+                this.TriFaceArray[this.Number_of_TriFaces*3 + X*2] = this.Number_of_Verts + mesh.TriFaceArray[X*2];
+                this.TriFaceArray[this.Number_of_TriFaces*3 + X*2 + 1] = this.Number_of_vtcords + mesh.TriFaceArray[X*2 + 1];
+            }
+            for(int X=0;X<mesh.Number_of_QuadFaces*4;X++){
+                this.QuadFaceArray[this.Number_of_QuadFaces*4 + X*2] = this.Number_of_Verts + mesh.QuadFaceArray[X*2];
+                this.QuadFaceArray[this.Number_of_QuadFaces*4 + X*2 + 1] = this.Number_of_vtcords + mesh.QuadFaceArray[X*2 + 1];
+            }
         }
 
 
@@ -556,9 +562,6 @@ public class Mesh{
         this.Number_of_vtcords += mesh.Number_of_vtcords;
         this.Number_of_TriFaces += mesh.Number_of_TriFaces;
         this.Number_of_QuadFaces += mesh.Number_of_QuadFaces;
-
-        //upload_Vertex_data();
-
     }
     public void upload_Vertex_data(){
         float [] VertexArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
