@@ -64,19 +64,25 @@ public class Main{
 
     public static ColisionBox unit_cube_colisionBox;
 
-    public static boolean glGenBuffers_Ready = false;
+    enum GLStatus{
+        Ready,
+        Working,
+        Done
+    }
+
+    public static GLStatus glGenBuffersStatus = GLStatus.Done;
     public static int glGenBuffers_Out;
     public static int glBindBuffer_In1;
     public static int glBindBuffer_In2;
-    public static boolean glEnableVertexAttribArray_Ready = false;
+    public static GLStatus glEnableVertexAttribArrayStatus = GLStatus.Done;
     public static int glEnableVertexAttribArray_In1;
-    public static boolean glDisableVertexAttribArray_Ready = false;
+    public static GLStatus glDisableVertexAttribArrayStatus = GLStatus.Done;
     public static int glDisableVertexAttribArray_In1;
-    public static boolean glBufferData_Ready = false;
+    public static GLStatus glBufferDataStatus = GLStatus.Done;
     public static int glBufferData_In1;
     public static float [] glBufferData_In2;
     public static int glBufferData_In3;
-    public static boolean glDeleteBuffers_Ready = false;
+    public static GLStatus glDeleteBuffersStatus = GLStatus.Done;
     public static int glDeleteBuffers_In1;
 
 
@@ -270,29 +276,33 @@ public class Main{
         }
     }
     public static void MakeGLCalls(){
-        if(glGenBuffers_Ready){
+        if(glGenBuffersStatus == GLStatus.Ready){
+            glGenBuffersStatus = GLStatus.Working;
             glGenBuffers_Out = glGenBuffers();
-            Main.glGenBuffers_Ready = false;
-            //System.out.println(glGenBuffers_Ready);
+            glGenBuffersStatus = GLStatus.Done;
         }
-        if(glEnableVertexAttribArray_Ready){
+        if(glEnableVertexAttribArrayStatus == GLStatus.Ready){
+            glEnableVertexAttribArrayStatus = GLStatus.Working;
             glBindBuffer(glBindBuffer_In1, glBindBuffer_In2);
             glEnableVertexAttribArray(glEnableVertexAttribArray_In1);
-            glEnableVertexAttribArray_Ready = false;
+            glEnableVertexAttribArrayStatus = GLStatus.Done;
         }
-        if(glDisableVertexAttribArray_Ready){
+        if(glDisableVertexAttribArrayStatus == GLStatus.Ready){
+            glDisableVertexAttribArrayStatus = GLStatus.Working;
             glBindBuffer(glBindBuffer_In1, glBindBuffer_In2);
             glDisableVertexAttribArray(glDisableVertexAttribArray_In1);
-            glDisableVertexAttribArray_Ready = false;
+            glDisableVertexAttribArrayStatus = GLStatus.Done;
         }
-        if(glBufferData_Ready){
+        if(glBufferDataStatus == GLStatus.Ready){
+            glBufferDataStatus = GLStatus.Working;
             glBindBuffer(glBindBuffer_In1, glBindBuffer_In2);
             glBufferData(glBufferData_In1, glBufferData_In2, glBufferData_In3);
-            glBufferData_Ready = false;
+            glBufferDataStatus = GLStatus.Done;
         }
-        if(glDeleteBuffers_Ready){
+        if(glDeleteBuffersStatus == GLStatus.Ready){
+            glDeleteBuffersStatus = GLStatus.Working;
             glDeleteBuffers(glDeleteBuffers_In1);
-            glDeleteBuffers_Ready = false;
+            glDeleteBuffersStatus = GLStatus.Done;
         }
     }
 

@@ -420,35 +420,72 @@ public class Mesh{
             }
         }
         else{
-            Main.glGenBuffers_Ready = true;
-            try {
-                Thread.sleep(75);
+            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
             }
-            catch(Exception e1){
-                e1.printStackTrace();
+            Main.glGenBuffersStatus = Main.GLStatus.Ready;
+            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
             }
-            //while(Main.glGenBuffers_Ready){}
             this.VertexBufferObject = Main.glGenBuffers_Out;
-            //this.VertexBufferObject = Main.GL_GenBuffers();
+
+
+            while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
             Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
             Main.glBindBuffer_In2 = this.VertexBufferObject;
-
             Main.glEnableVertexAttribArray_In1 = Main.shader_vertex_position;
-            Main.glEnableVertexAttribArray_Ready = true;
-            try {
-                Thread.sleep(75);
-            }
-            catch(Exception e1){
-                e1.printStackTrace();
-            }
-            //while(Main.glEnableVertexAttribArray_Ready){}
+            Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
+
+
             if (this.has_tex) {
+                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                    try {
+                        Thread.sleep(1);
+                    }
+                    catch(Exception e1){
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+                Main.glBindBuffer_In2 = this.VertexBufferObject;
                 Main.glEnableVertexAttribArray_In1 = Main.shader_vtcord_position;
-                Main.glEnableVertexAttribArray_Ready = true;
+                Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
             else{
+                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                    try {
+                        Thread.sleep(1);
+                    }
+                    catch(Exception e1){
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+                Main.glBindBuffer_In2 = this.VertexBufferObject;
                 Main.glDisableVertexAttribArray_In1 = Main.shader_vtcord_position;
-                Main.glDisableVertexAttribArray_Ready = true;
+                Main.glDisableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
 
 
@@ -604,24 +641,32 @@ public class Mesh{
             glBufferData(GL_ARRAY_BUFFER, VertexArray, GL_STATIC_DRAW);
         }
         else{
+
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
             Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
             Main.glBindBuffer_In2 = this.VertexBufferObject;
 
             Main.glBufferData_In1 = GL_ARRAY_BUFFER;
             Main.glBufferData_In2 = VertexArray;
             Main.glBufferData_In3 = GL_STATIC_DRAW;
-            Main.glBufferData_Ready = true;
-
-            try {
-                Thread.sleep(100);
+            Main.glBufferDataStatus = Main.GLStatus.Ready;
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
             }
-            catch(Exception e1){
-                e1.printStackTrace();
-            }
-            //while(Main.glBufferData_Ready){
-                //System.out.println("hello");
-            //}
-
         }
         status = MeshStatus.Completed;
     }
@@ -707,33 +752,36 @@ public class Mesh{
         //upload_Vertex_data();
 
 
-        try {
-            GL.getCapabilities();
+        if(Thread.currentThread().getName().equals("main")){
             glDeleteBuffers(this.VertexBufferObject);
             if (TBO_gen) {
                 glDeleteBuffers(this.Texture_Buffer_Object);
             }
         }
-        catch(Exception e){
+        else{
+            while(Main.glDeleteBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
             Main.glDeleteBuffers_In1 = this.VertexBufferObject;
-            Main.glDeleteBuffers_Ready = true;
-            try {
-                Thread.sleep(50);
+            Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
+            if (TBO_gen) {
+                while (Main.glDeleteBuffersStatus != Main.GLStatus.Done) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glDeleteBuffers_In1 = this.Texture_Buffer_Object;
+                Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
             }
-            catch(Exception e1){
-                e.printStackTrace();
-            }
-            //while(Main.glDeleteBuffers_Ready){}
-            Main.glDeleteBuffers_In1 = this.Texture_Buffer_Object;
-            Main.glDeleteBuffers_Ready = true;
-            try {
-                Thread.sleep(50);
-            }
-            catch(Exception e1){
-                e.printStackTrace();
-            }
-            //while(Main.glDeleteBuffers_Ready){}
-
         }
 
     }
