@@ -87,12 +87,12 @@ public class Chunk{
     }
     public void buildMesh(){
         if(this.is_empty){
+            System.out.println("Tried to build empty chunk at "+chunkPosition);
             blocks = null;
             return;
         }
         main_mesh = new Mesh(Block.TextureBufferObject);
         main_mesh.position = new Vec3(this.position);
-
 
         for(int Y=0;Y<Size;Y++){
             for(int X=0;X<Size;X++){
@@ -104,6 +104,9 @@ public class Chunk{
                 }
             }
         }
+
+        System.out.println("Building chunk "+this.chunkPosition);
+
         main_mesh.upload_Vertex_data();
     }
     public static Chunk FromPos(Vec3 pos){
@@ -302,20 +305,20 @@ public class Chunk{
         main_mesh.upload_Vertex_data();
 
     }
+
+    public boolean validCoord(int X, int Y, int Z) {
+        return (X >= 0 && X < Size) && (Y >= 0 && Y < Size) && (Z >= 0 && Z < Size);
+    }
+
     public int Get(int X,int Y,int Z){
-        if(X >= 0 && X < Size){
-            if(Y >= 0 && Y < Size){
-                if(Z >= 0 && Z < Size){
-                    return blocks[Y*Size*Size + X*Size + Z];
-                }
-                else{return 0;}
-            }
-            else{return 0;}
+        if(validCoord(X,Y,Z)){
+            return blocks[Y*Size*Size + X*Size + Z];
         }
-        else{return 0;}
+        return 0;
     }
 
     public void GenChunk(){
+        System.out.println("Generating chunk "+this.chunkPosition);
         for (int X = 0; X < Size;X++) {
             for (int Z = 0; Z < Size; Z++) {
                 int h;
@@ -396,7 +399,7 @@ public class Chunk{
                     byte curentblock = blocks[X];
                     int start = X;
                     int end = X;
-                    for(int Y=X;Y<blocks.length-3;Y++){
+                    for(int Y=X;Y<blocks.length-3;Y++){ // this is odd -Y
                         if(blocks[Y] == curentblock){
                             end++;
                         }

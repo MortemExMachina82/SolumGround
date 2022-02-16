@@ -12,10 +12,7 @@ import org.lwjgl.opengl.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL21.*;
 
-
-
-
-public class Main{
+public class Main {
     public static String jar_folder_path;
     public static String SaveFolder;
     public static String FontPath;
@@ -36,7 +33,7 @@ public class Main{
     public static float fps;
     public static int RenderDistance;
 
-    public static boolean showColisionBox = false;
+    public static boolean showCollisionBox = false;
     public static boolean DrawSkyBox;
 
     public static int shaderProgram;
@@ -62,7 +59,7 @@ public class Main{
     public static int ChunkCount = 0;
     public static Chunk [] ChunkArray = new Chunk[MaxChunks];
 
-    public static ColisionBox unit_cube_colisionBox;
+    public static CollisionBox unit_cube_collisionBox;
 
     enum GLStatus{
         Ready,
@@ -199,6 +196,9 @@ public class Main{
                 }
                 if(key == GLFW_KEY_S){
                     DrawSkyBox = !DrawSkyBox;
+                }
+                if(key == GLFW_KEY_K) {
+                    Player.is_flying = !Player.is_flying;
                 }
                 if(key == GLFW_KEY_R){
                     Player.reSpawn();
@@ -372,7 +372,7 @@ public class Main{
         new Light(new Vec3(15,25,-15), 1f, .5f,.5f,2f);
 
 
-        unit_cube_colisionBox = new ColisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
+        unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
         ChunkLoader chunkLoader = new ChunkLoader();
         chunkLoader.loadAroundPlayer(3);
@@ -428,11 +428,11 @@ public class Main{
                 Player.applyGravity();
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            if(!showColisionBox){Player.update();}
+            if(!showCollisionBox){Player.update();}
             if(DrawSkyBox) {
                 SkyBox.draw();
             }
-            if(showColisionBox){Player.update();}
+            if(showCollisionBox){Player.update();}
             Player.Draw();
             for(int X=0;X<ChunkCount;X++){
                 if(ChunkArray[X] != null) {

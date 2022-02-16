@@ -28,13 +28,7 @@ public class ChunkLoader extends Thread{
     }
     public void makeChunk(Vec3 pos){
         Chunk chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
-        if(MeshBuilder.bufferCount == MeshBuilder.bufferSize){
-            chunk.buildMesh();
-        }
-        else {
-            MeshBuilder.buffer[MeshBuilder.bufferCount] = chunk;
-            MeshBuilder.bufferCount++;
-        }
+        MeshBuilder.buffer.add(chunk);
     }
     public void loadAroundPlayer(int RenderDist){
         Vec3 pos;

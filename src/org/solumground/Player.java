@@ -15,7 +15,7 @@ public class Player{
     public static float YRot;
     public static float ZRot;
     public static float [] RotationMatrix;
-    public static boolean is_onGround;
+    public static boolean isOnGround() {return collisionBox.On_Ground();}
     public static boolean is_flying;
     public static boolean is_jumping;
     public static float fall_time;
@@ -26,7 +26,7 @@ public class Player{
     public static int looking_at_Z;
     public static Mesh wireframe;
     public static int hotbar_selected;
-    public static ColisionBox colisionBox;
+    public static CollisionBox collisionBox;
     public static Chunk[] chunks = new Chunk[11];
     public static boolean ChunkReload = false;
 
@@ -76,13 +76,12 @@ public class Player{
             }
         }
 
-        colisionBox = new ColisionBox(position, .33f,.1f,.33f, -.33f,-1.8f,-.33f);
-        colisionBox.set_Is_player(true);
+        collisionBox = new CollisionBox(position, .33f,.1f,.33f, -.33f,-1.8f,-.33f);
+        collisionBox.set_Is_player(true);
 
         RotationMatrix = new float[4*4];
         Math3D.Make3DRotationMatrix44(XRot, YRot, ZRot, RotationMatrix);
 
-        is_onGround = false;
         is_jumping = false;
         is_flying = false;
 
@@ -114,7 +113,7 @@ public class Player{
         Math3D.Make3DRotationMatrix44(XRot, YRot, ZRot, RotationMatrix);
         glUniformMatrix4fv(Main.shader_rotation_g_position, false, RotationMatrix);
 
-        colisionBox.active_update();
+        collisionBox.active_update();
 
         for(int Z=0;Z>-6;Z--){
             Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMatrix);
@@ -147,8 +146,8 @@ public class Player{
         wireframe.position.X = looking_at_X;
         wireframe.position.Y = looking_at_Y;
         wireframe.position.Z = looking_at_Z;
-
     }
+
     public static void place_block(){
         Vec3 pos = new Vec3(looking_at_X,looking_at_Y,looking_at_Z);
         Chunk selected_chunk = Chunk.FromPos(pos);
@@ -160,16 +159,15 @@ public class Player{
 
 
     }
+
     public static void break_block(){
         Vec3 pos = new Vec3(looking_at_X,looking_at_Y,looking_at_Z);
         Chunk selected_chunk = Chunk.FromPos(pos);
         if(selected_chunk != null){
             selected_chunk.Delete(pos);
         }
-
-
-
     }
+
     public static void move_hotbar(int dist){
         hotbar_selected += dist;
         while(hotbar_selected > 1){hotbar_selected -= Block.Number;}
@@ -179,18 +177,13 @@ public class Player{
     public static void Move_X(float distance){
         position.X -= (float)Math.cos(YRot*3.1415/180)*distance;
         position.Z += (float)Math.sin(YRot*3.1415/180)*distance;
-        test_if_on_ground();
     }
     public static void Move_Y(float distance){
         position.Y -= distance;
-        test_if_on_ground();
-
     }
     public static void Move_Z(float distance){
         position.X -= (float)Math.sin(YRot*3.1415/180)*distance;
         position.Z -= (float)Math.cos(YRot*3.1415/180)*distance;
-        test_if_on_ground();
-
     }
 
     public static void Rotate_Y(float distance){
@@ -208,8 +201,7 @@ public class Player{
     public static void applyGravity(){
         float TimeElapsed = Main.TimeElapsed;
         if(TimeElapsed > 0.3f){TimeElapsed = 0.3f;}
-        test_if_on_ground();
-        if(!is_onGround && !is_flying){
+        if(!isOnGround() && !is_flying){
             float time = (float)glfwGetTime() - fall_time;
             if(time > 3f){time = 3f;}
             float dist = (9.8f*time)*TimeElapsed;
@@ -239,14 +231,10 @@ public class Player{
 
     }
     public static void jump(){
-        test_if_on_ground();
-        if(!is_jumping && is_onGround) {
+        if(!is_jumping && isOnGround()) {
             is_jumping = true;
             jump_time = (float) glfwGetTime();
         }
-    }
-    public static void test_if_on_ground(){
-        is_onGround = colisionBox.On_Ground();
     }
     public static void reSpawn(){
         fall_time = (float)glfwGetTime();
@@ -256,13 +244,12 @@ public class Player{
         XRot = 0;
         YRot = 0;
         ZRot = 0;
-        test_if_on_ground();
         update();
     }
     public static void Draw(){
         wireframe.draw();
-        if(Main.showColisionBox) {
-            colisionBox.draw();
+        if(Main.showCollisionBox) {
+            collisionBox.draw();
         }
     }
 

@@ -1,32 +1,28 @@
 package org.solumground;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class MeshBuilder extends Thread{
-    public static int bufferSize = 1000;
-    public static Chunk [] buffer = new Chunk[bufferSize];
-    public static int bufferCount = 0;
+    public static List<Chunk> buffer = new ArrayList<>(1000);
 
     public boolean shouldClose = false;
     public void close(){
-        shouldClose = false;
+        shouldClose = true;
     }
     public void Build(){
-        while(bufferCount > 0){
-            int NMC = bufferCount;
-            Chunk chunk = buffer[NMC-1];
-            if(chunk != null){
-                chunk.buildMesh();
-            }
-            buffer[NMC-1] = null;
-            if(bufferCount == NMC){
-                bufferCount--;
-            }
+        while(buffer.size() > 0) {
+            //System.out.println("Current build queue: " + buffer.size());
+            buffer.get(0).buildMesh();
+            buffer.remove(0);
         }
     }
     public void run(){
         System.out.println("Starting Mesh Builder");
         while(!shouldClose){
+
             try{
-                Thread.sleep(10);
+                Thread.sleep(1);
             }
             catch(Exception e){
                 e.printStackTrace();

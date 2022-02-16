@@ -2,7 +2,7 @@ package org.solumground;
 
 import static org.lwjgl.opengl.GL21.*;
 
-public class ColisionBox{
+public class CollisionBox {
     Vec3 position;
 
     float BondPX;
@@ -18,10 +18,7 @@ public class ColisionBox{
     
     public Chunk[] chunks = new Chunk[27];
 
-    
-
-
-    public ColisionBox(Vec3 position,  float BPX,float BPY,float BPZ,   float BNX,float BNY,float BNZ){
+    public CollisionBox(Vec3 position, float BPX, float BPY, float BPZ, float BNX, float BNY, float BNZ){
         this.position = position;
 
         this.is_player = false;
@@ -32,7 +29,7 @@ public class ColisionBox{
         this.BondNY = BNY;
         this.BondNZ = BNZ;
 
-        if(Main.showColisionBox) {
+        if(Main.showCollisionBox) {
             this.wiremesh = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
             this.wiremesh.setWireFrame();
             wiremesh.setColor(0xFF0000FF);
@@ -40,7 +37,7 @@ public class ColisionBox{
         }
     }
 
-    public boolean detect_colision(ColisionBox box){
+    public boolean detect_collision(CollisionBox box){
         boolean fits_X = false;
         boolean fits_Y = false;
         boolean fits_Z = false;
@@ -66,7 +63,7 @@ public class ColisionBox{
         this.is_player = b;
     }
 
-    public boolean detect_if_ontop(ColisionBox box){
+    public boolean detect_if_ontop(CollisionBox box){
 
         boolean fits_X = false;
         boolean fits_Z = false;
@@ -93,7 +90,7 @@ public class ColisionBox{
     public boolean On_Ground(){
         Vec3[] VecArray = Get_Near();
 
-        ColisionBox box = Main.unit_cube_colisionBox;
+        CollisionBox box = Main.unit_cube_collisionBox;
         for (Vec3 vec3 : VecArray) {
             if (vec3 != null) {
                 box.position = vec3;
@@ -167,15 +164,15 @@ public class ColisionBox{
     public void active_update(){
         Vec3[] VecArray = Get_Near();
 
-        ColisionBox box = Main.unit_cube_colisionBox;
+        CollisionBox box = Main.unit_cube_collisionBox;
         for (Vec3 vec3 : VecArray) {
             if (vec3 != null) {
                 box.position = vec3;
-                if (Main.showColisionBox) {
+                if (Main.showCollisionBox) {
                     box.draw();
                 }
                 if (box != this && box.position != null) {
-                    if (detect_colision(box)) {
+                    if (detect_collision(box)) {
                         float XPd = (box.position.X + box.BondPX) - (this.position.X + this.BondNX);
                         if (XPd < 0) {
                             XPd *= -1;
@@ -226,7 +223,7 @@ public class ColisionBox{
                         }
 
                         for (int X = 0; X < 6; X++) {
-                            if (detect_colision(box)) {
+                            if (detect_collision(box)) {
                                 if (A[X] == XPd) {
                                     this.position.X = (box.position.X + box.BondPX) - this.BondNX;
                                 }
