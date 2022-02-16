@@ -127,19 +127,11 @@ public class Player{
                 int cY = (int)(looking_at_Y-lookingChunk.position.Y);
                 int cZ = (int)(looking_at_Z-lookingChunk.position.Z);
                 
-                boolean can_place = false;
-                if(cX >= 0 && cX < Chunk.Size){
-                    if(cY >= 0 && cY < Chunk.Size){
-                        if(cZ >= 0 && cZ < Chunk.Size){
-                            can_place = true;
-                        }
-                    }
+
+                if (lookingChunk.Get(cX,cY,cZ) != 0) {
+                    break;
                 }
-                if(can_place){              
-                    if(lookingChunk.blocks[cY*Chunk.Size*Chunk.Size + cX*Chunk.Size + cZ] != 0){
-                        break;
-                    }
-                }
+
             }
         }
 

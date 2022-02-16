@@ -70,11 +70,11 @@ public class Chunk{
             GenChunk();
         }
 
-
+        this.is_empty = true;
         for (int Y = 0; Y < Size; Y++) {
             for (int X = 0; X < Size; X++) {
                 for (int Z = 0; Z < Size; Z++) {
-                    int block = Get(X, Y, Z);
+                    int block = blocks[Y*Size*Size + X*Size + Z];
                     if (block != 0) {
                         this.is_empty = false;
                     }
@@ -293,7 +293,7 @@ public class Chunk{
             for (int Y = 0; Y < Size; Y++) {
                 for (int X = 0; X < Size; X++) {
                     for (int Z = 0; Z < Size; Z++) {
-                        int block = Get(X, Y, Z);
+                        int block = blocks[Y*Size*Size + X*Size + Z];
                         if (block != 0) {
                             Put(block, X, Y, Z);
                             this.is_empty = false;
@@ -311,7 +311,7 @@ public class Chunk{
     }
 
     public int Get(int X,int Y,int Z){
-        if(validCoord(X,Y,Z)){
+        if(validCoord(X,Y,Z) && !this.is_empty){
             return blocks[Y*Size*Size + X*Size + Z];
         }
         return 0;
