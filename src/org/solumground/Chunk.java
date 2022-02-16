@@ -14,7 +14,6 @@ public class Chunk{
     public byte [] blocks;
     public Vec3 position;
     public Vec3 chunkPosition;
-    public Vec3 MegaChunkPosition;
 
     public Mesh main_mesh;
     public boolean Exists;
@@ -26,7 +25,6 @@ public class Chunk{
     public Chunk(String Path, int Xpos,int Ypos,int Zpos) {
         this.position = new Vec3(Xpos * Size, Ypos * Size, Zpos * Size);
         this.chunkPosition = new Vec3(Xpos, Ypos, Zpos);
-        this.MegaChunkPosition = convert_to_Megachunk_pos(this.position);
         this.FilePath = Path + "/world_data_" + (int) this.chunkPosition.X + "_" + (int) this.chunkPosition.Y + "_" + (int) this.chunkPosition.Z + ".dat";
 
 
@@ -74,7 +72,7 @@ public class Chunk{
         for (int Y = 0; Y < Size; Y++) {
             for (int X = 0; X < Size; X++) {
                 for (int Z = 0; Z < Size; Z++) {
-                    int block = blocks[Y*Size*Size + X*Size + Z];
+                    int block = Get(X, Y, Z);
                     if (block != 0) {
                         this.is_empty = false;
                     }
@@ -87,7 +85,7 @@ public class Chunk{
     }
     public void buildMesh(){
         if(this.is_empty){
-            System.out.println("Tried to build empty chunk at "+chunkPosition);
+            //System.out.println("Tried to build empty chunk at "+chunkPosition);
             blocks = null;
             return;
         }
@@ -105,7 +103,7 @@ public class Chunk{
             }
         }
 
-        System.out.println("Building chunk "+this.chunkPosition);
+        //System.out.println("Building chunk "+this.chunkPosition);
 
         main_mesh.upload_Vertex_data();
     }
@@ -157,49 +155,6 @@ public class Chunk{
 
         return new Vec3(X,Y,Z);
     }
-    public static Vec3 convert_to_Megachunk_pos(Vec3 pos){
-        int MSize = Size*10;
-        int X = (int)pos.X;
-        int cX = 0;
-        if(X>0) {
-            while (X >= MSize) {X -= MSize;cX++;}X = cX;}
-        else{
-            while(X < 0){X += MSize;cX--;}X = cX;}
-        int Y = (int)pos.Y;
-        int cY = 0;
-        if(Y>0) {
-            while (Y >= MSize) {
-                Y -= MSize;
-                cY++;
-            }
-            Y = cY;
-        }
-        else{
-            while(Y <= 0){
-                Y += MSize;
-                cY--;
-            }
-            Y = cY;
-        }
-        int Z = (int)pos.Z;
-        int cZ = 0;
-        if(Z>0) {
-            while (Z >= MSize) {
-                Z -= MSize;
-                cZ++;
-            }
-            Z = cZ;
-        }
-        else{
-            while(Z < 0){
-                Z += MSize;
-                cZ--;
-            }
-            Z = cZ;
-        }
-
-        return new Vec3(X,Y,Z);
-    }
 
     public void Put_side(int cubeID, int side, int X,int Y,int Z){
         Mesh mesh = Block.Blocks[cubeID].Sides[side];
@@ -222,15 +177,7 @@ public class Chunk{
         int Y = (int)(blockpos.Y-this.position.Y);
         int Z = (int)(blockpos.Z-this.position.Z);
 
-        boolean can_place = false;
-        if(X >= 0 && X < Size){
-            if(Y >= 0 && Y < Size){
-                if(Z >= 0 && Z < Size){
-                    if(Get(X,Y,Z) == 0){can_place = true;}
-                }
-            }
-        }
-        if(can_place) {
+        if(Get(X,Y,Z) == 0) {
             if(this.is_empty){
                 blocks = new byte[Size*Size*Size];
                 main_mesh = new Mesh(Block.TextureBufferObject);
@@ -238,80 +185,29 @@ public class Chunk{
             }
             this.blocks[Y*Size*Size + X*Size + Z] = (byte)cubeID;
 
-            main_mesh.Number_of_Verts = 0;
-            main_mesh.Number_of_vtcords = 0;
-            main_mesh.Number_of_TriFaces = 0;
-            main_mesh.Number_of_QuadFaces = 0;
-
-            main_mesh.Original_VertexArray = new float[0];
-            main_mesh.VTcords_array = new float[0];
-            main_mesh.TriFaceArray = new int[0];
-            main_mesh.QuadFaceArray = new int[0];
-
-            for(int Yp=0;Yp<Size;Yp++){
-                for(int Xp=0;Xp<Size;Xp++){
-                    for(int Zp=0;Zp<Size;Zp++){
-                        int block = Get(Xp,Yp,Zp);
-                        if(block != 0){
-                            Put(block, Xp,Yp,Zp);
-                        }
-                    }
-                }
-            }
-            main_mesh.upload_Vertex_data();
+            buildMesh();
             return true;
         }
-        else{return false;}
+        return false;
     }
     public void Delete(Vec3 blockpos){
         int Xp = (int)(blockpos.X-this.position.X);
         int Yp = (int)(blockpos.Y-this.position.Y);
         int Zp = (int)(blockpos.Z-this.position.Z);
 
-        boolean can_break = false;
-        if(Xp >= 0 && Xp < Size){
-            if(Yp >= 0 && Yp < Size){
-                if(Zp >= 0 && Zp < Size){
-                    if(Get(Xp,Yp,Zp) != 0){can_break = true;}
-                }
-            }
-        }
-        if(can_break) {
+        if(Get(Xp,Yp,Zp) != 0) {
             this.blocks[Yp * Size * Size + Xp * Size + Zp] = 0;
-
-            main_mesh.Number_of_Verts = 0;
-            main_mesh.Number_of_vtcords = 0;
-            main_mesh.Number_of_TriFaces = 0;
-            main_mesh.Number_of_QuadFaces = 0;
-
-            main_mesh.Original_VertexArray = new float[0];
-            main_mesh.VTcords_array = new float[0];
-            main_mesh.TriFaceArray = new int[0];
-            main_mesh.QuadFaceArray = new int[0];
-
-            this.is_empty = true;
-            for (int Y = 0; Y < Size; Y++) {
-                for (int X = 0; X < Size; X++) {
-                    for (int Z = 0; Z < Size; Z++) {
-                        int block = blocks[Y*Size*Size + X*Size + Z];
-                        if (block != 0) {
-                            Put(block, X, Y, Z);
-                            this.is_empty = false;
-                        }
-                    }
-                }
-            }
+            buildMesh();
         }
-        main_mesh.upload_Vertex_data();
-
     }
 
+    // FIXME: doesn't work for negative coords
     public boolean validCoord(int X, int Y, int Z) {
         return (X >= 0 && X < Size) && (Y >= 0 && Y < Size) && (Z >= 0 && Z < Size);
     }
 
     public int Get(int X,int Y,int Z){
-        if(validCoord(X,Y,Z) && !this.is_empty){
+        if(validCoord(X,Y,Z) && blocks != null){
             return blocks[Y*Size*Size + X*Size + Z];
         }
         return 0;

@@ -33,7 +33,7 @@ public class Main {
     public static float fps;
     public static int RenderDistance;
 
-    public static boolean showCollisionBox = false;
+    public static boolean showCollisionBox;
     public static boolean DrawSkyBox;
 
     public static int shaderProgram;
@@ -196,6 +196,9 @@ public class Main {
                 }
                 if(key == GLFW_KEY_S){
                     DrawSkyBox = !DrawSkyBox;
+                }
+                if(key == GLFW_KEY_C){
+                    showCollisionBox = !showCollisionBox;
                 }
                 if(key == GLFW_KEY_K) {
                     Player.is_flying = !Player.is_flying;
