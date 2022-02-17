@@ -68,20 +68,23 @@ public class Chunk{
             GenChunk();
         }
 
-        this.is_empty = true;
+        this.is_empty = CheckIsEmpty();
+        Main.ChunkArray[Main.ChunkCount] = this;
+        Main.ChunkCount++;
+
+    }
+    public boolean CheckIsEmpty(){
         for (int Y = 0; Y < Size; Y++) {
             for (int X = 0; X < Size; X++) {
                 for (int Z = 0; Z < Size; Z++) {
                     int block = GetLocal(X, Y, Z);
                     if (block != 0) {
-                        this.is_empty = false;
+                        return false;
                     }
                 }
             }
         }
-        Main.ChunkArray[Main.ChunkCount] = this;
-        Main.ChunkCount++;
-
+        return true;
     }
     public void buildMesh(){
         if(this.is_empty){
@@ -221,13 +224,12 @@ public class Chunk{
         }
     }
 
-    // FIXME: doesn't work for negative coords
-    public boolean validCoord(int X, int Y, int Z) {
+    public boolean validCord(int X, int Y, int Z) {
         return (X >= 0 && X < Size) && (Y >= 0 && Y < Size) && (Z >= 0 && Z < Size);
     }
 
     public int GetLocal(int X, int Y, int Z){
-        if(validCoord(X,Y,Z) && blocks != null){
+        if(validCord(X,Y,Z) && blocks != null){
             return blocks[Y*Size*Size + X*Size + Z];
         }
         return 0;
@@ -236,7 +238,7 @@ public class Chunk{
         int X = (int)(pos.X-this.position.X);
         int Y = (int)(pos.Y-this.position.Y);
         int Z = (int)(pos.Z-this.position.Z);
-        if(validCoord(X,Y,Z) && blocks != null){
+        if(validCord(X,Y,Z) && blocks != null){
             return blocks[Y*Size*Size + X*Size + Z];
         }
         return 0;

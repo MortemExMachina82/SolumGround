@@ -103,10 +103,6 @@ public class CollisionBox {
     }
 
     public Vec3[] Get_Near(){
-        int sizeX = (int)(this.BondPX-this.BondNX);
-        int sizeY = (int)(this.BondPY-this.BondNY);
-        int sizeZ = (int)(this.BondPZ-this.BondNZ);
-
         chunks[0] = Chunk.FromPos(this.position, chunks[0]);
         chunks[1] = Chunk.FromPos(new Vec3(this.position.X, this.position.Y-Chunk.Size, this.position.Z), chunks[1]);
 
