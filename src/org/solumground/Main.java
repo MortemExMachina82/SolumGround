@@ -439,7 +439,7 @@ public class Main {
             Player.Draw();
             for(int X=0;X<ChunkCount;X++){
                 if(ChunkArray[X] != null) {
-                    if(ChunkArray[X].main_mesh != null && ChunkArray[X].main_mesh.status == Mesh.MeshStatus.Completed) {
+                    if(ChunkArray[X].status == Chunk.Status.Complete) {
                         ChunkArray[X].main_mesh.draw();
                     }
                 }

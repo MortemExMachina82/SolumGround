@@ -18,6 +18,15 @@ public class Chunk{
     public Mesh main_mesh;
     public boolean Exists;
 
+    public Status status = Status.Started;
+
+    enum Status{
+        Started,
+        Loaded,
+        MeshBuilt,
+        Complete
+    }
+
     public static void Init(){
         noisemap = PerlinNoise2D.getNoiseMap();
         //noisemap = Noise.MountainGen();
@@ -35,6 +44,7 @@ public class Chunk{
                 return;
             }
         }
+        status = Status.Started;
 
         blocks = new byte[Size * Size * Size];
 
@@ -67,6 +77,7 @@ public class Chunk{
         } else {
             GenChunk();
         }
+        status = Status.Loaded;
 
         this.is_empty = CheckIsEmpty();
         Main.ChunkArray[Main.ChunkCount] = this;
@@ -105,12 +116,15 @@ public class Chunk{
                 }
             }
         }
+        status = Status.MeshBuilt;
 
         //System.out.println("Building chunk "+this.chunkPosition);
 
         main_mesh.upload_Vertex_data();
+        status = Status.Complete;
     }
     public void ReBuildMesh(){
+        status = Status.Loaded;
         this.main_mesh.Number_of_Verts = 0;
         this.main_mesh.Number_of_vtcords = 0;
         this.main_mesh.Number_of_TriFaces = 0;
@@ -125,7 +139,9 @@ public class Chunk{
                 }
             }
         }
+        status = Status.MeshBuilt;
         main_mesh.upload_Vertex_data();
+        status = Status.Complete;
     }
     public static Chunk FromPos(Vec3 pos){
         Chunk selected_chunk = null;
