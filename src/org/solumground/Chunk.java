@@ -11,7 +11,7 @@ public class Chunk{
 
     public boolean is_empty;
     public String FilePath;
-    public byte [] blocks;
+    private byte [] blocks;
     public Vec3 position;
     public Vec3 chunkPosition;
 
@@ -107,6 +107,23 @@ public class Chunk{
 
         main_mesh.upload_Vertex_data();
     }
+    public void ReBuildMesh(){
+        this.main_mesh.Number_of_Verts = 0;
+        this.main_mesh.Number_of_vtcords = 0;
+        this.main_mesh.Number_of_TriFaces = 0;
+        this.main_mesh.Number_of_QuadFaces = 0;
+        for(int Y=0;Y<Size;Y++){
+            for(int X=0;X<Size;X++){
+                for(int Z=0;Z<Size;Z++){
+                    int block = Get(X,Y,Z);
+                    if(block != 0){
+                        Put(block, X,Y,Z);
+                    }
+                }
+            }
+        }
+        main_mesh.upload_Vertex_data();
+    }
     public static Chunk FromPos(Vec3 pos){
         Chunk selected_chunk = null;
         pos = convert_to_chunk_pos(pos);
@@ -185,7 +202,7 @@ public class Chunk{
             }
             this.blocks[Y*Size*Size + X*Size + Z] = (byte)cubeID;
 
-            buildMesh();
+            ReBuildMesh();
             return true;
         }
         return false;
@@ -197,7 +214,7 @@ public class Chunk{
 
         if(Get(Xp,Yp,Zp) != 0) {
             this.blocks[Yp * Size * Size + Xp * Size + Zp] = 0;
-            buildMesh();
+            ReBuildMesh();
         }
     }
 
@@ -214,7 +231,7 @@ public class Chunk{
     }
 
     public void GenChunk(){
-        System.out.println("Generating chunk "+this.chunkPosition);
+        //System.out.println("Generating chunk "+this.chunkPosition);
         for (int X = 0; X < Size;X++) {
             for (int Z = 0; Z < Size; Z++) {
                 int h;
