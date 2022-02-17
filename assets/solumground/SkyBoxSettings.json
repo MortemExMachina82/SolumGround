@@ -1,7 +1,7 @@
 {
-    "Generated":false,
+    "Generated":true,
     "OneTexture":false,
-    "DirectoryModelPath":"assets/solumground/models/SkyBox",
+    "DirectoryModelPath":"assets/solumground/models",
     "DirectoryTexturePath":"assets/solumground/textures/ulukai",
     "ModelName":"SkyBox.smobj",
     "TextureName":"SkyBox3.png",

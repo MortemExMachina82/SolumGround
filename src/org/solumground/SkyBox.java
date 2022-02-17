@@ -57,7 +57,7 @@ public class SkyBox {
             ModelName = (String) object.get("ModelName");
             TextureName = (String) object.get("TextureName");
 
-            if (!Generated & !OneTexture) {
+            if (!Generated && !OneTexture) {
                 JsonArray modelarray = (JsonArray) object.get("Model");
                 for (int X = 0; X < 6; X++) {
                     JsonArray side = (JsonArray) modelarray.get(X);
@@ -96,7 +96,7 @@ public class SkyBox {
         }
 
         if(Generated){
-            make(DirectoryModelPath+"/"+ModelName);
+            make(Main.jar_folder_path+"/"+DirectoryModelPath+"/"+ModelName);
         }
         else{
             if(OneTexture){
