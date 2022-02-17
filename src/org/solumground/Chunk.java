@@ -169,9 +169,9 @@ public class Chunk{
         return selected_chunk;
     }
     public static Vec3 convert_to_chunk_pos(Vec3 pos){
-        int X = (int)(pos.X)/Size;
-        int Y = (int)(pos.Y)/Size;
-        int Z = (int)(pos.Z)/Size;
+        int X = (int)(pos.X+1)/Size;
+        int Y = (int)(pos.Y+1)/Size;
+        int Z = (int)(pos.Z+1)/Size;
         if(pos.X < 0){X--;}
         if(pos.Y < 0){Y--;}
         if(pos.Z < 0){Z--;}
