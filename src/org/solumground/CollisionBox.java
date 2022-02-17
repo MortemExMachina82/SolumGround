@@ -140,7 +140,7 @@ public class CollisionBox {
 
 
 
-        Vec3[] VecArray = new Vec3[(sizeX+7)*(sizeY+7)*(sizeZ+7)];
+        Vec3[] VecArray = new Vec3[7*7*7];
         int VecCount = 0;
 
         for(int X=(-3);X<4;X++){
@@ -148,9 +148,9 @@ public class CollisionBox {
                 for(int Z=(-3);Z<4;Z++){
                     for(int C=0;C<27;C++){
                         if(chunks[C] == null){continue;}
-                        Vec3 v = new Vec3((int)(((int)this.position.X+X)-chunks[C].position.X), (int)(((int)this.position.Y+Y)-chunks[C].position.Y), (int)(((int)this.position.Z+Z)-chunks[C].position.Z));
-                        if(chunks[C].Get((int)v.X,(int)v.Y,(int)v.Z) != 0){
-                            VecArray[VecCount] = new Vec3((int)v.X+chunks[C].position.X,(int)v.Y+chunks[C].position.Y,(int)v.Z+chunks[C].position.Z);
+                        Vec3 v = new Vec3((int)(this.position.X+X), (int)(this.position.Y+Y), (int)(this.position.Z+Z));
+                        if(chunks[C].GetGlobal(v) != 0){
+                            VecArray[VecCount] = v;
                             break;
                         }
                     }

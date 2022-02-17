@@ -123,12 +123,7 @@ public class Player{
             
             Chunk lookingChunk = Chunk.FromPos(new Vec3(looking_at_X,looking_at_Y,looking_at_Z));
             if(lookingChunk != null){
-                int cX = (int)(looking_at_X-lookingChunk.position.X);
-                int cY = (int)(looking_at_Y-lookingChunk.position.Y);
-                int cZ = (int)(looking_at_Z-lookingChunk.position.Z);
-                
-
-                if (lookingChunk.Get(cX,cY,cZ) != 0) {
+                if (lookingChunk.GetGlobal(new Vec3(looking_at_X, looking_at_Y, looking_at_Z)) != 0) {
                     break;
                 }
 

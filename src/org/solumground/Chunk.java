@@ -72,7 +72,7 @@ public class Chunk{
         for (int Y = 0; Y < Size; Y++) {
             for (int X = 0; X < Size; X++) {
                 for (int Z = 0; Z < Size; Z++) {
-                    int block = Get(X, Y, Z);
+                    int block = GetLocal(X, Y, Z);
                     if (block != 0) {
                         this.is_empty = false;
                     }
@@ -95,7 +95,7 @@ public class Chunk{
         for(int Y=0;Y<Size;Y++){
             for(int X=0;X<Size;X++){
                 for(int Z=0;Z<Size;Z++){
-                    int block = Get(X,Y,Z);
+                    int block = GetLocal(X,Y,Z);
                     if(block != 0){
                         Put(block, X,Y,Z);
                     }
@@ -115,7 +115,7 @@ public class Chunk{
         for(int Y=0;Y<Size;Y++){
             for(int X=0;X<Size;X++){
                 for(int Z=0;Z<Size;Z++){
-                    int block = Get(X,Y,Z);
+                    int block = GetLocal(X,Y,Z);
                     if(block != 0){
                         Put(block, X,Y,Z);
                     }
@@ -169,6 +169,9 @@ public class Chunk{
         int X = (int)(pos.X)/Size;
         int Y = (int)(pos.Y)/Size;
         int Z = (int)(pos.Z)/Size;
+        if(pos.X < 0){X--;}
+        if(pos.Y < 0){Y--;}
+        if(pos.Z < 0){Z--;}
 
         return new Vec3(X,Y,Z);
     }
@@ -181,12 +184,12 @@ public class Chunk{
         main_mesh.add(mesh);
     }
     public void Put(int cubeID, int X,int Y,int Z){
-        if(Get(X-1,Y,Z) == 0){Put_side(cubeID,1, X,Y,Z);}
-        if(Get(X+1,Y,Z) == 0){Put_side(cubeID,0, X,Y,Z);}
-        if(Get(X,Y+1,Z) == 0){Put_side(cubeID,2, X,Y,Z);}
-        if(Get(X,Y-1,Z) == 0){Put_side(cubeID,3, X,Y,Z);}
-        if(Get(X,Y,Z-1) == 0){Put_side(cubeID,4, X,Y,Z);}
-        if(Get(X,Y,Z+1) == 0){Put_side(cubeID,5, X,Y,Z);}
+        if(GetLocal(X-1,Y,Z) == 0){Put_side(cubeID,1, X,Y,Z);}
+        if(GetLocal(X+1,Y,Z) == 0){Put_side(cubeID,0, X,Y,Z);}
+        if(GetLocal(X,Y+1,Z) == 0){Put_side(cubeID,2, X,Y,Z);}
+        if(GetLocal(X,Y-1,Z) == 0){Put_side(cubeID,3, X,Y,Z);}
+        if(GetLocal(X,Y,Z-1) == 0){Put_side(cubeID,4, X,Y,Z);}
+        if(GetLocal(X,Y,Z+1) == 0){Put_side(cubeID,5, X,Y,Z);}
     }
 
     public boolean Place(int cubeID, Vec3 blockpos){
@@ -194,7 +197,7 @@ public class Chunk{
         int Y = (int)(blockpos.Y-this.position.Y);
         int Z = (int)(blockpos.Z-this.position.Z);
 
-        if(Get(X,Y,Z) == 0) {
+        if(GetLocal(X,Y,Z) == 0) {
             if(this.is_empty){
                 blocks = new byte[Size*Size*Size];
                 main_mesh = new Mesh(Block.TextureBufferObject);
@@ -212,7 +215,7 @@ public class Chunk{
         int Yp = (int)(blockpos.Y-this.position.Y);
         int Zp = (int)(blockpos.Z-this.position.Z);
 
-        if(Get(Xp,Yp,Zp) != 0) {
+        if(GetLocal(Xp,Yp,Zp) != 0) {
             this.blocks[Yp * Size * Size + Xp * Size + Zp] = 0;
             ReBuildMesh();
         }
@@ -223,7 +226,16 @@ public class Chunk{
         return (X >= 0 && X < Size) && (Y >= 0 && Y < Size) && (Z >= 0 && Z < Size);
     }
 
-    public int Get(int X,int Y,int Z){
+    public int GetLocal(int X, int Y, int Z){
+        if(validCoord(X,Y,Z) && blocks != null){
+            return blocks[Y*Size*Size + X*Size + Z];
+        }
+        return 0;
+    }
+    public int GetGlobal(Vec3 pos){
+        int X = (int)(pos.X-this.position.X);
+        int Y = (int)(pos.Y-this.position.Y);
+        int Z = (int)(pos.Z-this.position.Z);
         if(validCoord(X,Y,Z) && blocks != null){
             return blocks[Y*Size*Size + X*Size + Z];
         }
