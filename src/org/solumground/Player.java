@@ -139,12 +139,9 @@ public class Player{
         Vec3 pos = new Vec3(looking_at_X,looking_at_Y,looking_at_Z);
         Chunk selected_chunk = Chunk.FromPos(pos);
         if(selected_chunk == null){
-            Vec3 CP = Chunk.convert_to_chunk_pos(pos);
-            selected_chunk = new Chunk(Main.SaveFolder, (int)CP.X,(int)CP.Y,(int)CP.Z);
+            return;
         }
         selected_chunk.Place(hotbar_selected, pos);
-
-
     }
 
     public static void break_block(){

@@ -492,7 +492,6 @@ public class Mesh{
         }
     }
     public void add(Mesh mesh){
-
         if(this.Number_of_Verts*3 + mesh.Number_of_Verts*3 > this.Original_VertexArray.length){
             float [] New_VertexArray = new float[(this.Original_VertexArray.length + mesh.Original_VertexArray.length)*2];
             System.arraycopy(this.Original_VertexArray, 0, New_VertexArray, 0, this.Original_VertexArray.length);

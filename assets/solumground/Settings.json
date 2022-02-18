@@ -5,7 +5,7 @@
     "NearClippingPlane":"0.1",
     "FarClippingPlane":"150",
     "WindowWidth":"1000",
-    "WindowHight":"600",
+    "WindowHight":"500",
     "FullScreen":false,
     
     "DrawSkyBox":true,

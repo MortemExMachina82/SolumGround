@@ -185,12 +185,25 @@ public class Chunk{
         return selected_chunk;
     }
     public static Vec3 convert_to_chunk_pos(Vec3 pos){
-        int X = (int)(pos.X+1)/Size;
-        int Y = (int)(pos.Y+1)/Size;
-        int Z = (int)(pos.Z+1)/Size;
-        if(pos.X < 0){X--;}
-        if(pos.Y < 0){Y--;}
-        if(pos.Z < 0){Z--;}
+        int X,Y,Z;
+        if(pos.X < 0){
+            X = (int)(pos.X-9)/Size;
+        }
+        else{
+            X = (int)(pos.X)/Size;
+        }
+        if(pos.Y < 0){
+            Y = (int)(pos.Y-9)/Size;
+        }
+        else{
+            Y = (int)(pos.Y)/Size;
+        }
+        if(pos.Z < 0){
+            Z = (int)(pos.Z-9)/Size;
+        }
+        else{
+            Z = (int)(pos.Z)/Size;
+        }
 
         return new Vec3(X,Y,Z);
     }
@@ -211,31 +224,25 @@ public class Chunk{
         if(GetLocal(X,Y,Z+1) == 0){Put_side(cubeID,5, X,Y,Z);}
     }
 
-    public boolean Place(int cubeID, Vec3 blockpos){
-        int X = (int)(blockpos.X-this.position.X);
-        int Y = (int)(blockpos.Y-this.position.Y);
-        int Z = (int)(blockpos.Z-this.position.Z);
-
-        if(GetLocal(X,Y,Z) == 0) {
+    public boolean Place(int BLockID, Vec3 blockpos){
+        Vec3 Lpos = ConvertToLocal(blockpos);
+        if(GetLocal((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) == 0) {
             if(this.is_empty){
                 blocks = new byte[Size*Size*Size];
                 main_mesh = new Mesh(Block.TextureBufferObject);
+                main_mesh.position = this.position;
                 this.is_empty = false;
             }
-            this.blocks[Y*Size*Size + X*Size + Z] = (byte)cubeID;
-
+            this.blocks[(int)Lpos.Y*Size*Size + (int)Lpos.X*Size + (int)Lpos.Z] = (byte)BLockID;
             ReBuildMesh();
             return true;
         }
         return false;
     }
     public void Delete(Vec3 blockpos){
-        int Xp = (int)(blockpos.X-this.position.X);
-        int Yp = (int)(blockpos.Y-this.position.Y);
-        int Zp = (int)(blockpos.Z-this.position.Z);
-
-        if(GetLocal(Xp,Yp,Zp) != 0) {
-            this.blocks[Yp * Size * Size + Xp * Size + Zp] = 0;
+        Vec3 Lpos = ConvertToLocal(blockpos);
+        if(GetLocal((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) != 0) {
+            this.blocks[(int)Lpos.Y * Size * Size + (int)Lpos.X * Size + (int)Lpos.Z] = 0;
             ReBuildMesh();
         }
     }
@@ -250,14 +257,15 @@ public class Chunk{
         }
         return 0;
     }
-    public int GetGlobal(Vec3 pos){
-        int X = (int)(pos.X-this.position.X);
-        int Y = (int)(pos.Y-this.position.Y);
-        int Z = (int)(pos.Z-this.position.Z);
-        if(validCord(X,Y,Z) && blocks != null){
-            return blocks[Y*Size*Size + X*Size + Z];
+    public int GetGlobal(Vec3 Gpos){
+        Vec3 Lpos = ConvertToLocal(Gpos);
+        if(validCord((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) && blocks != null){
+            return blocks[(int)Lpos.Y*Size*Size + (int)Lpos.X*Size + (int)Lpos.Z];
         }
         return 0;
+    }
+    public Vec3 ConvertToLocal(Vec3 position){
+        return new Vec3(position.X-this.position.X, position.Y-this.position.Y, position.Z-this.position.Z);
     }
 
     public void GenChunk(){
