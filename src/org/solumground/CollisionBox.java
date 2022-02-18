@@ -77,7 +77,7 @@ public class CollisionBox {
                 fits_Z = true;
             }
         }
-        if(this.position.Y == (box.position.Y + box.BondPY) - this.BondNY){
+        if(this.position.Y == (box.position.Y + box.BondPY) - this.BondNY + .01f){
             ontop = true;
         }
 
@@ -165,7 +165,7 @@ public class CollisionBox {
                 if (Main.showCollisionBox) {
                     box.draw();
                 }
-                if (box != this && box.position != null) {
+                if (box != this) {
                     if (detect_collision(box)) {
                         float XPd = (box.position.X + box.BondPX) - (this.position.X + this.BondNX);
                         if (XPd < 0) {
@@ -219,22 +219,22 @@ public class CollisionBox {
                         for (int X = 0; X < 6; X++) {
                             if (detect_collision(box)) {
                                 if (A[X] == XPd) {
-                                    this.position.X = (box.position.X + box.BondPX) - this.BondNX;
+                                    this.position.X = (box.position.X + box.BondPX) - this.BondNX + .01f;
                                 }
                                 if (A[X] == XNd) {
-                                    this.position.X = (box.position.X + box.BondNX) - this.BondPX;
+                                    this.position.X = (box.position.X + box.BondNX) - this.BondPX - .01f;
                                 }
                                 if (A[X] == YPd) {
-                                    this.position.Y = (box.position.Y + box.BondPY) - this.BondNY;
+                                    this.position.Y = (box.position.Y + box.BondPY) - this.BondNY + .01f;
                                 }
                                 if (A[X] == YNd) {
-                                    this.position.Y = (box.position.Y + box.BondNY) - this.BondPY;
+                                    this.position.Y = (box.position.Y + box.BondNY) - this.BondPY - .01f;
                                 }
                                 if (A[X] == ZPd) {
-                                    this.position.Z = (box.position.Z + box.BondPZ) - this.BondNZ;
+                                    this.position.Z = (box.position.Z + box.BondPZ) - this.BondNZ + .01f;
                                 }
                                 if (A[X] == ZNd) {
-                                    this.position.Z = (box.position.Z + box.BondNZ) - this.BondPZ;
+                                    this.position.Z = (box.position.Z + box.BondNZ) - this.BondPZ - .01f;
                                 }
 
                             } else {
@@ -262,7 +262,6 @@ public class CollisionBox {
             this.wiremesh.position.Y = this.position.Y + (this.BondPY + this.BondNY) * .5f;
             this.wiremesh.position.Z = this.position.Z + (this.BondPZ + this.BondNZ) * .5f;
         }
-
         this.wiremesh.draw();
 
         if(this.is_player) {
