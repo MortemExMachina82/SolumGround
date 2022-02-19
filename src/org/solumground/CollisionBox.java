@@ -1,5 +1,8 @@
 package org.solumground;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import static org.lwjgl.opengl.GL21.*;
 
 public class CollisionBox {
@@ -77,7 +80,7 @@ public class CollisionBox {
                 fits_Z = true;
             }
         }
-        if(this.position.Y == (box.position.Y + box.BondPY) - this.BondNY + .01f){
+        if(this.position.Y == (box.position.Y + box.BondPY) - this.BondNY + .001f){
             ontop = true;
         }
 
@@ -86,7 +89,7 @@ public class CollisionBox {
     }
 
     public boolean On_Ground(){
-        Vec3[] VecArray = Get_Near();
+        List<Vec3> VecArray = Get_Near();
 
         CollisionBox box = Main.unit_cube_collisionBox;
         for (Vec3 vec3 : VecArray) {
@@ -100,7 +103,7 @@ public class CollisionBox {
         return false;
     }
 
-    public Vec3[] Get_Near(){
+    public List<Vec3> Get_Near(){
         chunks[0] = Chunk.FromPos(this.position, chunks[0]);
         chunks[1] = Chunk.FromPos(new Vec3(this.position.X, this.position.Y-Chunk.Size, this.position.Z), chunks[1]);
 
@@ -134,8 +137,7 @@ public class CollisionBox {
 
 
 
-        Vec3[] VecArray = new Vec3[7*7*7];
-        int VecCount = 0;
+        List<Vec3> VecArray = new ArrayList<>(343);
 
         for(int X=(-3);X<4;X++){
             for(int Y=(-3);Y<4;Y++){
@@ -144,11 +146,10 @@ public class CollisionBox {
                         if(chunks[C] == null){continue;}
                         Vec3 v = new Vec3((int)(this.position.X+X), (int)(this.position.Y+Y), (int)(this.position.Z+Z));
                         if(chunks[C].GetGlobal(v) != 0){
-                            VecArray[VecCount] = v;
+                            VecArray.add(v);
                             break;
                         }
                     }
-                    VecCount++;
                 }
             }
         }
@@ -156,7 +157,7 @@ public class CollisionBox {
     }
 
     public void active_update(){
-        Vec3[] VecArray = Get_Near();
+        List<Vec3> VecArray = Get_Near();
 
         CollisionBox box = Main.unit_cube_collisionBox;
         for (Vec3 vec3 : VecArray) {
@@ -165,102 +166,77 @@ public class CollisionBox {
                 if (Main.showCollisionBox) {
                     box.draw();
                 }
-                if (box != this) {
-                    if (detect_collision(box)) {
-                        float XPd = (box.position.X + box.BondPX) - (this.position.X + this.BondNX);
-                        if (XPd < 0) {
-                            XPd *= -1;
-                        }
-                        float XNd = (box.position.X + box.BondNX) - (this.position.X + this.BondPX);
-                        if (XNd < 0) {
-                            XNd *= -1;
-                        }
-                        float YPd = (box.position.Y + box.BondPY) - (this.position.Y + this.BondNY);
-                        if (YPd < 0) {
-                            YPd *= -1;
-                        }
-                        float YNd = (box.position.Y + box.BondNY) - (this.position.Y + this.BondPY);
-                        if (YNd < 0) {
-                            YNd *= -1;
-                        }
-                        float ZPd = (box.position.Z + box.BondPZ) - (this.position.Z + this.BondNZ);
-                        if (ZPd < 0) {
-                            ZPd *= -1;
-                        }
-                        float ZNd = (box.position.Z + box.BondNZ) - (this.position.Z + this.BondPZ);
-                        if (ZNd < 0) {
-                            ZNd *= -1;
-                        }
+                if (detect_collision(box)) {
+                    float XPd = (box.position.X + box.BondPX) - (this.position.X + this.BondNX);
+                    if (XPd < 0) {
+                        XPd *= -1;
+                    }
+                    float XNd = (box.position.X + box.BondNX) - (this.position.X + this.BondPX);
+                    if (XNd < 0) {
+                        XNd *= -1;
+                    }
+                    float YPd = (box.position.Y + box.BondPY) - (this.position.Y + this.BondNY);
+                    if (YPd < 0) {
+                        YPd *= -1;
+                    }
+                    float YNd = (box.position.Y + box.BondNY) - (this.position.Y + this.BondPY);
+                    if (YNd < 0) {
+                        YNd *= -1;
+                    }
+                    float ZPd = (box.position.Z + box.BondPZ) - (this.position.Z + this.BondNZ);
+                    if (ZPd < 0) {
+                        ZPd *= -1;
+                    }
+                    float ZNd = (box.position.Z + box.BondNZ) - (this.position.Z + this.BondPZ);
+                    if (ZNd < 0) {
+                        ZNd *= -1;
+                    }
 
+                    float[] Nearest = new float[6];
+                    Nearest[0] = YPd;
+                    Nearest[1] = XPd;
+                    Nearest[2] = XNd;
+                    Nearest[3] = YNd;
+                    Nearest[4] = ZPd;
+                    Nearest[5] = ZNd;
+                    Arrays.sort(Nearest);
 
-                        float[] A = new float[6];
-                        A[0] = XPd;
-                        A[1] = XNd;
-                        A[2] = YPd;
-                        A[3] = YNd;
-                        A[4] = ZPd;
-                        A[5] = ZNd;
-                        int b = 1;
-                        while (b != 0) {
-                            b = 1;
-                            for (int X = 0; X < 5; X++) {
-                                if (A[X] > A[X + 1]) {
-                                    float t = A[X + 1];
-                                    A[X + 1] = A[X];
-                                    A[X] = t;
-                                    b++;
-                                }
+                    for (float N : Nearest) {
+                        if (detect_collision(box)) {
+                            if (N == XPd) {
+                                this.position.X = (box.position.X + box.BondPX) - this.BondNX + .001f;
                             }
-                            if (b == 1) {
-                                b = 0;
+                            if (N == XNd) {
+                                this.position.X = (box.position.X + box.BondNX) - this.BondPX - .001f;
                             }
-                        }
-
-                        for (int X = 0; X < 6; X++) {
-                            if (detect_collision(box)) {
-                                if (A[X] == XPd) {
-                                    this.position.X = (box.position.X + box.BondPX) - this.BondNX + .01f;
-                                }
-                                if (A[X] == XNd) {
-                                    this.position.X = (box.position.X + box.BondNX) - this.BondPX - .01f;
-                                }
-                                if (A[X] == YPd) {
-                                    this.position.Y = (box.position.Y + box.BondPY) - this.BondNY + .01f;
-                                }
-                                if (A[X] == YNd) {
-                                    this.position.Y = (box.position.Y + box.BondNY) - this.BondPY - .01f;
-                                }
-                                if (A[X] == ZPd) {
-                                    this.position.Z = (box.position.Z + box.BondPZ) - this.BondNZ + .01f;
-                                }
-                                if (A[X] == ZNd) {
-                                    this.position.Z = (box.position.Z + box.BondNZ) - this.BondPZ - .01f;
-                                }
-
-                            } else {
-                                break;
+                            if (N == YPd) {
+                                this.position.Y = (box.position.Y + box.BondPY) - this.BondNY + .001f;
                             }
-                        }
+                            if (N == YNd) {
+                                this.position.Y = (box.position.Y + box.BondNY) - this.BondPY - .001f;
+                            }
+                            if (N == ZPd) {
+                                this.position.Z = (box.position.Z + box.BondPZ) - this.BondNZ + .001f;
+                            }
+                            if (N == ZNd) {
+                                this.position.Z = (box.position.Z + box.BondNZ) - this.BondPZ - .001f;
+                            }
 
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
         }
-        
-        
     }
     
     public void draw(){
+        this.wiremesh.position.X = this.position.X + (this.BondPX + this.BondNX) * .5f;
+        this.wiremesh.position.Y = this.position.Y + (this.BondPY + this.BondNY) * .5f;
+        this.wiremesh.position.Z = this.position.Z + (this.BondPZ + this.BondNZ) * .5f;
         if(this.is_player){
-            this.wiremesh.position.X = this.position.X + (this.BondPX + this.BondNX) * .5f;
-            this.wiremesh.position.Y = this.position.Y + (this.BondPY + this.BondNY) * .5f;
-            this.wiremesh.position.Z = this.position.Z + (this.BondPZ + this.BondNZ) * .5f;
             glDisable(GL_CULL_FACE);
-        }
-        else {
-            this.wiremesh.position.X = this.position.X + (this.BondPX + this.BondNX) * .5f;
-            this.wiremesh.position.Y = this.position.Y + (this.BondPY + this.BondNY) * .5f;
-            this.wiremesh.position.Z = this.position.Z + (this.BondPZ + this.BondNZ) * .5f;
         }
         this.wiremesh.draw();
 
