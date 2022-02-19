@@ -590,12 +590,12 @@ public class Mesh{
                         VertexArray[VPos + 7] = 1.0f;
                     }
                     else {
-                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
+                        Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[VPos + 5] = light.X*light.W;
-                        VertexArray[VPos + 6] = light.Y*light.W;
-                        VertexArray[VPos + 7] = light.Z*light.W;
+                        VertexArray[VPos + 5] = light.X;
+                        VertexArray[VPos + 6] = light.Y;
+                        VertexArray[VPos + 7] = light.Z;
                     }
                     vert_count++;
                 }
@@ -626,12 +626,12 @@ public class Mesh{
                         VertexArray[VPos + 7] = 1.0f;
                     }
                     else {
-                        Vec4 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
+                        Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[VPos + 5] = light.X*light.W;
-                        VertexArray[VPos + 6] = light.Y*light.W;
-                        VertexArray[VPos + 7] = light.Z*light.W;
+                        VertexArray[VPos + 5] = light.X;
+                        VertexArray[VPos + 6] = light.Y;
+                        VertexArray[VPos + 7] = light.Z;
                     }
                     vert_count++;
                 }

@@ -20,6 +20,11 @@ public class Vec3 {
         this.Y = pos.Y;
         this.Z = pos.Z;
     }
+    public Vec3(IVec3 pos){
+        this.X = (float)pos.X;
+        this.Y = (float)pos.Y;
+        this.Z = (float)pos.Z;
+    }
 
     @Override
     public String toString() {

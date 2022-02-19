@@ -22,12 +22,9 @@ class Light{
         lightCount++;
     }
 
-    public static Vec4 getLight(Vec3 pos){
-        Vec4 l = new Vec4();
-        l.X = .2f;
-        l.Y = .2f;
-        l.Z = .2f;
-        l.W = .3f;
+    public static Vec3 getLight(Vec3 pos){
+        Vec3 l = new Vec3(.2f,.2f,.2f);
+        float lStrength = .3f;
         for(int X=0;X<lightCount;X++) {
             Light light = lights[X];
             float dist = (light.position.X - pos.X) * (light.position.X - pos.X) +
@@ -41,16 +38,19 @@ class Light{
             }
             if (dist > 0) {
                 float S = light.Strength / dist;
-                if(l.W < S){
-                    l.W = S;
+                if(lStrength < S){
+                    lStrength = S;
                 }
                 l.X += light.Red*S;
                 l.Y += light.Green*S;
                 l.Z += light.Blue*S;
             } else {
-                l.W = light.Strength;
+                lStrength = light.Strength;
             }
         }
+        l.X *= lStrength;
+        l.Y *= lStrength;
+        l.Z *= lStrength;
 
         return l;
     }
