@@ -18,34 +18,33 @@ public class ChunkLoader extends Thread{
             catch(Exception e){
                 e.printStackTrace();
             }
-            Vec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-            if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk) | Player.ChunkReload) {
+            IVec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
+            if (!IVec3.Equal(CurentStandingInChunk, Player.StandingInChunk) | Player.ChunkReload) {
                 Player.StandingInChunk = CurentStandingInChunk;
                 loadAroundPlayer(Main.RenderDistance);
                 Player.ChunkReload = false;
             }
         }
     }
-    public void makeChunk(Vec3 pos){
-        Chunk chunk = new Chunk(Main.SaveFolder, (int)pos.X, (int)pos.Y, (int)pos.Z);
+    public void makeChunk(IVec3 pos){
+        Chunk chunk = new Chunk(Main.SaveFolder, pos);
         MeshBuilder.buffer.add(chunk);
     }
     public void loadAroundPlayer(int RenderDist){
-        Vec3 pos;
+        IVec3 pos;
         Chunk chunk;
         for(int R=0;R<RenderDist+1;R++){
             if(ShouldClose){break;}
-            Vec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-            if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
+            IVec3 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
+            if (!IVec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                 Player.StandingInChunk = CurentStandingInChunk;
                 R = 0;
                 Player.ChunkReload = true;
             }
             if(R==0){
-                pos = new Vec3(Player.StandingInChunk);
-                chunk = Chunk.FromChunkPos(pos);
+                chunk = Chunk.FromChunkPos(Player.StandingInChunk);
                 if(chunk == null) {
-                    makeChunk(pos);
+                    makeChunk(Player.StandingInChunk);
                 }
                 continue;
             }
@@ -54,14 +53,14 @@ public class ChunkLoader extends Thread{
             for(int X=(-R);X<R+1;X++){
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
+                if (!IVec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;
                     break;
                 }
                 for(int Z=(-R);Z<R+1;Z++){
-                    pos = new Vec3(Player.StandingInChunk);
+                    pos = new IVec3(Player.StandingInChunk);
                     pos.X += X;
                     pos.Y += RY;
                     pos.Z += Z;
@@ -79,14 +78,14 @@ public class ChunkLoader extends Thread{
             for(int Y=(-RY)+1;Y<RY;Y++){
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
+                if (!IVec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;
                     break;
                 }
                 for(int Z=(-R)+1;Z<R;Z++){
-                    pos = new Vec3(Player.StandingInChunk);
+                    pos = new IVec3(Player.StandingInChunk);
                     pos.X += R;
                     pos.Y += Y;
                     pos.Z += Z;
@@ -104,14 +103,14 @@ public class ChunkLoader extends Thread{
             for(int X=(-R);X<R+1;X++) {
                 if(ShouldClose){break;}
                 CurentStandingInChunk = Chunk.convert_to_chunk_pos(Player.position);
-                if (!Vec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
+                if (!IVec3.Equal(CurentStandingInChunk, Player.StandingInChunk)){
                     Player.StandingInChunk = CurentStandingInChunk;
                     R = -1;
                     Player.ChunkReload = true;
                     break;
                 }
                 for(int Y=(-RY)+1;Y<RY;Y++){
-                    pos = new Vec3(Player.StandingInChunk);
+                    pos = new IVec3(Player.StandingInChunk);
                     pos.X += X;
                     pos.Y += Y;
                     pos.Z += R;

@@ -5,6 +5,11 @@ public class Vec3 {
     public float X;
     public float Y;
     public float Z;
+    public Vec3(){
+        this.X = 0;
+        this.Y = 0;
+        this.Z = 0;
+    }
     public Vec3(float X, float Y, float Z){
         this.X = X;
         this.Y = Y;
@@ -24,6 +29,9 @@ public class Vec3 {
         this.X = (float)pos.X;
         this.Y = (float)pos.Y;
         this.Z = (float)pos.Z;
+    }
+    public IVec3 ToInt(){
+        return new IVec3(this);
     }
 
     @Override

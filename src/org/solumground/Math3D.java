@@ -24,30 +24,30 @@ public class Math3D{
 
 
     }
-    public static void Make3DRotationMatrix44(float RX, float RY, float RZ, float [] mat){
+    public static void Make3DRotationMatrix44(Vec3 Rotation, float [] mat){
         //float mat [] = new float[4*4];
         float [] mat_x = new float[4*4];
         float [] mat_y = new float[4*4];
         float [] mat_z = new float[4*4];
 
         mat_x[0] = 1;
-        mat_x[5] = (float)Math.cos(RX*3.1415/180);
-        mat_x[6] = -(float)Math.sin(RX*3.1415/180);
-        mat_x[9] = (float)Math.sin(RX*3.1415/180);
-        mat_x[10] = (float)Math.cos(RX*3.1415/180);
+        mat_x[5] = (float)Math.cos(Rotation.X*3.1415/180);
+        mat_x[6] = -(float)Math.sin(Rotation.X*3.1415/180);
+        mat_x[9] = (float)Math.sin(Rotation.X*3.1415/180);
+        mat_x[10] = (float)Math.cos(Rotation.X*3.1415/180);
         mat_x[15] = 1;
 
-        mat_y[0] = (float)Math.cos(RY*3.1415/180);
-        mat_y[2] = (float)Math.sin(RY*3.1415/180);
+        mat_y[0] = (float)Math.cos(Rotation.Y*3.1415/180);
+        mat_y[2] = (float)Math.sin(Rotation.Y*3.1415/180);
         mat_y[5] = 1;
-        mat_y[8] = -(float)Math.sin(RY*3.1415/180);
-        mat_y[10] = (float)Math.cos(RY*3.1415/180);
+        mat_y[8] = -(float)Math.sin(Rotation.Y*3.1415/180);
+        mat_y[10] = (float)Math.cos(Rotation.Y*3.1415/180);
         mat_y[15] = 1;
 
-        mat_z[0] = (float)Math.cos(RZ*3.1415/180);
-        mat_z[1] = -(float)Math.sin(RZ*3.1415/180);
-        mat_z[4] = (float)Math.sin(RZ*3.1415/180);
-        mat_z[5] = (float)Math.cos(RZ*3.1415/180);
+        mat_z[0] = (float)Math.cos(Rotation.Z*3.1415/180);
+        mat_z[1] = -(float)Math.sin(Rotation.Z*3.1415/180);
+        mat_z[4] = (float)Math.sin(Rotation.Z*3.1415/180);
+        mat_z[5] = (float)Math.cos(Rotation.Z*3.1415/180);
         mat_z[10] = 1;
         mat_z[15] = 1;
 

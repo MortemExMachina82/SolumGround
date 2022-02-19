@@ -5,6 +5,12 @@ public class IVec3 {
     public int X;
     public int Y;
     public int Z;
+
+    public IVec3(){
+        this.X = 0;
+        this.Y = 0;
+        this.Z = 0;
+    }
     public IVec3(float X, float Y, float Z){
         this.X = (int)X;
         this.Y = (int)Y;
@@ -26,6 +32,9 @@ public class IVec3 {
         this.Z = (int)pos.Z;
     }
 
+    public Vec3 ToFloat(){
+        return new Vec3(this);
+    }
     @Override
     public String toString() {
         return String.format("(%d, %d, %d)", this.X, this.Y, this.Z);

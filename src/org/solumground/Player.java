@@ -10,10 +10,8 @@ import static org.lwjgl.opengl.GL21.*;
 public class Player{
     public static Vec3 position;
     public static Vec3 reSpawnPosition;
-    public static Vec3 StandingInChunk;
-    public static float XRot;
-    public static float YRot;
-    public static float ZRot;
+    public static IVec3 StandingInChunk;
+    public static Vec3 Rotation;
     public static float [] RotationMatrix;
     public static boolean isOnGround() {return collisionBox.On_Ground();}
     public static boolean is_flying;
@@ -21,9 +19,7 @@ public class Player{
     public static float fall_time;
     public static float jump_time;
 
-    public static int looking_at_X;
-    public static int looking_at_Y;
-    public static int looking_at_Z;
+    public static IVec3 LookingAt;
     public static Mesh wireframe;
     public static int hotbar_selected;
     public static CollisionBox collisionBox;
@@ -37,9 +33,8 @@ public class Player{
         position = new Vec3(reSpawnPosition);
         StandingInChunk = Chunk.convert_to_chunk_pos(position);
 
-        XRot = 0;
-        YRot = 0;
-        ZRot = 0;
+        Rotation = new Vec3();
+        LookingAt = new IVec3();
         hotbar_selected = 0;
 
         String DataPath = Main.SaveFolder+"/Player.dat";
@@ -64,9 +59,9 @@ public class Player{
                     position.X = bb.getFloat(0);
                     position.Y = bb.getFloat(4);
                     position.Z = bb.getFloat(8);
-                    XRot = bb.getFloat(12);
-                    YRot = bb.getFloat(16);
-                    ZRot = bb.getFloat(20);
+                    Rotation.X = bb.getFloat(12);
+                    Rotation.Y = bb.getFloat(16);
+                    Rotation.Z = bb.getFloat(20);
                     hotbar_selected = bb.getInt(24);
                 }
             }
@@ -80,7 +75,7 @@ public class Player{
         collisionBox.set_Is_player(true);
 
         RotationMatrix = new float[4*4];
-        Math3D.Make3DRotationMatrix44(XRot, YRot, ZRot, RotationMatrix);
+        Math3D.Make3DRotationMatrix44(Rotation, RotationMatrix);
 
         is_jumping = false;
         is_flying = false;
@@ -110,45 +105,41 @@ public class Player{
     }
 
     public static void update(){
-        Math3D.Make3DRotationMatrix44(XRot, YRot, ZRot, RotationMatrix);
+        Math3D.Make3DRotationMatrix44(Rotation, RotationMatrix);
         glUniformMatrix4fv(Main.shader_rotation_g_position, false, RotationMatrix);
 
         collisionBox.active_update();
 
         for(int Z=0;Z>-6;Z--){
             Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMatrix);
-            looking_at_X = Math.round(pos.X+position.X);
-            looking_at_Y = Math.round(pos.Y+position.Y);
-            looking_at_Z = Math.round(pos.Z+position.Z);
+            LookingAt.X = Math.round(pos.X+position.X);
+            LookingAt.Y = Math.round(pos.Y+position.Y);
+            LookingAt.Z = Math.round(pos.Z+position.Z);
             
-            Chunk lookingChunk = Chunk.FromPos(new Vec3(looking_at_X,looking_at_Y,looking_at_Z));
+            Chunk lookingChunk = Chunk.FromPos(new Vec3(LookingAt));
             if(lookingChunk != null){
-                if (lookingChunk.GetGlobal(new Vec3(looking_at_X, looking_at_Y, looking_at_Z)) != 0) {
+                if (lookingChunk.GetGlobal(new Vec3(LookingAt)) != 0) {
                     break;
                 }
 
             }
         }
 
-        wireframe.position.X = looking_at_X;
-        wireframe.position.Y = looking_at_Y;
-        wireframe.position.Z = looking_at_Z;
+        wireframe.position = new Vec3(LookingAt);
     }
 
     public static void place_block(){
-        Vec3 pos = new Vec3(looking_at_X,looking_at_Y,looking_at_Z);
-        Chunk selected_chunk = Chunk.FromPos(pos);
+        Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
         if(selected_chunk == null){
             return;
         }
-        selected_chunk.Place(hotbar_selected, pos);
+        selected_chunk.Place(hotbar_selected, LookingAt);
     }
 
     public static void break_block(){
-        Vec3 pos = new Vec3(looking_at_X,looking_at_Y,looking_at_Z);
-        Chunk selected_chunk = Chunk.FromPos(pos);
+        Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
         if(selected_chunk != null){
-            selected_chunk.Delete(pos);
+            selected_chunk.Delete(LookingAt);
         }
     }
 
@@ -159,27 +150,27 @@ public class Player{
     }
 
     public static void Move_X(float distance){
-        position.X -= (float)Math.cos(YRot*3.1415/180)*distance;
-        position.Z += (float)Math.sin(YRot*3.1415/180)*distance;
+        position.X -= (float)Math.cos(Rotation.Y*3.1415/180)*distance;
+        position.Z += (float)Math.sin(Rotation.Y*3.1415/180)*distance;
     }
     public static void Move_Y(float distance){
         position.Y -= distance;
     }
     public static void Move_Z(float distance){
-        position.X -= (float)Math.sin(YRot*3.1415/180)*distance;
-        position.Z -= (float)Math.cos(YRot*3.1415/180)*distance;
+        position.X -= (float)Math.sin(Rotation.Y*3.1415/180)*distance;
+        position.Z -= (float)Math.cos(Rotation.Y*3.1415/180)*distance;
     }
 
     public static void Rotate_Y(float distance){
-        YRot += distance;
+        Rotation.Y += distance;
     }
     public static void Rotate_X(float distance){
-        if(XRot + distance < 90 && XRot + distance > -90) {
-            XRot += distance;
+        if(Rotation.X + distance < 90 && Rotation.X + distance > -90) {
+            Rotation.X += distance;
         }
         else{
-            if(distance > 0){XRot = 90;}
-            if(distance < 0){XRot = -90;}
+            if(distance > 0){Rotation.X = 90;}
+            if(distance < 0){Rotation.X = -90;}
         }
     }
     public static void applyGravity(){
@@ -225,9 +216,6 @@ public class Player{
         position.X = reSpawnPosition.X;
         position.Y = reSpawnPosition.Y;
         position.Z = reSpawnPosition.Z;
-        XRot = 0;
-        YRot = 0;
-        ZRot = 0;
         update();
     }
     public static void Draw(){
@@ -246,9 +234,9 @@ public class Player{
         bb.putFloat(0, position.X);
         bb.putFloat(4, position.Y);
         bb.putFloat(8, position.Z);
-        bb.putFloat(12, XRot);
-        bb.putFloat(16, YRot);
-        bb.putFloat(20, ZRot);
+        bb.putFloat(12, Rotation.X);
+        bb.putFloat(16, Rotation.Y);
+        bb.putFloat(20, Rotation.Z);
         bb.putInt(24, hotbar_selected);
 
         try{

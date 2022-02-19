@@ -12,8 +12,8 @@ public class Chunk{
     public boolean is_empty;
     public String FilePath;
     private byte [] blocks;
-    public Vec3 position;
-    public Vec3 chunkPosition;
+    public IVec3 position;
+    public IVec3 chunkPosition;
 
     public Mesh main_mesh;
     public boolean Exists;
@@ -31,15 +31,15 @@ public class Chunk{
         noisemap = PerlinNoise2D.getNoiseMap();
         //noisemap = Noise.MountainGen();
     }
-    public Chunk(String Path, int Xpos,int Ypos,int Zpos) {
-        this.position = new Vec3(Xpos * Size, Ypos * Size, Zpos * Size);
-        this.chunkPosition = new Vec3(Xpos, Ypos, Zpos);
+    public Chunk(String Path, IVec3 Position) {
+        this.position = new IVec3(Position.X * Size, Position.Y * Size, Position.Z * Size);
+        this.chunkPosition = new IVec3(Position);
         this.FilePath = Path + "/world_data_" + (int) this.chunkPosition.X + "_" + (int) this.chunkPosition.Y + "_" + (int) this.chunkPosition.Z + ".dat";
 
 
         this.Exists = true;
         for (int X = 0; X < Main.ChunkCount; X++) {
-            if (Vec3.Equal(Main.ChunkArray[X].chunkPosition, this.chunkPosition)) {
+            if (IVec3.Equal(Main.ChunkArray[X].chunkPosition, this.chunkPosition)) {
                 this.Exists = false;
                 return;
             }
@@ -88,7 +88,7 @@ public class Chunk{
         for (int Y = 0; Y < Size; Y++) {
             for (int X = 0; X < Size; X++) {
                 for (int Z = 0; Z < Size; Z++) {
-                    int block = GetLocal(X, Y, Z);
+                    int block = GetLocal(new IVec3(X, Y, Z));
                     if (block != 0) {
                         return false;
                     }
@@ -109,9 +109,9 @@ public class Chunk{
         for(int Y=0;Y<Size;Y++){
             for(int X=0;X<Size;X++){
                 for(int Z=0;Z<Size;Z++){
-                    int block = GetLocal(X,Y,Z);
+                    int block = GetLocal(new IVec3(X, Y, Z));
                     if(block != 0){
-                        Put(block, X,Y,Z);
+                        Put(block, new IVec3(X, Y, Z));
                     }
                 }
             }
@@ -132,9 +132,9 @@ public class Chunk{
         for(int Y=0;Y<Size;Y++){
             for(int X=0;X<Size;X++){
                 for(int Z=0;Z<Size;Z++){
-                    int block = GetLocal(X,Y,Z);
+                    int block = GetLocal(new IVec3(X, Y, Z));
                     if(block != 0){
-                        Put(block, X,Y,Z);
+                        Put(block, new IVec3(X, Y, Z));
                     }
                 }
             }
@@ -145,10 +145,10 @@ public class Chunk{
     }
     public static Chunk FromPos(Vec3 pos){
         Chunk selected_chunk = null;
-        pos = convert_to_chunk_pos(pos);
+        IVec3 Ipos = convert_to_chunk_pos(pos);
         for(int X=0;X<Main.ChunkCount;X++){
             Chunk chunk = Main.ChunkArray[X];
-            if(Vec3.Equal(chunk.chunkPosition, pos)){
+            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
                 selected_chunk = chunk;
                 break;
             }
@@ -157,34 +157,34 @@ public class Chunk{
     }
     public static Chunk FromPos(Vec3 pos, Chunk guess){
         if(guess != null) {
-            if (Vec3.Equal(guess.chunkPosition, pos)) {
+            if (IVec3.Equal(guess.chunkPosition, pos.ToInt())) {
                 return guess;
             }
         }
     
         Chunk selected_chunk = null;
-        pos = convert_to_chunk_pos(pos);
+        IVec3 Ipos = convert_to_chunk_pos(pos);
         for(int X=0;X<Main.ChunkCount;X++){
             Chunk chunk = Main.ChunkArray[X];
-            if(Vec3.Equal(chunk.chunkPosition, pos)){
+            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
                 selected_chunk = chunk;
                 break;
             }
         }
         return selected_chunk;
     }
-    public static Chunk FromChunkPos(Vec3 Pos){
+    public static Chunk FromChunkPos(IVec3 Pos){
         Chunk selected_chunk = null;
         for(int X=0;X<Main.ChunkCount;X++){
             Chunk chunk = Main.ChunkArray[X];
-            if(Vec3.Equal(chunk.chunkPosition, Pos)){
+            if(IVec3.Equal(chunk.chunkPosition, Pos)){
                 selected_chunk = chunk;
                 break;
             }
         }
         return selected_chunk;
     }
-    public static Vec3 convert_to_chunk_pos(Vec3 pos){
+    public static IVec3 convert_to_chunk_pos(Vec3 pos){
         int X,Y,Z;
         if(pos.X < 0){
             X = (int)(pos.X-9)/Size;
@@ -205,67 +205,65 @@ public class Chunk{
             Z = (int)(pos.Z)/Size;
         }
 
-        return new Vec3(X,Y,Z);
+        return new IVec3(X,Y,Z);
     }
 
-    public void Put_side(int cubeID, int side, int X,int Y,int Z){
+    public void Put_side(int cubeID, int side, IVec3 Position){
         Mesh mesh = Block.Blocks[cubeID].Sides[side];
-        mesh.position.X = X;
-        mesh.position.Y = Y;
-        mesh.position.Z = Z;
+        mesh.position = Position.ToFloat();
         main_mesh.add(mesh);
     }
-    public void Put(int cubeID, int X,int Y,int Z){
-        if(GetLocal(X-1,Y,Z) == 0){Put_side(cubeID,1, X,Y,Z);}
-        if(GetLocal(X+1,Y,Z) == 0){Put_side(cubeID,0, X,Y,Z);}
-        if(GetLocal(X,Y+1,Z) == 0){Put_side(cubeID,2, X,Y,Z);}
-        if(GetLocal(X,Y-1,Z) == 0){Put_side(cubeID,3, X,Y,Z);}
-        if(GetLocal(X,Y,Z-1) == 0){Put_side(cubeID,4, X,Y,Z);}
-        if(GetLocal(X,Y,Z+1) == 0){Put_side(cubeID,5, X,Y,Z);}
+    public void Put(int cubeID, IVec3 Position){
+        if(GetLocal(new IVec3(Position.X-1,Position.Y,Position.Z)) == 0){Put_side(cubeID,1, Position);}
+        if(GetLocal(new IVec3(Position.X+1,Position.Y,Position.Z)) == 0){Put_side(cubeID,0, Position);}
+        if(GetLocal(new IVec3(Position.X,Position.Y+1,Position.Z)) == 0){Put_side(cubeID,2, Position);}
+        if(GetLocal(new IVec3(Position.X,Position.Y-1,Position.Z)) == 0){Put_side(cubeID,3, Position);}
+        if(GetLocal(new IVec3(Position.X,Position.Y,Position.Z-1)) == 0){Put_side(cubeID,4, Position);}
+        if(GetLocal(new IVec3(Position.X,Position.Y,Position.Z+1)) == 0){Put_side(cubeID,5, Position);}
     }
 
-    public boolean Place(int BLockID, Vec3 blockpos){
-        Vec3 Lpos = ConvertToLocal(blockpos);
-        if(GetLocal((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) == 0) {
+    public boolean Place(int BLockID, IVec3 blockpos){
+        IVec3 Lpos = ConvertToLocal(blockpos);
+        if(GetLocal(Lpos) == 0) {
             if(this.is_empty){
                 blocks = new byte[Size*Size*Size];
                 main_mesh = new Mesh(Block.TextureBufferObject);
-                main_mesh.position = this.position;
+                main_mesh.position = this.position.ToFloat();
                 this.is_empty = false;
             }
-            this.blocks[(int)Lpos.Y*Size*Size + (int)Lpos.X*Size + (int)Lpos.Z] = (byte)BLockID;
+            this.blocks[Lpos.Y*Size*Size + Lpos.X*Size + Lpos.Z] = (byte)BLockID;
             ReBuildMesh();
             return true;
         }
         return false;
     }
-    public void Delete(Vec3 blockpos){
-        Vec3 Lpos = ConvertToLocal(blockpos);
-        if(GetLocal((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) != 0) {
-            this.blocks[(int)Lpos.Y * Size * Size + (int)Lpos.X * Size + (int)Lpos.Z] = 0;
+    public void Delete(IVec3 blockpos){
+        IVec3 Lpos = ConvertToLocal(blockpos);
+        if(GetLocal(Lpos) != 0) {
+            this.blocks[Lpos.Y * Size * Size + Lpos.X * Size + Lpos.Z] = 0;
             ReBuildMesh();
         }
     }
 
-    public boolean validCord(int X, int Y, int Z) {
-        return (X >= 0 && X < Size) && (Y >= 0 && Y < Size) && (Z >= 0 && Z < Size);
+    public boolean validCord(IVec3 Position) {
+        return (Position.X >= 0 && Position.X < Size) && (Position.Y >= 0 && Position.Y < Size) && (Position.Z >= 0 && Position.Z < Size);
     }
 
-    public int GetLocal(int X, int Y, int Z){
-        if(validCord(X,Y,Z) && blocks != null){
-            return blocks[Y*Size*Size + X*Size + Z];
+    public int GetLocal(IVec3 Position){
+        if(validCord(Position) && blocks != null){
+            return blocks[Position.Y*Size*Size + Position.X*Size + Position.Z];
         }
         return 0;
     }
     public int GetGlobal(Vec3 Gpos){
-        Vec3 Lpos = ConvertToLocal(Gpos);
-        if(validCord((int)Lpos.X,(int)Lpos.Y,(int)Lpos.Z) && blocks != null){
-            return blocks[(int)Lpos.Y*Size*Size + (int)Lpos.X*Size + (int)Lpos.Z];
+        IVec3 Lpos = ConvertToLocal(Gpos.ToInt());
+        if(validCord(Lpos) && blocks != null){
+            return blocks[Lpos.Y*Size*Size + Lpos.X*Size + Lpos.Z];
         }
         return 0;
     }
-    public Vec3 ConvertToLocal(Vec3 position){
-        return new Vec3(position.X-this.position.X, position.Y-this.position.Y, position.Z-this.position.Z);
+    public IVec3 ConvertToLocal(IVec3 position){
+        return new IVec3(position.X-this.position.X, position.Y-this.position.Y, position.Z-this.position.Z);
     }
 
     public void GenChunk(){

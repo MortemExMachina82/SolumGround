@@ -1,7 +1,5 @@
 package org.solumground;
 
-import org.lwjgl.opengl.GL;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -34,9 +32,7 @@ public class Mesh{
     int Texture_Buffer_Object;
     boolean TBO_gen;
     Vec3 position = new Vec3(0,0,0);
-    float XRot;
-    float YRot;
-    float ZRot;
+    Vec3 Roation;
     boolean is_skyBox;
     boolean FullLight = false;
 
@@ -325,9 +321,7 @@ public class Mesh{
         this.TBO_gen = true;
 
         this.position = new Vec3(0,0,0);
-        this.XRot = 0;
-        this.YRot = 0;
-        this.ZRot = 0;
+        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
     }
     public Mesh(String Path, int type){
@@ -348,9 +342,7 @@ public class Mesh{
         this.TBO_gen = true;
 
         this.position = new Vec3(0,0,0);
-        this.XRot = 0;
-        this.YRot = 0;
-        this.ZRot = 0;
+        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
 
     }
@@ -367,9 +359,7 @@ public class Mesh{
         this.TBO_gen = false;
 
         this.position = new Vec3(0,0,0);
-        this.XRot = 0;
-        this.YRot = 0;
-        this.ZRot = 0;
+        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
     }
     public Mesh(Mesh mesh){
@@ -397,15 +387,9 @@ public class Mesh{
         glEnableVertexAttribArray(Main.shader_vertex_position);
         glEnableVertexAttribArray(Main.shader_vtcord_position);
 
-
-
         this.position = new Vec3(0,0,0);
-        this.XRot = 0;
-        this.YRot = 0;
-        this.ZRot = 0;
+        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
-
-
     }
 
     public void Init_VBO(){
@@ -724,7 +708,7 @@ public class Mesh{
 
             glUniformMatrix4fv(Main.shader_translation_position, false, mat);
 
-            Math3D.Make3DRotationMatrix44(this.XRot, this.YRot, this.ZRot, mat);
+            Math3D.Make3DRotationMatrix44(new Vec3(this.Roation), mat);
             glUniformMatrix4fv(Main.shader_rotation_l_position, false, mat);
         }
 
