@@ -1,14 +1,13 @@
 package org.solumground;
 
-import com.github.cliftonlabs.json_simple.JsonArray;
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.Jsoner;
+import org.solumground.Json.JsonArray;
+import org.solumground.Json.JsonObject;
+import org.solumground.Json.JsonParser;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -169,28 +168,28 @@ public class Block {
         try {
             String fileContents = String.join("\n", Files.readAllLines(Paths.get(File)));
 
-            JsonObject object = (JsonObject)Jsoner.deserialize(fileContents);
-            this.Name = (String)object.get("Name");
-            this.ID = ((BigDecimal)object.get("ID")).intValue();
-            this.Full = (boolean)object.get("Full");
-            this.DirectoryModelPath = (String)object.get("DirectoryModelPath");
-            this.DirectoryTexturePath = (String)object.get("DirectoryTexturePath");
+            JsonObject jsonObject = new JsonParser(File).mainJsonObject;
+            this.Name = jsonObject.Get("Name").GetString();
+            this.ID = jsonObject.Get("ID").GetInt();
+            this.Full = jsonObject.Get("Full").GetBoolean();
+            this.DirectoryModelPath = jsonObject.Get("DirectoryModelPath").GetString();
+            this.DirectoryTexturePath = jsonObject.Get("DirectoryTexturePath").GetString();
 
             if(Full) {
                 Models = new String[6];
                 Texture = new String[6];
                 Sides = new Mesh[6];
-                JsonArray modelarray = (JsonArray)object.get("Model");
+                JsonArray modelarray = jsonObject.Get("Model").GetArray();
                 int OldLength = Textures.length;
                 String [] paths = new String[OldLength+6];
                 System.arraycopy(Textures, 0, paths, 0, Textures.length);
 
                 Textures = paths;
                 for (int Y = 0; Y < 6; Y++) {
-                    JsonArray sidearray = (JsonArray) modelarray.get(Y);
-                    String Side = (String) sidearray.get(0);
-                    String FileName = (String) sidearray.get(1);
-                    String TexturePath = (String) sidearray.get(2);
+                    JsonArray sidearray = modelarray.Get(Y).GetArray();
+                    String Side = sidearray.Get(0).GetString();
+                    String FileName = sidearray.Get(1).GetString();
+                    String TexturePath = sidearray.Get(2).GetString();
 
                     if(Side.equals("Right")){
                         Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
@@ -228,12 +227,12 @@ public class Block {
             else{
                 Models = new String[1];
                 Sides = new Mesh[1];
-                JsonArray modelarray = (JsonArray)object.get("Model");
+                JsonArray modelarray = jsonObject.Get("Model").GetArray();
                 if(modelarray != null) {
-                    JsonArray sidearray = (JsonArray) modelarray.get(0);
-                    String Side = (String) sidearray.get(0);
-                    String FileName = (String) sidearray.get(1);
-                    String TexturePath = (String) sidearray.get(2);
+                    JsonArray sidearray = modelarray.Get(0).GetArray();
+                    String Side = sidearray.Get(0).GetString();
+                    String FileName = sidearray.Get(1).GetString();
+                    String TexturePath = sidearray.Get(2).GetString();
                     Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
                     if(Side.equals("Model")){
                         Models[0] = FileName;

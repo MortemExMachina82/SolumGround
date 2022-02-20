@@ -1,5 +1,8 @@
 {
     "Name":"air",
     "ID":0,
-    "Full":false
+    "Full":false,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Model":null
 }

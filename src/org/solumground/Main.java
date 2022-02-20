@@ -1,10 +1,9 @@
 package org.solumground;
 
+import org.solumground.Json.*;
+
 import java.io.*;
 import java.nio.file.*;
-
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.Jsoner;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
@@ -239,38 +238,28 @@ public class Main {
         }
     }
     public static void LoadSettings(String Path) {
-        String fileContents;
         try {
-            fileContents = String.join("\n", Files.readAllLines(Paths.get(Path)));
-        } catch (Exception e) {
-            System.out.print("Failed To Load Settings: ");
-            System.out.println(Path);
-            e.printStackTrace();
-            return;
-        }
-        try {
-            JsonObject object = (JsonObject) Jsoner.deserialize(fileContents);
+            JsonObject jsonObject = new JsonParser(Path).mainJsonObject;
 
-            SaveFolder = jar_folder_path+"/"+ object.get("SaveFolder");
-            FOV = Float.parseFloat((String)object.get("FOV"));
-            nearPlane = Float.parseFloat((String)object.get("NearClippingPlane"));
-            farPlane = Float.parseFloat((String)object.get("FarClippingPlane"));
+            SaveFolder = jar_folder_path+"/"+ jsonObject.Get("SaveFolder").GetString();
+            FOV = jsonObject.Get("FOV").GetFloat();
+            nearPlane = jsonObject.Get("NearClippingPlane").GetFloat();
+            farPlane = jsonObject.Get("FarClippingPlane").GetFloat();
 
-            win_X = Integer.parseInt((String)object.get("WindowWidth"));
-            win_Y = Integer.parseInt((String)object.get("WindowHight"));
-            aspectRatio = win_X/(float)win_Y;
+            win_X = jsonObject.Get("WindowWidth").GetInt();
+            win_Y = jsonObject.Get("WindowHight").GetInt();
+            aspectRatio = (float) win_X/(float)win_Y;
 
-            FullScreen = (boolean)object.get("FullScreen");
-            //showColisionBox = (boolean)object.get("showColisionBox");
-            DrawSkyBox = (boolean)object.get("DrawSkyBox");
+            FullScreen = jsonObject.Get("FullScreen").GetBoolean();
+            DrawSkyBox = jsonObject.Get("DrawSkyBox").GetBoolean();
 
 
-            playerMoveSpeed = Float.parseFloat((String)object.get("playerMoveSpeed"));
-            playerRotateSpeedKey = Float.parseFloat((String)object.get("playerRotateSpeedKey"));
-            playerRotateSpeedMouse = Float.parseFloat((String)object.get("playerRotateSpeedMouse"));
-            RenderDistance = Integer.parseInt((String)object.get("RenderDistance"));
+            playerMoveSpeed = jsonObject.Get("playerMoveSpeed").GetFloat();
+            playerRotateSpeedKey = jsonObject.Get("playerRotateSpeedKey").GetFloat();
+            playerRotateSpeedMouse = jsonObject.Get("playerRotateSpeedMouse").GetFloat();
+            RenderDistance = jsonObject.Get("RenderDistance").GetInt();
 
-            FontPath = jar_folder_path+"/"+ object.get("Font");
+            FontPath = jar_folder_path+"/"+ jsonObject.Get("Font").GetString();
 
         } catch (Exception e) {
             System.out.print("Error While Parseing Settings: ");
@@ -373,7 +362,6 @@ public class Main {
         new Light(new Vec3(0,25,0), 1f, 2f,.5f,.5f);
         new Light(new Vec3(30,25,0), 1f, .5f,2f,.5f);
         new Light(new Vec3(15,25,-15), 1f, .5f,.5f,2f);
-
 
         unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 

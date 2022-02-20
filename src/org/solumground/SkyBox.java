@@ -1,15 +1,13 @@
 package org.solumground;
 
-import com.github.cliftonlabs.json_simple.JsonArray;
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.Jsoner;
+import org.solumground.Json.*;
+
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -38,52 +36,45 @@ public class SkyBox {
 
     public static void Init(){
         String Path = Main.jar_folder_path+"/assets/solumground/SkyBoxSettings.json";
-        String fileContents;
         try {
-            fileContents = String.join("\n", Files.readAllLines(Paths.get(Path)));
-        } catch (Exception e) {
-            System.out.print("Failed To Load SkyBox Settings Data: ");
-            System.out.println(Path);
-            e.printStackTrace();
-            return;
-        }
-        try {
-            JsonObject object = (JsonObject) Jsoner.deserialize(fileContents);
+            JsonParser jsonParser = new JsonParser(Path);
+            JsonObject jsonObject = jsonParser.mainJsonObject;
 
-            Generated = (boolean) object.get("Generated");
-            OneTexture = (boolean) object.get("OneTexture");
-            DirectoryModelPath = (String) object.get("DirectoryModelPath");
-            DirectoryTexturePath = (String) object.get("DirectoryTexturePath");
-            ModelName = (String) object.get("ModelName");
-            TextureName = (String) object.get("TextureName");
+            Generated = jsonObject.Get("Generated").GetBoolean();
+            OneTexture = jsonObject.Get("OneTexture").GetBoolean();
+            DirectoryModelPath = jsonObject.Get("DirectoryModelPath").GetString();
+            DirectoryTexturePath = jsonObject.Get("DirectoryTexturePath").GetString();
+            ModelName = jsonObject.Get("ModelName").GetString();
+            TextureName = jsonObject.Get("TextureName").GetString();
 
             if (!Generated && !OneTexture) {
-                JsonArray modelarray = (JsonArray) object.get("Model");
+                JsonArray modelarray = jsonObject.Get("Model").GetArray();
+                System.out.println(modelarray.jsonItems.get(0).Parent.Name);
                 for (int X = 0; X < 6; X++) {
-                    JsonArray side = (JsonArray) modelarray.get(X);
-                    if ("Right".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    JsonArray side = modelarray.Get(X).GetArray();
+                    if ("Right".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
-                    if ("Left".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    if ("Left".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
-                    if ("Top".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    if ("Top".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
-                    if ("Bottom".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    if ("Bottom".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
-                    if ("Front".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    if ("Front".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
-                    if ("Back".equals(side.get(0))) {
-                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.get(1);
-                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.get(2);
+                    if ("Back".equals(side.Get(0).GetString())) {
+                        ModelNames[X] = Main.jar_folder_path+"/"+DirectoryModelPath+"/"+side.Get(1).GetString();
+                        TextureNames[X] = Main.jar_folder_path+"/"+DirectoryTexturePath+"/"+side.Get(2).GetString();
                     }
                 }
             }

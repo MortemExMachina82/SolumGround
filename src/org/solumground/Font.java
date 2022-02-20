@@ -1,15 +1,12 @@
 package org.solumground;
 
+import org.solumground.Json.*;
+
 import java.io.*;
-import java.math.BigDecimal;
-import java.nio.file.*;
+
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.JsonArray;
-import com.github.cliftonlabs.json_simple.Jsoner;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -28,32 +25,22 @@ public class Font {
 
     public Font(String Path){
         this.filepath = Path;
-        String fileContents;
         this.widths = new int[127];
         try{
-            fileContents = String.join("\n", Files.readAllLines(Paths.get(this.filepath)));
-        }
-        catch(Exception e){
-            System.out.print("Failed To Load Font: ");
-            System.out.println(this.filepath);
-            e.printStackTrace();
-            return;
-        }
-        try{
-            JsonObject object = (JsonObject)Jsoner.deserialize(fileContents);
+            JsonObject jsonObject = new JsonParser(Path).mainJsonObject;
 
-            this.name = (String)object.get("name");
-            this.texpath = Main.jar_folder_path+"/"+ object.get("texturePath");
-            boolean fixedWidth = (boolean)object.get("fixed-width");
+            this.name = jsonObject.Get("name").GetString();
+            this.texpath = Main.jar_folder_path+"/"+ jsonObject.Get("texturePath").GetString();
+            boolean fixedWidth = jsonObject.Get("fixed-width").GetBoolean();
             if(fixedWidth){
-                int width = ((BigDecimal)object.get("widths")).intValue();
+                int width = jsonObject.Get("widths").GetInt();
                 Arrays.fill(this.widths, width);
             }
             else{
-                JsonArray array = (JsonArray)object.get("widths");
+                JsonArray jsonArray = jsonObject.Get("widths").GetArray();
                 for(int X=0;X<this.widths.length;X++){
-                    long element = ((BigDecimal)array.get(X)).longValue();
-                    this.widths[X] = Long.valueOf(element).intValue();
+                    int element = jsonArray.Get(X).GetInt();
+                    this.widths[X] = element;
                 }
             }
         }

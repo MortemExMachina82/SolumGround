@@ -2,19 +2,19 @@
     "SaveFolder":"saves/world",
     "Font":"assets/solumground/Fonts/Default.json",
     "FOV":"90",
-    "NearClippingPlane":"0.1",
-    "FarClippingPlane":"150",
-    "WindowWidth":"1000",
-    "WindowHight":"500",
+    "NearClippingPlane":0.1,
+    "FarClippingPlane":150,
+    "WindowWidth":1000,
+    "WindowHight":500,
     "FullScreen":false,
     
     "DrawSkyBox":true,
     "SkyBoxGenerated":false,
     "SkyBoxTexturePath":"assets/solumground/textures/SkyBox3.png",
     
-    "playerMoveSpeed":"6",
-    "playerRotateSpeedKey":"100",
-    "playerRotateSpeedMouse":"8",
+    "playerMoveSpeed":6,
+    "playerRotateSpeedKey":100,
+    "playerRotateSpeedMouse":8,
     
-    "RenderDistance":"2"
+    "RenderDistance":2
 }
