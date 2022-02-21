@@ -116,9 +116,9 @@ public class Text {
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, font.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 4 * 9, 0);
-        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 4 * 9, 4 * 3);
-        glVertexAttribPointer(Main.shader_light, 4, GL_FLOAT, false, 9 * 4, 3*4 + 2*4);
+        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 36, 0);
+        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 36, 12);
+        glVertexAttribPointer(Main.shader_light, 4, GL_FLOAT, false, 36, 20);
 
         glDisable(GL_DEPTH_TEST);
         glDrawArrays(GL_QUADS, 0, this.text.length*4);

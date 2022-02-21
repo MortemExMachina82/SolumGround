@@ -12,9 +12,8 @@ class MeshBuilder extends Thread{
     }
     public void Build(){
         while(buffer.size() > 0) {
-            //System.out.println("Current build queue: " + buffer.size());
-            buffer.get(0).buildMesh();
-            buffer.remove(0);
+            Chunk chunk = buffer.remove(0);
+            chunk.buildMesh();
         }
     }
     public void run(){

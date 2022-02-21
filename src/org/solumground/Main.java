@@ -308,8 +308,7 @@ public class Main {
             return;
         }
         LoadSettings(jar_folder_path+"/assets/solumground/Settings.json");
-        
-        
+
         File save_folder_file = new File(SaveFolder);
         if(!save_folder_file.exists()){
             save_folder_file.mkdirs(); // create file path if it doesn't exist
@@ -332,7 +331,6 @@ public class Main {
         assert mode != null;
         monitor_W = mode.width();
         monitor_H = mode.height();
-
 
         win = glfwCreateWindow(win_X, win_Y, "SolumGround", 0, 0);
         glfwMakeContextCurrent(win);
@@ -417,11 +415,10 @@ public class Main {
                 Player.applyGravity();
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            if(!showCollisionBox){Player.update();}
+            Player.update();
             if(DrawSkyBox) {
                 SkyBox.draw();
             }
-            if(showCollisionBox){Player.update();}
             Player.Draw();
             for(int X=0;X<ChunkCount;X++){
                 if(ChunkArray[X] != null) {
@@ -449,19 +446,6 @@ public class Main {
         Player.Save();
         System.out.println("Saved");
         glfwDestroyWindow(win);
-        double Time = glfwGetTime();
-        while(chunkLoader.isAlive()){
-            double CTime = glfwGetTime();
-            if(CTime-Time > 5){
-                chunkLoader.interrupt();
-                break;
-            }
-            MakeGLCalls();
-        }
-
-
-
         glfwTerminate();
     }
-
 }

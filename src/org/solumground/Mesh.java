@@ -683,9 +683,9 @@ public class Mesh{
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 8 * 4, 0);
-        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 8 * 4, 3 * 4);
-        glVertexAttribPointer(Main.shader_light, 3, GL_FLOAT, false, 8 * 4, 3*4 + 2*4);
+        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 32, 0);
+        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 32, 12);
+        glVertexAttribPointer(Main.shader_light, 3, GL_FLOAT, false, 32, 20);
 
         if(this.is_skyBox){glDisable(GL_DEPTH_TEST);}
         if(this.has_triangles) {
