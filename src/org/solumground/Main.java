@@ -21,6 +21,8 @@ public class Main {
     public static float farPlane;
     public static int win_X;
     public static int win_Y;
+    public static int OriginalWinX;
+    public static int OriginalWinY;
     public static float aspectRatio;
     public static long monitor;
     public static int monitor_W;
@@ -191,6 +193,8 @@ public class Main {
             if((mods & 0x0004) > 0) {
                 if (key == GLFW_KEY_F) {
                     FullScreen = !FullScreen;
+                    win_X /= 2;
+                    win_Y /= 2;
                     update_fullscreen();
                 }
                 if(key == GLFW_KEY_S){
@@ -234,7 +238,7 @@ public class Main {
             glfwSetWindowMonitor(win, monitor, 0,0, monitor_W,monitor_H, 0);
         }
         else{
-            glfwSetWindowMonitor(win, 0, (monitor_W/2)-(win_X/2), (monitor_H/2)-(win_Y/2), win_X, win_Y, 0);
+            glfwSetWindowMonitor(win, 0, (monitor_W/2)-(OriginalWinX/2), (monitor_H/2)-(OriginalWinY/2), OriginalWinX, OriginalWinY, 0);
         }
     }
     public static void LoadSettings(String Path) {
@@ -246,8 +250,10 @@ public class Main {
             nearPlane = jsonObject.Get("NearClippingPlane").GetFloat();
             farPlane = jsonObject.Get("FarClippingPlane").GetFloat();
 
-            win_X = jsonObject.Get("WindowWidth").GetInt();
-            win_Y = jsonObject.Get("WindowHight").GetInt();
+            OriginalWinX = jsonObject.Get("WindowWidth").GetInt();
+            OriginalWinY = jsonObject.Get("WindowHight").GetInt();
+            win_X = OriginalWinX;
+            win_Y = OriginalWinY;
             aspectRatio = (float) win_X/(float)win_Y;
 
             FullScreen = jsonObject.Get("FullScreen").GetBoolean();
