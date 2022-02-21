@@ -66,8 +66,8 @@ public class Text {
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBufferData(GL_ARRAY_BUFFER, this.VertexArray, GL_DYNAMIC_DRAW);
 
-        glEnableVertexAttribArray(Main.shader_vertex_position);
-        glEnableVertexAttribArray(Main.shader_vtcord_position);
+        glEnableVertexAttribArray(Main.shader_Vertex);
+        glEnableVertexAttribArray(Main.shader_TextureCords);
     }
 
     public Text(String newtext, Font font, float Size, Vec3 pos){
@@ -104,29 +104,27 @@ public class Text {
         mat[13] = this.position.Y - this.Size;
         mat[14] = -1;
 
-
-        glUniformMatrix4fv(Main.shader_translation_position, false, mat);
+        glUniformMatrix4fv(Main.shader_ModelMat, false, mat);
 
         mat[12] = 0;
         mat[13] = 0;
         mat[14] = 0;
-        glUniformMatrix4fv(Main.shader_rotation_g_position, false, mat);
-        glUniformMatrix4fv(Main.shader_rotation_l_position, false, mat);
+        glUniformMatrix4fv(Main.shader_WorldMat, false, mat);
 
 
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, font.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.shader_vertex_position, 3, GL_FLOAT, false, 4 * 9, 0);
-        glVertexAttribPointer(Main.shader_vtcord_position, 2, GL_FLOAT, false, 4 * 9, 4 * 3);
-        glVertexAttribPointer(Main.shader_light_position, 4, GL_FLOAT, false, 9 * 4, 3*4 + 2*4);
+        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 4 * 9, 0);
+        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 4 * 9, 4 * 3);
+        glVertexAttribPointer(Main.shader_light, 4, GL_FLOAT, false, 9 * 4, 3*4 + 2*4);
 
         glDisable(GL_DEPTH_TEST);
         glDrawArrays(GL_QUADS, 0, this.text.length*4);
         glEnable(GL_DEPTH_TEST);
 
-        glUniformMatrix4fv(Main.shader_rotation_g_position, false, Player.RotationMatrix);
+        glUniformMatrix4fv(Main.shader_WorldMat, false, Player.WorldMatrix);
     }
 }
 

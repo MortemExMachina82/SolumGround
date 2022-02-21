@@ -9,13 +9,12 @@ varying vec2 texcord;
 varying vec3 light;
 
 
-uniform mat4 rotation_l;
-uniform mat4 rotation_g;
-uniform mat4 translation;
-uniform mat4 projection;
+uniform mat4 ModelMat;
+uniform mat4 WorldMat;
+uniform mat4 ProjectionMat;
 
 void main(){
     texcord = a_texcord;
     light = a_light;
-    gl_Position = (projection*(rotation_g*(translation*(rotation_l*vec4(a_position, 1.0)))));
+    gl_Position = (ProjectionMat*(WorldMat*(ModelMat*vec4(a_position, 1.0))));
 }

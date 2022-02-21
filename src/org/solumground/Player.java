@@ -12,7 +12,7 @@ public class Player{
     public static Vec3 reSpawnPosition;
     public static IVec3 StandingInChunk;
     public static Vec3 Rotation;
-    public static float [] RotationMatrix;
+    public static float [] WorldMatrix;
     public static boolean isOnGround() {return collisionBox.On_Ground();}
     public static boolean is_flying;
     public static boolean is_jumping;
@@ -74,8 +74,8 @@ public class Player{
         collisionBox = new CollisionBox(position, .33f,.1f,.33f, -.33f,-1.8f,-.33f);
         collisionBox.set_Is_player(true);
 
-        RotationMatrix = new float[4*4];
-        Math3D.Make3DRotationMatrix44(Rotation, RotationMatrix);
+        WorldMatrix = new float[4*4];
+        Math3D.Make3DRotationMatrix44(Rotation, WorldMatrix);
 
         is_jumping = false;
         is_flying = false;
@@ -101,17 +101,27 @@ public class Player{
         projection_mat[11] = -1;
         projection_mat[14] = ((Main.farPlane*Main.nearPlane) / (Main.nearPlane-Main.farPlane))*2;
 
-        glUniformMatrix4fv(Main.shader_projection_position, false, projection_mat);
+        glUniformMatrix4fv(Main.shader_Projection, false, projection_mat);
     }
 
     public static void update(){
-        Math3D.Make3DRotationMatrix44(Rotation, RotationMatrix);
-        glUniformMatrix4fv(Main.shader_rotation_g_position, false, RotationMatrix);
+        float [] RotationMat = new float[16];
+        Math3D.Make3DRotationMatrix44(Rotation, RotationMat);
+        float [] TransMat = new float[16];
+        TransMat[0] = 1;
+        TransMat[5] = 1;
+        TransMat[10] = 1;
+        TransMat[12] = -position.X;
+        TransMat[13] = -position.Y;
+        TransMat[14] = -position.Z;
+        TransMat[15] = 1;
+        Math3D.Matrix44_Multiply(TransMat,RotationMat, WorldMatrix);
+        glUniformMatrix4fv(Main.shader_WorldMat, false, WorldMatrix);
 
         collisionBox.active_update();
 
         for(int Z=0;Z>-6;Z--){
-            Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMatrix);
+            Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMat);
             LookingAt.X = Math.round(pos.X+position.X);
             LookingAt.Y = Math.round(pos.Y+position.Y);
             LookingAt.Z = Math.round(pos.Z+position.Z);

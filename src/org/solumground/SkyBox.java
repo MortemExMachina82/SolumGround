@@ -2,12 +2,10 @@ package org.solumground;
 
 import org.solumground.Json.*;
 
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 
 import static org.lwjgl.opengl.GL21.*;
 

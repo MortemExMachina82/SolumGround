@@ -37,16 +37,14 @@ public class Main {
     public static boolean showCollisionBox;
     public static boolean DrawSkyBox;
 
-    public static int shaderProgram;
-    public static int shader_vertex_position;
-    public static int shader_vtcord_position;
-    public static int shader_projection_position;
-    public static int shader_translation_position;
-    public static int shader_rotation_l_position;
-    public static int shader_rotation_g_position;
-    public static int shader_scean_position;
-    public static int shader_doubleDraw_position;
-    public static int shader_light_position;
+    public static int MainShaderProgram;
+    public static int shader_Vertex;
+    public static int shader_TextureCords;
+    public static int shader_light;
+    public static int shader_Projection;
+    public static int shader_ModelMat;
+    public static int shader_WorldMat;
+
 
     public static double mouse_past_X;
     public static double mouse_past_Y;
@@ -84,10 +82,9 @@ public class Main {
     public static int glDeleteBuffers_In1;
 
 
-    public static int Init_shader(){
-
-        String vertex_shader_source_path = jar_folder_path +"/assets/solumground/shaders/Vertex.fsh";
-        String fragment_shader_source_path = jar_folder_path +"/assets/solumground/shaders/Fragment.fsh";
+    public static int LoadShader(String Path){
+        String vertex_shader_source_path = Path+"/Vertex.vsh";
+        String fragment_shader_source_path = Path+"/Fragment.fsh";
         String vertex_shader_source;
         String fragment_shader_source;
         try{
@@ -135,20 +132,17 @@ public class Main {
         glUseProgram(shaderProgram);
 
 
-        shader_vertex_position = glGetAttribLocation(shaderProgram, "a_position");
-        shader_vtcord_position = glGetAttribLocation(shaderProgram, "a_texcord");
-        shader_light_position = glGetAttribLocation(shaderProgram, "a_light");
+        shader_Vertex = glGetAttribLocation(shaderProgram, "a_position");
+        shader_TextureCords = glGetAttribLocation(shaderProgram, "a_texcord");
+        shader_light = glGetAttribLocation(shaderProgram, "a_light");
 
-        shader_projection_position = glGetUniformLocation(shaderProgram, "projection");
-        shader_translation_position = glGetUniformLocation(shaderProgram, "translation");
-        shader_rotation_l_position = glGetUniformLocation(shaderProgram, "rotation_l");
-        shader_rotation_g_position = glGetUniformLocation(shaderProgram, "rotation_g");
-        
-        shader_scean_position = glGetUniformLocation(shaderProgram, "scean");
-        shader_doubleDraw_position = glGetUniformLocation(shaderProgram, "doubleDraw");
+        shader_Projection = glGetUniformLocation(shaderProgram, "ProjectionMat");
+        shader_ModelMat = glGetUniformLocation(shaderProgram, "ModelMat");
+        shader_WorldMat = glGetUniformLocation(shaderProgram, "WorldMat");
 
-        glEnableVertexAttribArray(shader_vtcord_position);
-        glEnableVertexAttribArray(shader_light_position);
+        glEnableVertexAttribArray(shader_Vertex);
+        glEnableVertexAttribArray(shader_TextureCords);
+        glEnableVertexAttribArray(shader_light);
 
         glClearColor(0,0,0,1);
         glEnable(GL_DEPTH_TEST);
@@ -355,9 +349,7 @@ public class Main {
         glfwSetMouseButtonCallback(win, Main::mouseButtonCallback);
         glfwSwapInterval(1);
         
-        shaderProgram = Init_shader();
-        glUniform1i(shader_doubleDraw_position, 0);
-        glUniform1f(shader_scean_position, 0);
+        MainShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Main");
 
         Player.Init();
         Player.is_flying = false;

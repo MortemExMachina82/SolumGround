@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -72,7 +71,7 @@ public class Mesh{
     }
 
     public void LoadSMOBJ(String model_Path) {
-        if(Objects.equals(model_Path, "")){
+        if(model_Path.equals("")){
             this.has_triangles = true;
             this.has_quads = true;
 
@@ -362,45 +361,16 @@ public class Mesh{
         this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
     }
-    public Mesh(Mesh mesh){
-        this.modelPath = mesh.modelPath;
-        this.texturePath = mesh.texturePath;
-        this.has_tex = mesh.has_tex;
-        this.has_triangles = mesh.has_triangles;
-        this.has_quads = mesh.has_quads;
-        this.Number_of_Verts = mesh.Number_of_Verts;
-        this.Number_of_TriFaces = mesh.Number_of_TriFaces;
-        this.Number_of_QuadFaces = mesh.Number_of_QuadFaces;
-        this.Number_of_vtcords = mesh.Number_of_vtcords;
-        this.Original_VertexArray = mesh.Original_VertexArray;
-        this.VTcords_array = mesh.VTcords_array;
-        this.TriFaceArray = mesh.TriFaceArray;
-        this.QuadFaceArray = mesh.QuadFaceArray;
-        this.Texture_width = mesh.Texture_width;
-        this.Texture_hight = mesh.Texture_width;
-        this.VertexBufferObject = mesh.VertexBufferObject;
-        this.Texture_Buffer_Object = mesh.Texture_Buffer_Object;
-        this.TBO_gen = false;
-        this.FullLight = mesh.FullLight;
-
-        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-        glEnableVertexAttribArray(Main.shader_vertex_position);
-        glEnableVertexAttribArray(Main.shader_vtcord_position);
-
-        this.position = new Vec3(0,0,0);
-        this.Roation = new Vec3(0,0,0);
-        this.is_skyBox = false;
-    }
 
     public void Init_VBO(){
         if(Thread.currentThread().getName().equals("main")){
             this.VertexBufferObject = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glEnableVertexAttribArray(Main.shader_vertex_position);
+            glEnableVertexAttribArray(Main.shader_Vertex);
             if (this.has_tex) {
-                glEnableVertexAttribArray(Main.shader_vtcord_position);
+                glEnableVertexAttribArray(Main.shader_TextureCords);
             } else {
-                glDisableVertexAttribArray(Main.shader_vtcord_position);
+                glDisableVertexAttribArray(Main.shader_TextureCords);
             }
         }
         else{
@@ -437,7 +407,7 @@ public class Mesh{
             }
             Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
             Main.glBindBuffer_In2 = this.VertexBufferObject;
-            Main.glEnableVertexAttribArray_In1 = Main.shader_vertex_position;
+            Main.glEnableVertexAttribArray_In1 = Main.shader_Vertex;
             Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
 
 
@@ -453,7 +423,7 @@ public class Mesh{
                 }
                 Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
                 Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glEnableVertexAttribArray_In1 = Main.shader_vtcord_position;
+                Main.glEnableVertexAttribArray_In1 = Main.shader_TextureCords;
                 Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
             else{
@@ -468,7 +438,7 @@ public class Mesh{
                 }
                 Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
                 Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glDisableVertexAttribArray_In1 = Main.shader_vtcord_position;
+                Main.glDisableVertexAttribArray_In1 = Main.shader_TextureCords;
                 Main.glDisableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
 
@@ -545,6 +515,14 @@ public class Mesh{
         this.Number_of_vtcords += mesh.Number_of_vtcords;
         this.Number_of_TriFaces += mesh.Number_of_TriFaces;
         this.Number_of_QuadFaces += mesh.Number_of_QuadFaces;
+
+        if(this.Number_of_TriFaces > 0){
+            this.has_triangles = true;
+        }
+        if(this.Number_of_QuadFaces > 0){
+            this.has_quads = true;
+        }
+
     }
     public void upload_Vertex_data(){
         float [] VertexArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
@@ -680,49 +658,46 @@ public class Mesh{
         upload_Vertex_data();
     }
     public void draw(){
+        float [] FinalMat = new float[16];
+        float [] RotationMat = new float[4*4];
+        float [] TransMat = new float[16];
         if(this.is_skyBox){
-            float [] mat = new float[4*4];
-            mat[0]=1;mat[5]=1;mat[10]=1;mat[15]=1;
-            glUniformMatrix4fv(Main.shader_translation_position, false, mat);
-            glUniformMatrix4fv(Main.shader_rotation_l_position, false, mat);
+            TransMat[0]=1;TransMat[5]=1;TransMat[10]=1;TransMat[15]=1;
+            glUniformMatrix4fv(Main.shader_ModelMat, false, TransMat);
+            Math3D.Make3DRotationMatrix44(Player.Rotation, RotationMat);
+            glUniformMatrix4fv(Main.shader_WorldMat, false, RotationMat);
         }
         else {
-            float[] mat = new float[4 * 4];
-            mat[0] = 1;
-            mat[4] = 0;
-            mat[8] = 0;
-            mat[1] = 0;
-            mat[5] = 1;
-            mat[9] = 0;
-            mat[2] = 0;
-            mat[6] = 0;
-            mat[10] = 1;
-            mat[3] = 0;
-            mat[7] = 0;
-            mat[11] = 0;
-
-            mat[12] = this.position.X - Player.position.X;
-            mat[13] = this.position.Y - Player.position.Y;
-            mat[14] = this.position.Z - Player.position.Z;
-            mat[15] = 1;
-
-            glUniformMatrix4fv(Main.shader_translation_position, false, mat);
-
-            Math3D.Make3DRotationMatrix44(new Vec3(this.Roation), mat);
-            glUniformMatrix4fv(Main.shader_rotation_l_position, false, mat);
+            TransMat[0] = 1;
+            TransMat[5] = 1;
+            TransMat[10] = 1;
+            TransMat[12] = this.position.X;
+            TransMat[13] = this.position.Y;
+            TransMat[14] = this.position.Z;
+            TransMat[15] = 1;
+            Math3D.Make3DRotationMatrix44(this.Roation, RotationMat);
+            Math3D.Matrix44_Multiply(RotationMat, TransMat, FinalMat);
+            glUniformMatrix4fv(Main.shader_ModelMat, false, FinalMat);
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.shader_vertex_position, 3, GL_FLOAT, false, 8 * 4, 0);
-        glVertexAttribPointer(Main.shader_vtcord_position, 2, GL_FLOAT, false, 8 * 4, 3 * 4);
-        glVertexAttribPointer(Main.shader_light_position, 3, GL_FLOAT, false, 8 * 4, 3*4 + 2*4);
+        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 8 * 4, 0);
+        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 8 * 4, 3 * 4);
+        glVertexAttribPointer(Main.shader_light, 3, GL_FLOAT, false, 8 * 4, 3*4 + 2*4);
 
         if(this.is_skyBox){glDisable(GL_DEPTH_TEST);}
-        glDrawArrays(GL_TRIANGLES, 0, this.Number_of_TriFaces*3);
-        glDrawArrays(GL_QUADS, this.Number_of_TriFaces*3, this.Number_of_QuadFaces*4);
-        if(this.is_skyBox){glEnable(GL_DEPTH_TEST);}
+        if(this.has_triangles) {
+            glDrawArrays(GL_TRIANGLES, 0, this.Number_of_TriFaces * 3);
+        }
+        if(this.has_quads) {
+            glDrawArrays(GL_QUADS, this.Number_of_TriFaces * 3, this.Number_of_QuadFaces * 4);
+        }
+        if(this.is_skyBox){
+            glEnable(GL_DEPTH_TEST);
+            glUniformMatrix4fv(Main.shader_WorldMat, false, Player.WorldMatrix);
+        }
     }
     public void Remove(){
         this.Number_of_Verts = 0;
@@ -771,6 +746,4 @@ public class Mesh{
         }
 
     }
-
-
 }
