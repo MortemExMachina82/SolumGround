@@ -366,11 +366,11 @@ public class Mesh{
         if(Thread.currentThread().getName().equals("main")){
             this.VertexBufferObject = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glEnableVertexAttribArray(Main.shader_Vertex);
+            glEnableVertexAttribArray(Main.MainShader_Vertex);
             if (this.has_tex) {
-                glEnableVertexAttribArray(Main.shader_TextureCords);
+                glEnableVertexAttribArray(Main.MainShader_TextureCords);
             } else {
-                glDisableVertexAttribArray(Main.shader_TextureCords);
+                glDisableVertexAttribArray(Main.MainShader_TextureCords);
             }
         }
         else{
@@ -407,7 +407,7 @@ public class Mesh{
             }
             Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
             Main.glBindBuffer_In2 = this.VertexBufferObject;
-            Main.glEnableVertexAttribArray_In1 = Main.shader_Vertex;
+            Main.glEnableVertexAttribArray_In1 = Main.MainShader_Vertex;
             Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
 
 
@@ -423,7 +423,7 @@ public class Mesh{
                 }
                 Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
                 Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glEnableVertexAttribArray_In1 = Main.shader_TextureCords;
+                Main.glEnableVertexAttribArray_In1 = Main.MainShader_TextureCords;
                 Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
             else{
@@ -438,7 +438,7 @@ public class Mesh{
                 }
                 Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
                 Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glDisableVertexAttribArray_In1 = Main.shader_TextureCords;
+                Main.glDisableVertexAttribArray_In1 = Main.MainShader_TextureCords;
                 Main.glDisableVertexAttribArrayStatus = Main.GLStatus.Ready;
             }
 
@@ -663,9 +663,9 @@ public class Mesh{
         float [] TransMat = new float[16];
         if(this.is_skyBox){
             TransMat[0]=1;TransMat[5]=1;TransMat[10]=1;TransMat[15]=1;
-            glUniformMatrix4fv(Main.shader_ModelMat, false, TransMat);
+            glUniformMatrix4fv(Main.MainShader_ModelMat, false, TransMat);
             Math3D.Make3DRotationMatrix44(Player.Rotation, RotationMat);
-            glUniformMatrix4fv(Main.shader_WorldMat, false, RotationMat);
+            glUniformMatrix4fv(Main.MainShader_WorldMat, false, RotationMat);
         }
         else {
             TransMat[0] = 1;
@@ -677,15 +677,15 @@ public class Mesh{
             TransMat[15] = 1;
             Math3D.Make3DRotationMatrix44(this.Roation, RotationMat);
             Math3D.Matrix44_Multiply(RotationMat, TransMat, FinalMat);
-            glUniformMatrix4fv(Main.shader_ModelMat, false, FinalMat);
+            glUniformMatrix4fv(Main.MainShader_ModelMat, false, FinalMat);
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.shader_Vertex, 3, GL_FLOAT, false, 32, 0);
-        glVertexAttribPointer(Main.shader_TextureCords, 2, GL_FLOAT, false, 32, 12);
-        glVertexAttribPointer(Main.shader_light, 3, GL_FLOAT, false, 32, 20);
+        glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 32, 0);
+        glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 32, 12);
+        glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 32, 20);
 
         if(this.is_skyBox){glDisable(GL_DEPTH_TEST);}
         if(this.has_triangles) {
@@ -696,7 +696,7 @@ public class Mesh{
         }
         if(this.is_skyBox){
             glEnable(GL_DEPTH_TEST);
-            glUniformMatrix4fv(Main.shader_WorldMat, false, Player.WorldMatrix);
+            glUniformMatrix4fv(Main.MainShader_WorldMat, false, Player.WorldMatrix);
         }
     }
     public void Remove(){

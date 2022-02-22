@@ -38,13 +38,15 @@ public class Main {
     public static boolean DrawSkyBox;
 
     public static int MainShaderProgram;
-    public static int shader_Vertex;
-    public static int shader_TextureCords;
-    public static int shader_light;
-    public static int shader_Projection;
-    public static int shader_ModelMat;
-    public static int shader_WorldMat;
-
+    public static int MainShader_Vertex;
+    public static int MainShader_TextureCords;
+    public static int MainShader_light;
+    public static int MainShader_Projection;
+    public static int MainShader_ModelMat;
+    public static int MainShader_WorldMat;
+    public static int TextShaderProgram;
+    public static int TextShader_Vertex;
+    public static int TextShader_TextureCords;
 
     public static double mouse_past_X;
     public static double mouse_past_Y;
@@ -129,28 +131,7 @@ public class Main {
             System.out.println(glGetProgramInfoLog(shaderProgram));
         }
 
-        glUseProgram(shaderProgram);
 
-
-        shader_Vertex = glGetAttribLocation(shaderProgram, "a_position");
-        shader_TextureCords = glGetAttribLocation(shaderProgram, "a_texcord");
-        shader_light = glGetAttribLocation(shaderProgram, "a_light");
-
-        shader_Projection = glGetUniformLocation(shaderProgram, "ProjectionMat");
-        shader_ModelMat = glGetUniformLocation(shaderProgram, "ModelMat");
-        shader_WorldMat = glGetUniformLocation(shaderProgram, "WorldMat");
-
-        glEnableVertexAttribArray(shader_Vertex);
-        glEnableVertexAttribArray(shader_TextureCords);
-        glEnableVertexAttribArray(shader_light);
-
-        glClearColor(0,0,0,1);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         return shaderProgram;
     }
@@ -346,8 +327,35 @@ public class Main {
         glfwSetCursorPosCallback(win, Main::mouseMoveCallback);
         glfwSetMouseButtonCallback(win, Main::mouseButtonCallback);
         glfwSwapInterval(1);
-        
+
+        glClearColor(0,0,0,1);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         MainShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Main");
+        glUseProgram(MainShaderProgram);
+        MainShader_Vertex = glGetAttribLocation(MainShaderProgram, "a_position");
+        MainShader_TextureCords = glGetAttribLocation(MainShaderProgram, "a_texcord");
+        MainShader_light = glGetAttribLocation(MainShaderProgram, "a_light");
+        MainShader_Projection = glGetUniformLocation(MainShaderProgram, "ProjectionMat");
+        MainShader_ModelMat = glGetUniformLocation(MainShaderProgram, "ModelMat");
+        MainShader_WorldMat = glGetUniformLocation(MainShaderProgram, "WorldMat");
+        glEnableVertexAttribArray(MainShader_Vertex);
+        glEnableVertexAttribArray(MainShader_TextureCords);
+        glEnableVertexAttribArray(MainShader_light);
+
+        TextShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Text");
+        glUseProgram(TextShaderProgram);
+        TextShader_Vertex = glGetAttribLocation(TextShaderProgram, "a_position");
+        TextShader_TextureCords = glGetAttribLocation(TextShaderProgram, "a_texcord");
+        glEnableVertexAttribArray(TextShader_Vertex);
+        glEnableVertexAttribArray(TextShader_TextureCords);
+
+        glUseProgram(MainShaderProgram);
 
         Player.Init();
         Player.is_flying = false;
@@ -415,6 +423,7 @@ public class Main {
                 Player.applyGravity();
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glUseProgram(MainShaderProgram);
             Player.update();
             if(DrawSkyBox) {
                 SkyBox.draw();
@@ -427,6 +436,7 @@ public class Main {
                     }
                 }
             }
+            glUseProgram(TextShaderProgram);
             fpsText.updateText("FPS:"+ Math.round(fps));
             fpsText.render();
             SelectedBlockText.updateText("Selected Block:"+Block.Blocks[Player.hotbar_selected].Name);

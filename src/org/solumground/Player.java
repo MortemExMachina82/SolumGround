@@ -101,7 +101,7 @@ public class Player{
         projection_mat[11] = -1;
         projection_mat[14] = ((Main.farPlane*Main.nearPlane) / (Main.nearPlane-Main.farPlane))*2;
 
-        glUniformMatrix4fv(Main.shader_Projection, false, projection_mat);
+        glUniformMatrix4fv(Main.MainShader_Projection, false, projection_mat);
     }
 
     public static void update(){
@@ -118,7 +118,7 @@ public class Player{
         TransMat[14] = -position.Z;
         TransMat[15] = 1;
         Math3D.Matrix44_Multiply(TransMat,RotationMat, WorldMatrix);
-        glUniformMatrix4fv(Main.shader_WorldMat, false, WorldMatrix);
+        glUniformMatrix4fv(Main.MainShader_WorldMat, false, WorldMatrix);
 
         for(int Z=0;Z>-6;Z--){
             Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMat);
