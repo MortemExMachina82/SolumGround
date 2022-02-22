@@ -89,10 +89,13 @@ public class CollisionBox {
     }
 
     public boolean On_Ground(){
-        List<Vec3> VecArray = Get_Near();
+        List<Object> VecAndBox = Get_Near();
 
-        CollisionBox box = Main.unit_cube_collisionBox;
-        for (Vec3 vec3 : VecArray) {
+        CollisionBox box;
+        Vec3 vec3;
+        for (int X=0;X<VecAndBox.size();X+=2) {
+            vec3 = (Vec3) VecAndBox.get(X);
+            box = (CollisionBox) VecAndBox.get(X+1);
             if (vec3 != null) {
                 box.position = vec3;
                 if (detect_if_ontop(box)) {
@@ -103,7 +106,7 @@ public class CollisionBox {
         return false;
     }
 
-    public List<Vec3> Get_Near(){
+    public List<Object> Get_Near(){
         chunks[0] = Chunk.FromPos(this.position, chunks[0]);
         chunks[1] = Chunk.FromPos(new Vec3(this.position.X, this.position.Y-Chunk.Size, this.position.Z), chunks[1]);
 
@@ -137,7 +140,7 @@ public class CollisionBox {
 
 
 
-        List<Vec3> VecArray = new ArrayList<>(343);
+        List<Object> VecAndBox = new ArrayList<>(343*2);
 
         for(int X=(-3);X<4;X++){
             for(int Y=(-3);Y<4;Y++){
@@ -145,22 +148,27 @@ public class CollisionBox {
                     for(int C=0;C<27;C++){
                         if(chunks[C] == null){continue;}
                         Vec3 v = new Vec3((int)(this.position.X+X), (int)(this.position.Y+Y), (int)(this.position.Z+Z));
-                        if(chunks[C].GetGlobal(v) != 0){
-                            VecArray.add(v);
+                        Block block = Block.Blocks[chunks[C].GetGlobal(v)];
+                        if(block.HasCollisionBox){
+                            VecAndBox.add(v);
+                            VecAndBox.add(block.collisionBox);
                             break;
                         }
                     }
                 }
             }
         }
-        return VecArray;
+        return VecAndBox;
     }
 
     public void active_update(){
-        List<Vec3> VecArray = Get_Near();
+        List<Object> VecAndBox = Get_Near();
 
-        CollisionBox box = Main.unit_cube_collisionBox;
-        for (Vec3 vec3 : VecArray) {
+        CollisionBox box;
+        Vec3 vec3;
+        for (int X=0;X<VecAndBox.size();X+=2) {
+            vec3 = (Vec3) VecAndBox.get(X);
+            box = (CollisionBox) VecAndBox.get(X+1);
             if (vec3 != null) {
                 box.position = vec3;
                 if (Main.showCollisionBox) {

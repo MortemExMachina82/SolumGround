@@ -214,12 +214,31 @@ public class Chunk{
         main_mesh.add(mesh);
     }
     public void Put(int cubeID, IVec3 Position){
-        if(GetLocal(new IVec3(Position.X-1,Position.Y,Position.Z)) == 0){Put_side(cubeID,1, Position);}
-        if(GetLocal(new IVec3(Position.X+1,Position.Y,Position.Z)) == 0){Put_side(cubeID,0, Position);}
-        if(GetLocal(new IVec3(Position.X,Position.Y+1,Position.Z)) == 0){Put_side(cubeID,2, Position);}
-        if(GetLocal(new IVec3(Position.X,Position.Y-1,Position.Z)) == 0){Put_side(cubeID,3, Position);}
-        if(GetLocal(new IVec3(Position.X,Position.Y,Position.Z-1)) == 0){Put_side(cubeID,4, Position);}
-        if(GetLocal(new IVec3(Position.X,Position.Y,Position.Z+1)) == 0){Put_side(cubeID,5, Position);}
+        if(Block.Blocks[cubeID].Full) {
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
+                Put_side(cubeID, 1, Position);
+            }
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
+                Put_side(cubeID, 0, Position);
+            }
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
+                Put_side(cubeID, 2, Position);
+            }
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
+                Put_side(cubeID, 3, Position);
+            }
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
+                Put_side(cubeID, 4, Position);
+            }
+            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z + 1))].Full) {
+                Put_side(cubeID, 5, Position);
+            }
+        }
+        else{
+            Mesh mesh = Block.Blocks[cubeID].mesh;
+            mesh.position = Position.ToFloat();
+            main_mesh.add(mesh);
+        }
     }
 
     public boolean Place(int BLockID, IVec3 blockpos){

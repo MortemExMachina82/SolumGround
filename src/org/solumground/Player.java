@@ -20,6 +20,7 @@ public class Player{
     public static float jump_time;
 
     public static IVec3 LookingAt;
+    public static Block LookingAtBlock;
     public static Mesh wireframe;
     public static int hotbar_selected;
     public static CollisionBox collisionBox;
@@ -128,10 +129,10 @@ public class Player{
             
             Chunk lookingChunk = Chunk.FromPos(new Vec3(LookingAt));
             if(lookingChunk != null){
-                if (lookingChunk.GetGlobal(new Vec3(LookingAt)) != 0) {
+                LookingAtBlock = Block.Blocks[lookingChunk.GetGlobal(LookingAt.ToFloat())];
+                if (LookingAtBlock.ID != 0) {
                     break;
                 }
-
             }
         }
 
@@ -139,11 +140,13 @@ public class Player{
     }
 
     public static void place_block(){
-        Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
-        if(selected_chunk == null){
-            return;
+        if(LookingAtBlock.ID == 0) {
+            Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
+            if (selected_chunk == null) {
+                return;
+            }
+            selected_chunk.Place(hotbar_selected, LookingAt);
         }
-        selected_chunk.Place(hotbar_selected, LookingAt);
     }
 
     public static void break_block(){

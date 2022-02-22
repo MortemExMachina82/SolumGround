@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -19,18 +21,49 @@ public class Block {
     public boolean Full;
     public String DirectoryModelPath;
     public String DirectoryTexturePath;
+    public boolean HasCollisionBox;
 
     public String [] Models;
     public String [] Texture;
     public Mesh [] Sides;
+    public Mesh mesh;
+    public CollisionBox collisionBox;
 
     public static int Number;
-    public static String [] Textures = new String[0];
+    public static List<String> Textures = new ArrayList<>(1);
     public static Block [] Blocks;
     public static int CompTextureSizeX;
     public static int CompTextureSizeY;
     public static int [] CompTexture;
     public static int TextureBufferObject;
+
+    public static int [] TexPos;
+    public static int [] TexSizeX;
+    public static int [] TexSizeY;
+
+    public static void ConvertTextureCords(Mesh mesh, Block block, int Index){
+        String tex = block.Texture[Index];
+        int index = 0;
+        for(int Z=0;Z<Textures.size();Z++){
+            if(Textures.get(Z).equals(tex)){
+                index = Z;
+                break;
+            }
+        }
+        int Pos = TexPos[index];
+        int SizeX = TexSizeX[index];
+        int SizeY = TexSizeY[index];
+
+        for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
+            float U = mesh.VTcords_array[Z*2];
+            float V = mesh.VTcords_array[Z*2 + 1];
+            U = U * ((float)SizeX/CompTextureSizeX);
+            V = V * ((float)SizeY/CompTextureSizeY);
+            U += ((float)Pos/CompTextureSizeX);
+            mesh.VTcords_array[Z*2] = U;
+            mesh.VTcords_array[Z*2 + 1] = V;
+        }
+    }
 
     public static void Init() {
         File blocks_dir = new File(Main.jar_folder_path+"/assets/solumground/blocks");
@@ -44,23 +77,21 @@ public class Block {
         }
 
 
-        String [] NewTex = new String[Textures.length];
-        int NewTexCount = 0;
+        List<String> NewTex = new ArrayList<>(Textures.size());
         for (String Tex : Textures) {
             boolean exists = false;
-            for (int Y = 0; Y < NewTexCount; Y++) {
-                if (Tex.equals(NewTex[Y])) {
+            for (String newTex : NewTex) {
+                if (Tex.equals(newTex)) {
                     exists = true;
                     break;
                 }
             }
             if (!exists) {
-                NewTex[NewTexCount] = Tex;
-                NewTexCount++;
+                NewTex.add(Tex);
             }
         }
-        Textures = new String[NewTexCount];
-        System.arraycopy(NewTex, 0, Textures, 0, NewTexCount);
+        Textures = NewTex;
+
         int FullTexMaxSizeX = 0;
         int FullTexMaxSizeY = 0;
 
@@ -69,7 +100,7 @@ public class Block {
         for (String texture : Textures) {
             try {
                 img = ImageIO.read(new File(texture));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.out.print("Failed to load Texture: ");
                 System.out.println(texture);
                 e.printStackTrace();
@@ -86,16 +117,16 @@ public class Block {
         CompTextureSizeY = FullTexMaxSizeY;
         CompTexture = new int[CompTextureSizeX*CompTextureSizeY];
 
-        int [] TexPos = new int[Textures.length];
-        int [] TexSizeX = new int[Textures.length];
-        int [] TexSizeY = new int[Textures.length];
+        TexPos = new int[Textures.size()];
+        TexSizeX = new int[Textures.size()];
+        TexSizeY = new int[Textures.size()];
         int TexOffset = 0;
-        for(int X=0;X<Textures.length;X++){
+        for(int X=0;X<Textures.size();X++){
             try {
-                img = ImageIO.read(new File(Textures[X]));
+                img = ImageIO.read(new File(Textures.get(X)));
             } catch (IOException e) {
                 System.out.print("Failed to load Texture: ");
-                System.out.println(Textures[X]);
+                System.out.println(Textures.get(X));
                 e.printStackTrace();
             }
             int Texture_width = img.getTileWidth();
@@ -122,34 +153,12 @@ public class Block {
                 for(int Y=0;Y<6;Y++) {
                     Mesh mesh = new Mesh(block.Models[Y], Mesh.MESH_SMOBJ);
                     block.Sides[Y] = mesh;
-                    String tex = block.Texture[Y];
-                    int index = 0;
-                    for(int Z=0;Z<Textures.length;Z++){
-                        if(Textures[Z].equals(tex)){
-                            index = Z;
-                            break;
-                        }
-                    }
-                    int Pos = TexPos[index];
-                    int SizeX = TexSizeX[index];
-                    int SizeY = TexSizeY[index];
-
-                    for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
-                        float U = mesh.VTcords_array[Z*2];
-                        float V = mesh.VTcords_array[Z*2 + 1];
-                        U = U * ((float)SizeX/CompTextureSizeX);
-                        V = V * ((float)SizeY/CompTextureSizeY);
-                        U += ((float)Pos/CompTextureSizeX);
-                        //U=0;
-                        //V=0;
-                        mesh.VTcords_array[Z*2] = U;
-                        mesh.VTcords_array[Z*2 + 1] = V;
-                    }
+                    ConvertTextureCords(mesh, block, Y);
                 }
             }
             else{
-                Mesh mesh = new Mesh(block.Models[0], Mesh.MESH_SMOBJ);
-
+                block.mesh = new Mesh(block.Models[0], Mesh.MESH_SMOBJ);
+                ConvertTextureCords(block.mesh, block, 0);
             }
         }
         TextureBufferObject = glGenTextures();
@@ -166,25 +175,23 @@ public class Block {
 
     public Block(String File){
         try {
-            String fileContents = String.join("\n", Files.readAllLines(Paths.get(File)));
-
             JsonObject jsonObject = new JsonParser(File).mainJsonObject;
             this.Name = jsonObject.Get("Name").GetString();
             this.ID = jsonObject.Get("ID").GetInt();
             this.Full = jsonObject.Get("Full").GetBoolean();
             this.DirectoryModelPath = jsonObject.Get("DirectoryModelPath").GetString();
             this.DirectoryTexturePath = jsonObject.Get("DirectoryTexturePath").GetString();
+            this.HasCollisionBox = jsonObject.Get("HasCollisionBox").GetBoolean();
+
 
             if(Full) {
                 Models = new String[6];
                 Texture = new String[6];
                 Sides = new Mesh[6];
+                if(HasCollisionBox) {
+                    this.collisionBox = Main.unit_cube_collisionBox;
+                }
                 JsonArray modelarray = jsonObject.Get("Model").GetArray();
-                int OldLength = Textures.length;
-                String [] paths = new String[OldLength+6];
-                System.arraycopy(Textures, 0, paths, 0, Textures.length);
-
-                Textures = paths;
                 for (int Y = 0; Y < 6; Y++) {
                     JsonArray sidearray = modelarray.Get(Y).GetArray();
                     String Side = sidearray.Get(0).GetString();
@@ -194,50 +201,55 @@ public class Block {
                     if(Side.equals("Right")){
                         Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength] = Texture[0];
+                        Textures.add(Texture[0]);
                     }
 
                     if(Side.equals("Left")){
                         Models[1] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[1] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+1] = Texture[1];
+                        Textures.add(Texture[1]);
                     }
                     if(Side.equals("Top")){
                         Models[2] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[2] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+2] = Texture[2];
+                        Textures.add(Texture[2]);
                     }
                     if(Side.equals("Bottom")){
                         Models[3] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[3] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+3] = Texture[3];
+                        Textures.add(Texture[3]);
                     }
                     if(Side.equals("Front")){
                         Models[4] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[4] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+4] = Texture[4];
+                        Textures.add(Texture[4]);
                     }
                     if(Side.equals("Back")){
                         Models[5] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
                         Texture[5] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                        Textures[OldLength+5] = Texture[5];
+                        Textures.add(Texture[5]);
                     }
                 }
             }
             else{
                 Models = new String[1];
-                Sides = new Mesh[1];
+                Texture = new String[1];
+
                 JsonArray modelarray = jsonObject.Get("Model").GetArray();
                 if(modelarray != null) {
-                    JsonArray sidearray = modelarray.Get(0).GetArray();
-                    String Side = sidearray.Get(0).GetString();
-                    String FileName = sidearray.Get(1).GetString();
-                    String TexturePath = sidearray.Get(2).GetString();
-                    Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
-                    if(Side.equals("Model")){
-                        Models[0] = FileName;
-                        Textures[0] = Texture[0];
-                    }
+                    Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+modelarray.Get(0).GetString();
+                    Texture[0] = Main.jar_folder_path + "/" + this.DirectoryTexturePath + "/" + modelarray.Get(1).GetString();
+                    Textures.add(Texture[0]);
+                }
+                if(HasCollisionBox){
+                    JsonArray CBarray = jsonObject.Get("CollisionBoxSizes").GetArray();
+                    float BPX = CBarray.Get(0).GetFloat();
+                    float BPY = CBarray.Get(1).GetFloat();
+                    float BPZ = CBarray.Get(2).GetFloat();
+                    float BNX = CBarray.Get(3).GetFloat();
+                    float BNY = CBarray.Get(4).GetFloat();
+                    float BNZ = CBarray.Get(5).GetFloat();
+                    this.collisionBox = new CollisionBox(new Vec3(), BPX,BPY,BPZ, BNX,BNY,BNZ);
                 }
             }
         }

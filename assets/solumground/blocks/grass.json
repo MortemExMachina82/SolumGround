@@ -11,5 +11,7 @@
         ["Bottom", "Bottom.smobj", "dirt.png"],
         ["Front", "Front.smobj", "grass_side.png"],
         ["Back", "Back.smobj", "grass_side.png"]
-    ]
+    ],
+    "HasCollisionBox":true,
+    "CollisionBoxSizes":[]
 }

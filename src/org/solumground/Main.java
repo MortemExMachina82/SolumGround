@@ -44,6 +44,7 @@ public class Main {
     public static int MainShader_Projection;
     public static int MainShader_ModelMat;
     public static int MainShader_WorldMat;
+
     public static int TextShaderProgram;
     public static int TextShader_Vertex;
     public static int TextShader_TextureCords;
@@ -357,6 +358,9 @@ public class Main {
 
         glUseProgram(MainShaderProgram);
 
+        unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
+
+
         Player.Init();
         Player.is_flying = false;
         Block.Init();
@@ -367,7 +371,6 @@ public class Main {
         new Light(new Vec3(30,25,0), 1f, .5f,2f,.5f);
         new Light(new Vec3(15,25,-15), 1f, .5f,.5f,2f);
 
-        unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
         ChunkLoader chunkLoader = new ChunkLoader();
         chunkLoader.loadAroundPlayer(3);
