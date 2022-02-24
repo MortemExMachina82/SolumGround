@@ -106,7 +106,7 @@ public class Player{
     }
 
     public static void update(){
-
+        collisionBox.active_update();
 
         float [] RotationMat = new float[16];
         Math3D.Make3DRotationMatrix44(Rotation, RotationMat);
@@ -121,7 +121,6 @@ public class Player{
         Math3D.Matrix44_Multiply(TransMat,RotationMat, WorldMatrix);
         glUniformMatrix4fv(Main.MainShader_WorldMat, false, WorldMatrix);
 
-        collisionBox.active_update();
 
         for(int Z=0;Z>-6;Z--){
             Vec3 pos = Math3D.Vec3X44MatrixMultiply(new Vec3(0,0,Z), RotationMat);
