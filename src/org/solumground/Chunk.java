@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Chunk{
-    public static int Size = 10;
+    public static int Size = 16;
     public static byte [] noisemap;
 
     public boolean is_empty;
@@ -187,19 +187,19 @@ public class Chunk{
     public static IVec3 convert_to_chunk_pos(Vec3 pos){
         int X,Y,Z;
         if(pos.X < 0){
-            X = (int)(pos.X-9)/Size;
+            X = (int)(pos.X-(Size-1))/Size;
         }
         else{
             X = (int)(pos.X)/Size;
         }
         if(pos.Y < 0){
-            Y = (int)(pos.Y-9)/Size;
+            Y = (int)(pos.Y-(Size-1))/Size;
         }
         else{
             Y = (int)(pos.Y)/Size;
         }
         if(pos.Z < 0){
-            Z = (int)(pos.Z-9)/Size;
+            Z = (int)(pos.Z-(Size-1))/Size;
         }
         else{
             Z = (int)(pos.Z)/Size;
