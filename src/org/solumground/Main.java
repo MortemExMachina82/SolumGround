@@ -2,12 +2,17 @@ package org.solumground;
 
 import org.solumground.Json.*;
 
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.file.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.util.Calendar;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
 
+import static java.util.Calendar.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL21.*;
 
@@ -166,6 +171,32 @@ public class Main {
             glfwSetWindowShouldClose(window, true);
         }
         if(action == GLFW_PRESS){
+            if(mods == 0){
+                if(key == GLFW_KEY_F10){
+                    int [] RawScreenData = new int[win_X*win_Y*3];
+                    glReadBuffer(GL_BACK);
+                    glReadPixels(0,0, win_X,win_Y, GL_RGB, GL_UNSIGNED_INT, RawScreenData);
+                    int [] FlipedScreenData = new int[RawScreenData.length];
+                    for(int Y=0;Y<win_Y;Y++){
+                        System.arraycopy(RawScreenData, (win_Y-(Y+1))*win_X*3, FlipedScreenData, Y*win_X*3, win_X*3);
+                    }
+                    BufferedImage img = new BufferedImage(win_X, win_Y, BufferedImage.TYPE_INT_RGB);
+                    WritableRaster wr  = img.getRaster();
+                    wr.setPixels(0,0,win_X,win_Y, FlipedScreenData);
+                    Calendar Time = Calendar.getInstance();
+                    String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
+                            Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
+                    File ScreenShotFile = new File(jar_folder_path+"/screenshots/"+TimeString+".png");
+                    ScreenShotFile.mkdirs();
+                    try {
+                        ImageIO.write(img, "png", ScreenShotFile);
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    System.out.println("Saved ScreenShot as: "+TimeString+".png");
+                }
+            }
             if((mods & 0x0004) > 0) {
                 if (key == GLFW_KEY_F) {
                     FullScreen = !FullScreen;
@@ -367,9 +398,9 @@ public class Main {
         SkyBox.Init();
         Chunk.Init();
 
-        new Light(new Vec3(0,25,0), 1f, 2f,.5f,.5f);
-        new Light(new Vec3(30,25,0), 1f, .5f,2f,.5f);
-        new Light(new Vec3(15,25,-15), 1f, .5f,.5f,2f);
+        new Light(new Vec3(0,35,0), 1f, 2f,.5f,.5f);
+        new Light(new Vec3(30,35,0), 1f, .5f,2f,.5f);
+        new Light(new Vec3(15,35,-15), 1f, .5f,.5f,2f);
 
 
         ChunkLoader chunkLoader = new ChunkLoader();
