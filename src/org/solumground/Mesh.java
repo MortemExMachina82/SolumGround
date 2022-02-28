@@ -35,6 +35,10 @@ public class Mesh{
     boolean is_skyBox;
     boolean FullLight = false;
 
+    public int VertexStart;
+    public int TextureCordsStart;
+    public int LightStart;
+
     enum MeshStatus {
         NotDone,
         Completed
@@ -526,38 +530,43 @@ public class Mesh{
     }
     public void upload_Vertex_data(){
         float [] VertexArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
+        VertexStart = 0;
+        TextureCordsStart = this.Number_of_TriFaces*3*3 + this.Number_of_QuadFaces*4*3;
+        LightStart = this.Number_of_TriFaces*3*5 + this.Number_of_QuadFaces*4*5;
         int vert_count = 0;
 
 
         if(this.has_triangles) {
             for (int F = 0; F < this.Number_of_TriFaces; F++) {
                 for (int V = 0; V < 3; V++) {
-                    int VPos = vert_count * 8;
+                    int VPos = VertexStart + vert_count * 3;
+                    int TPos = TextureCordsStart + vert_count * 2;
+                    int LPos = LightStart + vert_count * 3;
                     if (this.has_tex) {
                         VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
-                        VertexArray[VPos + 3] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2];
-                        VertexArray[VPos + 4] = 1 - this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 1];
+                        VertexArray[TPos] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2];
+                        VertexArray[TPos + 1] = 1 - this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 1];
                     } else {
                         VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
-                        VertexArray[VPos + 3] = .5f;
-                        VertexArray[VPos + 4] = .5f;
+                        VertexArray[TPos] = .5f;
+                        VertexArray[TPos + 1] = .5f;
                     }
                     if(FullLight){
-                        VertexArray[VPos + 5] = 1.0f;
-                        VertexArray[VPos + 6] = 1.0f;
-                        VertexArray[VPos + 7] = 1.0f;
+                        VertexArray[LPos] = 1.0f;
+                        VertexArray[LPos + 1] = 1.0f;
+                        VertexArray[LPos + 2] = 1.0f;
                     }
                     else {
                         Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[VPos + 5] = light.X;
-                        VertexArray[VPos + 6] = light.Y;
-                        VertexArray[VPos + 7] = light.Z;
+                        VertexArray[LPos] = light.X;
+                        VertexArray[LPos + 1] = light.Y;
+                        VertexArray[LPos + 2] = light.Z;
                     }
                     vert_count++;
                 }
@@ -567,33 +576,35 @@ public class Mesh{
         if(this.has_quads){
             for(int F=0;F<this.Number_of_QuadFaces;F++){
                 for(int V=0;V<4;V++){
-                    int VPos = vert_count * 8;
+                    int VPos = VertexStart + vert_count * 3;
+                    int TPos = TextureCordsStart + vert_count * 2;
+                    int LPos = LightStart + vert_count * 3;
                     if(this.has_tex){
                         VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
-                        VertexArray[VPos + 3] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2];
-                        VertexArray[VPos + 4] = 1-this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 1];
+                        VertexArray[TPos] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2];
+                        VertexArray[TPos + 1] = 1-this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 1];
                     }
                     else{
                         VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
                         VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
                         VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
-                        VertexArray[VPos + 3] = .5f;
-                        VertexArray[VPos + 4] = .5f;
+                        VertexArray[TPos] = .5f;
+                        VertexArray[TPos + 1] = .5f;
                     }
                     if(FullLight){
-                        VertexArray[VPos + 5] = 1.0f;
-                        VertexArray[VPos + 6] = 1.0f;
-                        VertexArray[VPos + 7] = 1.0f;
+                        VertexArray[LPos] = 1.0f;
+                        VertexArray[LPos + 1] = 1.0f;
+                        VertexArray[LPos + 2] = 1.0f;
                     }
                     else {
                         Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
                                 VertexArray[VPos + 1]+this.position.Y,
                                 VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[VPos + 5] = light.X;
-                        VertexArray[VPos + 6] = light.Y;
-                        VertexArray[VPos + 7] = light.Z;
+                        VertexArray[LPos] = light.X;
+                        VertexArray[LPos + 1] = light.Y;
+                        VertexArray[LPos + 2] = light.Z;
                     }
                     vert_count++;
                 }
@@ -623,6 +634,108 @@ public class Mesh{
             Main.glBufferData_In3 = GL_STATIC_DRAW;
             Main.glBufferDataStatus = Main.GLStatus.Ready;
             while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+        }
+        status = MeshStatus.Completed;
+    }
+    public void LightUpdate(){
+        float [] VertexArray = new float[this.Number_of_TriFaces*3*3 + this.Number_of_QuadFaces*4*3];
+        int vert_count = 0;
+        if(this.has_triangles) {
+            for (int F = 0; F < this.Number_of_TriFaces; F++) {
+                for (int V = 0; V < 3; V++) {
+                    int LPos = vert_count * 3;
+                    Vec3 VertPos = new Vec3();
+                    if (this.has_tex) {
+                        VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
+                        VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
+                        VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
+                    } else {
+                        VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
+                        VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
+                        VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
+                    }
+                    if(FullLight){
+                        VertexArray[LPos] = 1.0f;
+                        VertexArray[LPos + 1] = 1.0f;
+                        VertexArray[LPos + 2] = 1.0f;
+                    }
+                    else {
+                        Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
+                                VertPos.Y+this.position.Y,
+                                VertPos.Z+this.position.Z));
+                        VertexArray[LPos] = light.X;
+                        VertexArray[LPos + 1] = light.Y;
+                        VertexArray[LPos + 2] = light.Z;
+                    }
+                    vert_count++;
+                }
+            }
+        }
+        //vert_count = 0;
+        if(this.has_quads){
+            for(int F=0;F<this.Number_of_QuadFaces;F++){
+                for(int V=0;V<4;V++){
+                    int LPos = vert_count * 3;
+                    Vec3 VertPos = new Vec3();
+                    if(this.has_tex){
+                        VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
+                        VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
+                        VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
+                    }
+                    else{
+                        VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
+                        VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
+                        VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
+                    }
+                    if(FullLight){
+                        VertexArray[LPos] = 1.0f;
+                        VertexArray[LPos + 1] = 1.0f;
+                        VertexArray[LPos + 2] = 1.0f;
+                    }
+                    else {
+                        Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
+                                VertPos.Y+this.position.Y,
+                                VertPos.Z+this.position.Z));
+                        VertexArray[LPos] = light.X;
+                        VertexArray[LPos + 1] = light.Y;
+                        VertexArray[LPos + 2] = light.Z;
+                    }
+                    vert_count++;
+                }
+            }
+        }
+        status = MeshStatus.NotDone;
+        if(Thread.currentThread().getName().equals("main")){
+            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+            glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
+        }
+        else{
+
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+            Main.glBindBuffer_In2 = this.VertexBufferObject;
+
+            Main.glBufferSubData_In1 = GL_ARRAY_BUFFER;
+            Main.glBufferSubData_In2 = LightStart*4;
+            Main.glBufferSubData_In3 = VertexArray;
+            Main.glBufferSubDataStatus = Main.GLStatus.Ready;
+            while(Main.glBufferSubDataStatus != Main.GLStatus.Done){
                 try {
                     Thread.sleep(1);
                 }
@@ -683,15 +796,18 @@ public class Mesh{
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 32, 0);
-        glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 32, 12);
-        glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 32, 20);
 
         if(this.is_skyBox){glDisable(GL_DEPTH_TEST);}
         if(this.has_triangles) {
+            glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, VertexStart*4);
+            glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, TextureCordsStart*4);
+            glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 12, LightStart*4);
             glDrawArrays(GL_TRIANGLES, 0, this.Number_of_TriFaces * 3);
         }
         if(this.has_quads) {
+            glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, VertexStart*4 + this.Number_of_TriFaces*3*4);
+            glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, TextureCordsStart*4 + this.Number_of_TriFaces*3*4);
+            glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 12, LightStart*4 + this.Number_of_TriFaces*3*4);
             glDrawArrays(GL_QUADS, this.Number_of_TriFaces * 3, this.Number_of_QuadFaces * 4);
         }
         if(this.is_skyBox){

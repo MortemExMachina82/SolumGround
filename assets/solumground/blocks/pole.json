@@ -4,6 +4,7 @@
     "Full":false,
     "DirectoryModelPath":"assets/solumground/models",
     "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":false,
     "Model":["pole.smobj", "stone.png"],
     "HasCollisionBox":true,
     "CollisionBoxSizes":[0.15, 0.5, 0.15,   -0.15, -0.5, -0.15],

@@ -4,6 +4,7 @@
     "Full":true,
     "DirectoryModelPath":"assets/solumground/models/Standard",
     "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":false,
     "Model":[
         ["Right", "Right.smobj", "dirt.png"],
         ["Left", "Left.smobj", "dirt.png"],
