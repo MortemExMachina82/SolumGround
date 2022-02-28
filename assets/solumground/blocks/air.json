@@ -4,6 +4,7 @@
     "Full":false,
     "DirectoryModelPath":"assets/solumground/models/Standard",
     "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":false,
     "Model":null,
     "HasCollisionBox":false,
     "CollisionBoxSizes":[]

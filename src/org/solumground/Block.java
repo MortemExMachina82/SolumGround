@@ -8,8 +8,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,9 @@ public class Block {
     public String DirectoryModelPath;
     public String DirectoryTexturePath;
     public boolean HasCollisionBox;
+    public boolean Illuminated;
+    public float LightStrength;
+    public float [] LightColor;
 
     public String [] Models;
     public String [] Texture;
@@ -182,6 +183,7 @@ public class Block {
             this.DirectoryModelPath = jsonObject.Get("DirectoryModelPath").GetString();
             this.DirectoryTexturePath = jsonObject.Get("DirectoryTexturePath").GetString();
             this.HasCollisionBox = jsonObject.Get("HasCollisionBox").GetBoolean();
+            this.Illuminated = jsonObject.Get("Illuminated").GetBoolean();
 
 
             if(Full) {
@@ -251,6 +253,14 @@ public class Block {
                     float BNZ = CBarray.Get(5).GetFloat();
                     this.collisionBox = new CollisionBox(new Vec3(), BPX,BPY,BPZ, BNX,BNY,BNZ);
                 }
+            }
+            if(Illuminated){
+                this.LightStrength = jsonObject.Get("LightStrength").GetFloat();
+                JsonArray array = jsonObject.Get("LightColor").GetArray();
+                this.LightColor = new float[3];
+                this.LightColor[0] = array.Get(0).GetFloat();
+                this.LightColor[1] = array.Get(1).GetFloat();
+                this.LightColor[2] = array.Get(2).GetFloat();
             }
         }
         catch(Exception e){

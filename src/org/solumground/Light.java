@@ -25,8 +25,8 @@ class Light{
     }
 
     public static Vec3 getLight(Vec3 pos){
-        Vec3 l = new Vec3(.4f,.4f,.4f);
-        float LightStrength = .3f;
+        Vec3 l = new Vec3(.7f,.7f,.7f);
+        float LightStrength = .6f;
         for(int X=0;X<lightCount;X++) {
             Light light = lights[X];
             float dist = (light.position.X - pos.X) * (light.position.X - pos.X) +

@@ -1,0 +1,20 @@
+{
+    "Name":"light",
+    "ID":5,
+    "Full":true,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":true,
+    "LightStrength":1,
+    "LightColor":[1,1,1],
+    "Model":[
+        ["Right", "Right.smobj", "Light.png"],
+        ["Left", "Left.smobj", "Light.png"],
+        ["Top", "Top.smobj", "Light.png"],
+        ["Bottom", "Bottom.smobj", "Light.png"],
+        ["Front", "Front.smobj", "Light.png"],
+        ["Back", "Back.smobj", "Light.png"]
+    ],
+    "HasCollisionBox":true,
+    "CollisionBoxSizes":[]
+}

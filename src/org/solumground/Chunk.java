@@ -34,7 +34,7 @@ public class Chunk{
     public Chunk(String Path, IVec3 Position) {
         this.position = new IVec3(Position.X * Size, Position.Y * Size, Position.Z * Size);
         this.chunkPosition = new IVec3(Position);
-        this.FilePath = Path + "/world_data_" + (int) this.chunkPosition.X + "_" + (int) this.chunkPosition.Y + "_" + (int) this.chunkPosition.Z + ".dat";
+        this.FilePath = Path + "/block_data_" + this.chunkPosition.X + "_" + this.chunkPosition.Y + "_" + this.chunkPosition.Z + ".dat";
 
 
         this.Exists = true;
@@ -59,19 +59,37 @@ public class Chunk{
                 return;
             }
             //System.out.println(Byte.toUnsignedInt(data[0]));
-            int blockcount = 0;
+            int Ypos = 0;
+            int Zpos = 0;
+            int Xpos = 0;
             for (int X = 0; X < data.length; X++) {
                 if (Byte.toUnsignedInt(data[X]) == 255) {
                     int size = Byte.toUnsignedInt(data[X + 1]);
                     byte blockID = (byte) Byte.toUnsignedInt(data[X + 2]);
                     for (int Y = 0; Y < size; Y++) {
-                        blocks[blockcount] = blockID;
-                        blockcount++;
+                        Set(new IVec3(Xpos, Ypos, Zpos), blockID);
+                        Zpos++;
+                        if(Zpos == Size){
+                            Xpos++;
+                            Zpos = 0;
+                            if(Xpos == Size){
+                                Ypos++;
+                                Xpos = 0;
+                            }
+                        }
                     }
                     X += 2;
                 } else {
-                    blocks[blockcount] = (byte) Byte.toUnsignedInt(data[X]);
-                    blockcount++;
+                    Set(new IVec3(Xpos, Ypos, Zpos), (byte) Byte.toUnsignedInt(data[X]));
+                    Zpos++;
+                    if(Zpos == Size){
+                        Xpos++;
+                        Zpos = 0;
+                        if(Xpos == Size){
+                            Ypos++;
+                            Xpos = 0;
+                        }
+                    }
                 }
             }
         } else {
@@ -117,9 +135,6 @@ public class Chunk{
             }
         }
         status = Status.MeshBuilt;
-
-        //System.out.println("Building chunk "+this.chunkPosition);
-
         main_mesh.upload_Vertex_data();
         status = Status.Complete;
     }
@@ -213,35 +228,44 @@ public class Chunk{
         mesh.position = Position.ToFloat();
         main_mesh.add(mesh);
     }
-    public void Put(int cubeID, IVec3 Position){
-        if(Block.Blocks[cubeID].Full) {
+    public void Put(int BlockID, IVec3 Position){
+        if(Block.Blocks[BlockID].Full) {
             if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
-                Put_side(cubeID, 1, Position);
+                Put_side(BlockID, 1, Position);
             }
             if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
-                Put_side(cubeID, 0, Position);
+                Put_side(BlockID, 0, Position);
             }
             if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
-                Put_side(cubeID, 2, Position);
+                Put_side(BlockID, 2, Position);
             }
             if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
-                Put_side(cubeID, 3, Position);
+                Put_side(BlockID, 3, Position);
             }
             if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
-                Put_side(cubeID, 4, Position);
+                Put_side(BlockID, 4, Position);
             }
             if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z + 1))].Full) {
-                Put_side(cubeID, 5, Position);
+                Put_side(BlockID, 5, Position);
             }
         }
         else{
-            Mesh mesh = Block.Blocks[cubeID].mesh;
+            Mesh mesh = Block.Blocks[BlockID].mesh;
             mesh.position = Position.ToFloat();
             main_mesh.add(mesh);
         }
     }
+    public void Set(IVec3 Position, int BlockID){
+        blocks[Position.Y*Size*Size + Position.X*Size + Position.Z] = (byte)BlockID;
+        if(Block.Blocks[BlockID].Illuminated){
+            new Light(ConvertToGlobalPos(Position).ToFloat(), Block.Blocks[BlockID].LightStrength,
+                    Block.Blocks[BlockID].LightColor[0],
+                    Block.Blocks[BlockID].LightColor[1],
+                    Block.Blocks[BlockID].LightColor[2]);
+        }
+    }
 
-    public boolean Place(int BLockID, IVec3 blockpos){
+    public boolean Place(int BlockID, IVec3 blockpos){
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) == 0) {
             if(this.is_empty){
@@ -250,7 +274,7 @@ public class Chunk{
                 main_mesh.position = this.position.ToFloat();
                 this.is_empty = false;
             }
-            this.blocks[Lpos.Y*Size*Size + Lpos.X*Size + Lpos.Z] = (byte)BLockID;
+            Set(Lpos, BlockID);
             ReBuildMesh();
             return true;
         }
@@ -260,6 +284,15 @@ public class Chunk{
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) != 0) {
             this.blocks[Lpos.Y * Size * Size + Lpos.X * Size + Lpos.Z] = 0;
+            for(int X=0;X<Light.lightCount;X++){
+                Light light = Light.lights[X];
+                if(IVec3.Equal(blockpos, light.position.ToInt())){
+                    for(int Y=X;Y<Light.lightCount;Y++) {
+                        Light.lights[Y] = Light.lights[Y+1];
+                    }
+                    Light.lightCount--;
+                }
+            }
             ReBuildMesh();
         }
     }
@@ -283,6 +316,9 @@ public class Chunk{
     }
     public IVec3 ConvertToLocal(IVec3 position){
         return new IVec3(position.X-this.position.X, position.Y-this.position.Y, position.Z-this.position.Z);
+    }
+    public IVec3 ConvertToGlobalPos(IVec3 pos){
+        return new IVec3(this.position.X+pos.X, this.position.Y+pos.Y, this.position.Z+pos.Z);
     }
 
     public void GenChunk(){
@@ -344,7 +380,11 @@ public class Chunk{
             this.main_mesh.Remove();
         }
     }
-
+    public void LightUpdate(){
+        if(!this.is_empty) {
+            this.main_mesh.LightUpdate();
+        }
+    }
     public void Save(){
         if(this.is_empty){
             return;

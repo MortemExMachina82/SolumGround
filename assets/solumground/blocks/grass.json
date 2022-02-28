@@ -4,6 +4,7 @@
     "Full":true,
     "DirectoryModelPath":"assets/solumground/models/Standard",
     "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":false,
     "Model":[
         ["Right", "Right.smobj", "grass_side.png"],
         ["Left", "Left.smobj", "grass_side.png"],

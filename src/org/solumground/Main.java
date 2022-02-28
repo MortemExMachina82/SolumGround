@@ -86,6 +86,10 @@ public class Main {
     public static int glBufferData_In1;
     public static float [] glBufferData_In2;
     public static int glBufferData_In3;
+    public static GLStatus glBufferSubDataStatus = GLStatus.Done;
+    public static int glBufferSubData_In1;
+    public static long glBufferSubData_In2;
+    public static float [] glBufferSubData_In3;
     public static GLStatus glDeleteBuffersStatus = GLStatus.Done;
     public static int glDeleteBuffers_In1;
 
@@ -303,6 +307,12 @@ public class Main {
             glBindBuffer(glBindBuffer_In1, glBindBuffer_In2);
             glBufferData(glBufferData_In1, glBufferData_In2, glBufferData_In3);
             glBufferDataStatus = GLStatus.Done;
+        }
+        if(glBufferSubDataStatus == GLStatus.Ready){
+            glBufferSubDataStatus = GLStatus.Working;
+            glBindBuffer(glBindBuffer_In1, glBindBuffer_In2);
+            glBufferSubData(glBufferSubData_In1, glBufferSubData_In2, glBufferSubData_In3);
+            glBufferSubDataStatus = GLStatus.Done;
         }
         if(glDeleteBuffersStatus == GLStatus.Ready){
             glDeleteBuffersStatus = GLStatus.Working;
