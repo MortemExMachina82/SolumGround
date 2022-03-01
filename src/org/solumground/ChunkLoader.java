@@ -10,7 +10,6 @@ public class ChunkLoader extends Thread{
     }
 
     public void run(){
-        System.out.println("Starting Chunkloader");
         while(!ShouldClose) {
             try{
                 Thread.sleep(1);
@@ -28,7 +27,7 @@ public class ChunkLoader extends Thread{
     }
     public void makeChunk(IVec3 pos){
         Chunk chunk = new Chunk(Main.SaveFolder, pos);
-        MeshBuilder.buffer.add(chunk);
+        MeshBuilder.Genbuffer.add(chunk);
     }
     public void loadAroundPlayer(int RenderDist){
         IVec3 pos;

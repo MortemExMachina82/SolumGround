@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 public class Chunk{
     public static int Size = 16;
     public static byte [] noisemap;
+    public static Random RNG = new Random();
 
     public boolean is_empty;
     public String FilePath;
@@ -16,7 +18,6 @@ public class Chunk{
     public IVec3 chunkPosition;
 
     public Mesh main_mesh;
-    public boolean Exists;
 
     public Status status = Status.Started;
 
@@ -31,19 +32,77 @@ public class Chunk{
         noisemap = PerlinNoise2D.getNoiseMap();
         //noisemap = Noise.MountainGen();
     }
+    public static Chunk FromPos(Vec3 pos){
+        Chunk selected_chunk = null;
+        IVec3 Ipos = convert_to_chunk_pos(pos);
+        for(int X=0;X<Main.ChunkCount;X++){
+            Chunk chunk = Main.ChunkArray[X];
+            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
+                selected_chunk = chunk;
+                break;
+            }
+        }
+        return selected_chunk;
+    }
+    public static Chunk FromPos(Vec3 pos, Chunk guess){
+        if(guess != null) {
+            if (IVec3.Equal(guess.chunkPosition, pos.ToInt())) {
+                return guess;
+            }
+        }
+    
+        Chunk selected_chunk = null;
+        IVec3 Ipos = convert_to_chunk_pos(pos);
+        for(int X=0;X<Main.ChunkCount;X++){
+            Chunk chunk = Main.ChunkArray[X];
+            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
+                selected_chunk = chunk;
+                break;
+            }
+        }
+        return selected_chunk;
+    }
+    public static Chunk FromChunkPos(IVec3 Pos){
+        Chunk selected_chunk = null;
+        for(int X=0;X<Main.ChunkCount;X++){
+            Chunk chunk = Main.ChunkArray[X];
+            if(IVec3.Equal(chunk.chunkPosition, Pos)){
+                selected_chunk = chunk;
+                break;
+            }
+        }
+        return selected_chunk;
+    }
+    public static IVec3 convert_to_chunk_pos(Vec3 pos){
+        int X,Y,Z;
+        if(pos.X < 0){
+            X = (int)(pos.X-(Size-1))/Size;
+        }
+        else{
+            X = (int)(pos.X)/Size;
+        }
+        if(pos.Y < 0){
+            Y = (int)(pos.Y-(Size-1))/Size;
+        }
+        else{
+            Y = (int)(pos.Y)/Size;
+        }
+        if(pos.Z < 0){
+            Z = (int)(pos.Z-(Size-1))/Size;
+        }
+        else{
+            Z = (int)(pos.Z)/Size;
+        }
+
+        return new IVec3(X,Y,Z);
+    }
+
     public Chunk(String Path, IVec3 Position) {
         this.position = new IVec3(Position.X * Size, Position.Y * Size, Position.Z * Size);
         this.chunkPosition = new IVec3(Position);
         this.FilePath = Path + "/block_data_" + this.chunkPosition.X + "_" + this.chunkPosition.Y + "_" + this.chunkPosition.Z + ".dat";
 
 
-        this.Exists = true;
-        for (int X = 0; X < Main.ChunkCount; X++) {
-            if (IVec3.Equal(Main.ChunkArray[X].chunkPosition, this.chunkPosition)) {
-                this.Exists = false;
-                return;
-            }
-        }
         status = Status.Started;
 
         blocks = new byte[Size * Size * Size];
@@ -158,71 +217,6 @@ public class Chunk{
         main_mesh.upload_Vertex_data();
         status = Status.Complete;
     }
-    public static Chunk FromPos(Vec3 pos){
-        Chunk selected_chunk = null;
-        IVec3 Ipos = convert_to_chunk_pos(pos);
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
-            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
-                selected_chunk = chunk;
-                break;
-            }
-        }
-        return selected_chunk;
-    }
-    public static Chunk FromPos(Vec3 pos, Chunk guess){
-        if(guess != null) {
-            if (IVec3.Equal(guess.chunkPosition, pos.ToInt())) {
-                return guess;
-            }
-        }
-    
-        Chunk selected_chunk = null;
-        IVec3 Ipos = convert_to_chunk_pos(pos);
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
-            if(IVec3.Equal(chunk.chunkPosition, Ipos)){
-                selected_chunk = chunk;
-                break;
-            }
-        }
-        return selected_chunk;
-    }
-    public static Chunk FromChunkPos(IVec3 Pos){
-        Chunk selected_chunk = null;
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
-            if(IVec3.Equal(chunk.chunkPosition, Pos)){
-                selected_chunk = chunk;
-                break;
-            }
-        }
-        return selected_chunk;
-    }
-    public static IVec3 convert_to_chunk_pos(Vec3 pos){
-        int X,Y,Z;
-        if(pos.X < 0){
-            X = (int)(pos.X-(Size-1))/Size;
-        }
-        else{
-            X = (int)(pos.X)/Size;
-        }
-        if(pos.Y < 0){
-            Y = (int)(pos.Y-(Size-1))/Size;
-        }
-        else{
-            Y = (int)(pos.Y)/Size;
-        }
-        if(pos.Z < 0){
-            Z = (int)(pos.Z-(Size-1))/Size;
-        }
-        else{
-            Z = (int)(pos.Z)/Size;
-        }
-
-        return new IVec3(X,Y,Z);
-    }
-
     public void Put_side(int cubeID, int side, IVec3 Position){
         Mesh mesh = Block.Blocks[cubeID].Sides[side];
         mesh.position = Position.ToFloat();
@@ -262,6 +256,19 @@ public class Chunk{
                     Block.Blocks[BlockID].LightColor[0],
                     Block.Blocks[BlockID].LightColor[1],
                     Block.Blocks[BlockID].LightColor[2]);
+            Chunk NextTo;
+            for(int X=-1;X<2;X++){
+                for(int Y=-1;Y<2;Y++){
+                    for(int Z=-1;Z<2;Z++){
+                        NextTo = FromChunkPos(new IVec3(this.chunkPosition.X+X, this.chunkPosition.Y+Y, this.chunkPosition.Z+Z));
+                        if(NextTo != null){
+                            if(NextTo.main_mesh != null) {
+                                MeshBuilder.LightUpdateBuffer.add(NextTo);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -284,13 +291,23 @@ public class Chunk{
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) != 0) {
             this.blocks[Lpos.Y * Size * Size + Lpos.X * Size + Lpos.Z] = 0;
-            for(int X=0;X<Light.lightCount;X++){
-                Light light = Light.lights[X];
+            for(int X=0;X<Light.lights.size();X++){
+                Light light = Light.lights.get(X);
                 if(IVec3.Equal(blockpos, light.position.ToInt())){
-                    for(int Y=X;Y<Light.lightCount;Y++) {
-                        Light.lights[Y] = Light.lights[Y+1];
+                    Light.lights.remove(X);
+                    Chunk NextTo;
+                    for(int X2=-1;X2<2;X2++){
+                        for(int Y=-1;Y<2;Y++){
+                            for(int Z=-1;Z<2;Z++){
+                                NextTo = FromChunkPos(new IVec3(this.chunkPosition.X+X2, this.chunkPosition.Y+Y, this.chunkPosition.Z+Z));
+                                if(NextTo != null){
+                                    if(NextTo.main_mesh != null) {
+                                        MeshBuilder.LightUpdateBuffer.add(NextTo);
+                                    }
+                                }
+                            }
+                        }
                     }
-                    Light.lightCount--;
                 }
             }
             ReBuildMesh();
@@ -353,9 +370,16 @@ public class Chunk{
 
                 for(int Y=h;Y!=-1;Y--) {
                     byte blockType = 3;
-                    if(Y == h){blockType = 1;}
+                    if(Y == h){
+                        blockType = 1;
+                        float r = RNG.nextFloat();
+                        if(r < 0.005){
+                            blockType = 6;
+                        }
+                    }
                     if(isFull){blockType = 2;}
-                    blocks[Y * Size * Size + X * Size + Z] = blockType;
+                    Set(new IVec3(X,Y,Z), blockType);
+                    //blocks[Y * Size * Size + X * Size + Z] = blockType;
                 }
             }
         }

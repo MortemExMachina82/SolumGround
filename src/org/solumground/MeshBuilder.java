@@ -4,26 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MeshBuilder extends Thread{
-    public static List<Chunk> buffer = new ArrayList<>(1000);
+    public static List<Chunk> Genbuffer = new ArrayList<>(100);
+    public static List<Chunk> ReGenBuffer = new ArrayList<>(10);
+    public static List<Chunk> LightUpdateBuffer = new ArrayList<>(10);
 
     public boolean shouldClose = false;
     public void close(){
         shouldClose = true;
     }
     public void Build(){
-        while(buffer.size() > 0) {
-            Chunk chunk = buffer.remove(0);
+        Chunk chunk;
+        if(Genbuffer.size() > 0) {
+            chunk = Genbuffer.remove(0);
             chunk.buildMesh();
+        }
+        if(ReGenBuffer.size() > 0) {
+            chunk = ReGenBuffer.remove(0);
+            chunk.ReBuildMesh();
+        }
+        if(LightUpdateBuffer.size() > 0) {
+            chunk = LightUpdateBuffer.remove(0);
+            chunk.LightUpdate();
         }
     }
     public void run(){
-        System.out.println("Starting Mesh Builder");
         while(!shouldClose){
             try{
                 Thread.sleep(1);
             }
             catch(Exception e){
-                e.printStackTrace();
+            e.printStackTrace();
             }
             Build();
         }

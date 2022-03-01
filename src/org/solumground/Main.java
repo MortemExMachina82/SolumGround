@@ -408,9 +408,6 @@ public class Main {
         SkyBox.Init();
         Chunk.Init();
 
-        new Light(new Vec3(0,35,0), 1f, 2f,.5f,.5f);
-        new Light(new Vec3(30,35,0), 1f, .5f,2f,.5f);
-        new Light(new Vec3(15,35,-15), 1f, .5f,.5f,2f);
 
 
         ChunkLoader chunkLoader = new ChunkLoader();
@@ -495,7 +492,7 @@ public class Main {
         meshBuilder.close();
         System.out.print("Saving...");
         for(int X=0;X<ChunkCount;X++){
-            ChunkArray[X].Save();
+            //ChunkArray[X].Save();
         }
         Player.Save();
         System.out.println("Saved");

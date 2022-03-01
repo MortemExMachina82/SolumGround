@@ -1,0 +1,20 @@
+{
+    "Name":"Blue Moss",
+    "ID":6,
+    "Full":true,
+    "DirectoryModelPath":"assets/solumground/models/Standard",
+    "DirectoryTexturePath":"assets/solumground/textures",
+    "Illuminated":true,
+    "LightStrength":1,
+    "LightColor":[0.5,0.5,1],
+    "Model":[
+        ["Right", "Right.smobj", "BlueMossSide.png"],
+        ["Left", "Left.smobj", "BlueMossSide.png"],
+        ["Top", "Top.smobj", "BlueMossTop.png"],
+        ["Bottom", "Bottom.smobj", "dirt.png"],
+        ["Front", "Front.smobj", "BlueMossSide.png"],
+        ["Back", "Back.smobj", "BlueMossSide.png"]
+    ],
+    "HasCollisionBox":true,
+    "CollisionBoxSizes":[]
+}

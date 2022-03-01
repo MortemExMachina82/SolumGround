@@ -168,7 +168,7 @@ public class Player{
         position.Z += (float)Math.sin(Rotation.Y*3.1415/180)*distance;
     }
     public static void Move_Y(float distance){
-        position.Y -= distance;
+        position.Y += distance;
     }
     public static void Move_Z(float distance){
         position.X -= (float)Math.sin(Rotation.Y*3.1415/180)*distance;
@@ -194,7 +194,7 @@ public class Player{
             float time = (float)glfwGetTime() - fall_time;
             if(time > 3f){time = 3f;}
             float dist = (9.8f*time)*TimeElapsed;
-            position.Y -= dist;
+            Move_Y(-dist);
         }
 
         else{
@@ -207,7 +207,7 @@ public class Player{
             float a = 1f-time;
             if(a > 0) {
 
-                position.Y += a * 15f * TimeElapsed;
+                Move_Y(a * 15f * TimeElapsed);
 
             }
             else{
