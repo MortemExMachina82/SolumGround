@@ -37,7 +37,7 @@ public class JsonParser {
     public static String ParseString(FileInputStream In, JsonObject O) throws Exception{
         String Out = "";
         for(int X=0;X<500;X++){
-            int Char = SkipWhiteSpace(In, O);
+            int Char = In.read();
             if(Char == '"'){
                 return Out;
             }
