@@ -42,6 +42,13 @@ public class Block {
     public static int [] TexSizeX;
     public static int [] TexSizeY;
 
+    public static final int RIGHT = 0;
+    public static final int LEFT = 1;
+    public static final int TOP = 2;
+    public static final int BOTTOM = 3;
+    public static final int FRONT = 4;
+    public static final int BACK = 5;
+
     public static void ConvertTextureCords(Mesh mesh, Block block, int Index){
         String tex = block.Texture[Index];
         int index = 0;

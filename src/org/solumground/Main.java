@@ -438,14 +438,14 @@ public class Main {
             playerMoveSpeedSprint = 1.0f;
             if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == 1) {
                 if (Player.is_flying) {
-                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed);
+                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed * -1);
                 } else {
                     playerMoveSpeedSprint = 1.5f;
                 }
             }
             if(glfwGetKey(win, GLFW_KEY_SPACE) == 1){
                 if(Player.is_flying) {
-                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed * -1);
+                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed);
                 }
                 else{
                     Player.jump();
@@ -492,7 +492,7 @@ public class Main {
         meshBuilder.close();
         System.out.print("Saving...");
         for(int X=0;X<ChunkCount;X++){
-            //ChunkArray[X].Save();
+            ChunkArray[X].Save();
         }
         Player.Save();
         System.out.println("Saved");

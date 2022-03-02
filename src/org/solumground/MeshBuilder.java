@@ -16,10 +16,12 @@ class MeshBuilder extends Thread{
         Chunk chunk;
         if(Genbuffer.size() > 0) {
             chunk = Genbuffer.remove(0);
+            chunk.GetNear();
             chunk.buildMesh();
         }
         if(ReGenBuffer.size() > 0) {
             chunk = ReGenBuffer.remove(0);
+            chunk.GetNear();
             chunk.ReBuildMesh();
         }
         if(LightUpdateBuffer.size() > 0) {

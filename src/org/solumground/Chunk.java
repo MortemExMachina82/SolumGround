@@ -19,7 +19,8 @@ public class Chunk{
 
     public Mesh main_mesh;
 
-    public Status status = Status.Started;
+    public Status status;
+    public Chunk [] NearChunks = new Chunk[27];
 
     enum Status{
         Started,
@@ -102,6 +103,7 @@ public class Chunk{
         this.chunkPosition = new IVec3(Position);
         this.FilePath = Path + "/block_data_" + this.chunkPosition.X + "_" + this.chunkPosition.Y + "_" + this.chunkPosition.Z + ".dat";
 
+        GetNear();
 
         status = Status.Started;
 
@@ -160,6 +162,20 @@ public class Chunk{
         Main.ChunkArray[Main.ChunkCount] = this;
         Main.ChunkCount++;
 
+    }
+    public void GetNear(){
+        Chunk NextTo;
+
+        for(int X=-1;X<2;X++){
+            for(int Y=-1;Y<2;Y++){
+                for(int Z=-1;Z<2;Z++){
+                    NextTo = FromChunkPos(new IVec3(this.chunkPosition.X+X, this.chunkPosition.Y+Y, this.chunkPosition.Z+Z));
+                    if(NextTo != this) {
+                        NearChunks[(Y+1)*9 + (X+1)*3 + (Z+1)] = NextTo;
+                    }
+                }
+            }
+        }
     }
     public boolean CheckIsEmpty(){
         for (int Y = 0; Y < Size; Y++) {
@@ -224,25 +240,104 @@ public class Chunk{
     }
     public void Put(int BlockID, IVec3 Position){
         if(Block.Blocks[BlockID].Full) {
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
-                Put_side(BlockID, 1, Position);
+            if(Position.X == 0){
+                Chunk NextChunk = NearChunks[10]; //1*9 + 0*3 + 1
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(Size-1, Position.Y, Position.Z))].Full) {
+                        Put_side(BlockID, Block.LEFT, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
+                    Put_side(BlockID, Block.RIGHT, Position);
+                }
             }
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
-                Put_side(BlockID, 0, Position);
+            else if(Position.X == Size-1){
+                Chunk NextChunk = NearChunks[16]; //1*9 + 2*3 + 1
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(0, Position.Y, Position.Z))].Full) {
+                        Put_side(BlockID, Block.RIGHT, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
+                    Put_side(BlockID, Block.LEFT, Position);
+                }
             }
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
-                Put_side(BlockID, 2, Position);
+            else {
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
+                    Put_side(BlockID, 1, Position);
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
+                    Put_side(BlockID, 0, Position);
+                }
             }
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
-                Put_side(BlockID, 3, Position);
+
+
+            if(Position.Y == 0){
+                Chunk NextChunk = NearChunks[4]; //0*9 + 1*3 + 1
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(Position.X, Size-1, Position.Z))].Full) {
+                        Put_side(BlockID, Block.BOTTOM, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
+                    Put_side(BlockID, Block.TOP, Position);
+                }
             }
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
-                Put_side(BlockID, 4, Position);
+            else if(Position.Y == Size-1){
+                Chunk NextChunk = NearChunks[22]; //2*9 + 1*3 + 1
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(Position.X, 0, Position.Z))].Full) {
+                        Put_side(BlockID, Block.TOP, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
+                    Put_side(BlockID, Block.BOTTOM, Position);
+                }
             }
-            if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z + 1))].Full) {
-                Put_side(BlockID, 5, Position);
+            else {
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
+                    Put_side(BlockID, Block.BOTTOM, Position);
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
+                    Put_side(BlockID, Block.TOP, Position);
+                }
             }
+
+
+            if(Position.Z == 0){
+                Chunk NextChunk = NearChunks[12]; //1*9 + 1*3 + 0
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(Position.X, Position.Y, Size-1))].Full) {
+                        Put_side(BlockID, Block.FRONT, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z+1))].Full) {
+                    Put_side(BlockID, Block.BACK, Position);
+                }
+            }
+            else if(Position.Z == Size-1){
+                Chunk NextChunk = NearChunks[14]; //1*9 + 1*3 + 2
+                if(NextChunk != null){
+                    if (!Block.Blocks[NextChunk.GetLocal(new IVec3(Position.X, Position.Y, 0))].Full) {
+                        Put_side(BlockID, Block.BACK, Position);
+                    }
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
+                    Put_side(BlockID, Block.FRONT, Position);
+                }
+            }
+            else {
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
+                    Put_side(BlockID, Block.FRONT, Position);
+                }
+                if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z + 1))].Full) {
+                    Put_side(BlockID, Block.BACK, Position);
+                }
+            }
+
         }
+
+
         else{
             Mesh mesh = Block.Blocks[BlockID].mesh;
             mesh.position = Position.ToFloat();
@@ -256,16 +351,11 @@ public class Chunk{
                     Block.Blocks[BlockID].LightColor[0],
                     Block.Blocks[BlockID].LightColor[1],
                     Block.Blocks[BlockID].LightColor[2]);
-            Chunk NextTo;
-            for(int X=-1;X<2;X++){
-                for(int Y=-1;Y<2;Y++){
-                    for(int Z=-1;Z<2;Z++){
-                        NextTo = FromChunkPos(new IVec3(this.chunkPosition.X+X, this.chunkPosition.Y+Y, this.chunkPosition.Z+Z));
-                        if(NextTo != null){
-                            if(NextTo.main_mesh != null) {
-                                MeshBuilder.LightUpdateBuffer.add(NextTo);
-                            }
-                        }
+
+            for(Chunk NextTo : NearChunks) {
+                if(NextTo != null){
+                    if(NextTo.main_mesh != null){
+                        MeshBuilder.LightUpdateBuffer.add(NextTo);
                     }
                 }
             }
@@ -273,6 +363,7 @@ public class Chunk{
     }
 
     public boolean Place(int BlockID, IVec3 blockpos){
+        GetNear();
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) == 0) {
             if(this.is_empty){
@@ -288,6 +379,7 @@ public class Chunk{
         return false;
     }
     public void Delete(IVec3 blockpos){
+        GetNear();
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) != 0) {
             this.blocks[Lpos.Y * Size * Size + Lpos.X * Size + Lpos.Z] = 0;
@@ -295,16 +387,10 @@ public class Chunk{
                 Light light = Light.lights.get(X);
                 if(IVec3.Equal(blockpos, light.position.ToInt())){
                     Light.lights.remove(X);
-                    Chunk NextTo;
-                    for(int X2=-1;X2<2;X2++){
-                        for(int Y=-1;Y<2;Y++){
-                            for(int Z=-1;Z<2;Z++){
-                                NextTo = FromChunkPos(new IVec3(this.chunkPosition.X+X2, this.chunkPosition.Y+Y, this.chunkPosition.Z+Z));
-                                if(NextTo != null){
-                                    if(NextTo.main_mesh != null) {
-                                        MeshBuilder.LightUpdateBuffer.add(NextTo);
-                                    }
-                                }
+                    for(Chunk NextTo : NearChunks) {
+                        if(NextTo != null){
+                            if(NextTo.main_mesh != null){
+                                MeshBuilder.LightUpdateBuffer.add(NextTo);
                             }
                         }
                     }
