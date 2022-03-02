@@ -425,7 +425,6 @@ public class Chunk{
     }
 
     public void GenChunk(){
-        //System.out.println("Generating chunk "+this.chunkPosition);
         for (int X = 0; X < Size;X++) {
             for (int Z = 0; Z < Size; Z++) {
                 int h;
@@ -435,7 +434,6 @@ public class Chunk{
                 catch(Exception e){
                     h = Size;
                 }
-                //int h = Byte.toUnsignedInt(noisemap[(int)(X)*100 + (int)(Z)]);
                 float a = h/255.0f;
                 a *= 1f;
                 float b = 4;
@@ -459,13 +457,12 @@ public class Chunk{
                     if(Y == h){
                         blockType = 1;
                         float r = RNG.nextFloat();
-                        if(r < 0.005){
+                        if(r < 0.01){
                             blockType = 6;
                         }
                     }
                     if(isFull){blockType = 2;}
                     Set(new IVec3(X,Y,Z), blockType);
-                    //blocks[Y * Size * Size + X * Size + Z] = blockType;
                 }
             }
         }
