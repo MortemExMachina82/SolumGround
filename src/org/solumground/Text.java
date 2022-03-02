@@ -14,34 +14,43 @@ public class Text {
     public void BuildAndUploadVertexData(){
         this.VertexArray = new float[this.text.length*16];
 
-        float offset = 0;
+        float offsetX = 0;
+        float offsetY = 0;
         for(int X=0;X<this.text.length;X++){
+            if(this.text[X] == '\n'){
+                offsetY -= Size;
+                offsetX = 0;
+                continue;
+            }
+            if(this.text[X] == '\r'){
+                offsetX = 0;
+            }
             float width = ((this.font.getWidth(this.text[X])/(float)this.font.Texture_width)*128*this.Size)/Main.aspectRatio;
             float texWidth1 = this.font.getAcumWidth(this.text[X]-1)/(float)this.font.Texture_width;
             float texWidth2 = this.font.getAcumWidth(this.text[X])/(float)this.font.Texture_width;
 
             int arrayStart = X*16;
-            this.VertexArray[arrayStart] = this.position.X + offset;
-            this.VertexArray[arrayStart + 1] = this.position.Y-this.Size;
+            this.VertexArray[arrayStart] = this.position.X + offsetX;
+            this.VertexArray[arrayStart + 1] = (this.position.Y-this.Size) + offsetY;
             this.VertexArray[arrayStart + 2] = texWidth1;
             this.VertexArray[arrayStart + 3] = 1;
 
-            this.VertexArray[arrayStart + 4] = this.position.X + offset;
-            this.VertexArray[arrayStart + 5] = this.position.Y;
+            this.VertexArray[arrayStart + 4] = this.position.X + offsetX;
+            this.VertexArray[arrayStart + 5] = this.position.Y + offsetY;
             this.VertexArray[arrayStart + 6] = texWidth1;
             this.VertexArray[arrayStart + 7] = 0;
 
-            this.VertexArray[arrayStart + 8] = this.position.X + offset + width;
-            this.VertexArray[arrayStart + 9] = this.position.Y;
+            this.VertexArray[arrayStart + 8] = this.position.X + offsetX + width;
+            this.VertexArray[arrayStart + 9] = this.position.Y + offsetY;
             this.VertexArray[arrayStart + 10] = texWidth2;
             this.VertexArray[arrayStart + 11] = 0;
 
-            this.VertexArray[arrayStart + 12] = this.position.X + offset + width;
-            this.VertexArray[arrayStart + 13] = this.position.Y-this.Size;
+            this.VertexArray[arrayStart + 12] = this.position.X + offsetX + width;
+            this.VertexArray[arrayStart + 13] = (this.position.Y-this.Size) + offsetY;
             this.VertexArray[arrayStart + 14] = texWidth2;
             this.VertexArray[arrayStart + 15] = 1;
 
-            offset += width;
+            offsetX += width;
         }
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBufferData(GL_ARRAY_BUFFER, this.VertexArray, GL_DYNAMIC_DRAW);
@@ -63,11 +72,7 @@ public class Text {
             return;
         }
         this.SText = newText;
-        byte [] newTextByte = newText.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        if(newTextByte == this.text){
-            return;
-        }
-        this.text = newTextByte;
+        this.text = newText.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         BuildAndUploadVertexData();
     }
     public void render(){
