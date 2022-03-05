@@ -25,9 +25,16 @@ public class ChunkLoader extends Thread{
             }
         }
     }
-    public void makeChunk(IVec3 pos){
-        Chunk chunk = new Chunk(Main.SaveFolder, pos);
-        MeshBuilder.Genbuffer.add(chunk);
+    public Chunk makeChunk(IVec3 pos){
+        Chunk chunk = Chunk.FromChunkPos(pos);
+        if(chunk == null) {
+            chunk = new Chunk(Main.SaveFolder, pos);
+            if(chunk.status == Chunk.Status.Loaded) {
+                MeshBuilder.Genbuffer.add(chunk);
+            }
+            return chunk;
+        }
+        return chunk;
     }
     public void loadAroundPlayer(int RenderDist){
         IVec3 pos;
@@ -41,10 +48,7 @@ public class ChunkLoader extends Thread{
                 Player.ChunkReload = true;
             }
             if(R==0){
-                chunk = Chunk.FromChunkPos(Player.StandingInChunk);
-                if(chunk == null) {
-                    makeChunk(Player.StandingInChunk);
-                }
+                chunk = makeChunk(Player.StandingInChunk);
                 continue;
             }
             int RY = (int)(R*.5f);
@@ -63,15 +67,9 @@ public class ChunkLoader extends Thread{
                     pos.X += X;
                     pos.Y += RY;
                     pos.Z += Z;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if(chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                     pos.Y -= RY+RY;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if(chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                 }
             }
             for(int Y=(-RY)+1;Y<RY;Y++){
@@ -88,15 +86,9 @@ public class ChunkLoader extends Thread{
                     pos.X += R;
                     pos.Y += Y;
                     pos.Z += Z;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if(chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                     pos.X -= R+R;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if(chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                 }
             }
             for(int X=(-R);X<R+1;X++) {
@@ -113,15 +105,9 @@ public class ChunkLoader extends Thread{
                     pos.X += X;
                     pos.Y += Y;
                     pos.Z += R;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if (chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                     pos.Z -= R+R;
-                    chunk = Chunk.FromChunkPos(pos);
-                    if (chunk == null) {
-                        makeChunk(pos);
-                    }
+                    chunk = makeChunk(pos);
                 }
             }
 

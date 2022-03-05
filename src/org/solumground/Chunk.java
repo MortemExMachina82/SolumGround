@@ -99,13 +99,13 @@ public class Chunk{
     }
 
     public Chunk(String Path, IVec3 Position) {
+        status = Status.Started;
         this.position = new IVec3(Position.X * Size, Position.Y * Size, Position.Z * Size);
         this.chunkPosition = new IVec3(Position);
         this.FilePath = Path + "/block_data_" + this.chunkPosition.X + "_" + this.chunkPosition.Y + "_" + this.chunkPosition.Z + ".dat";
 
         GetNear();
 
-        status = Status.Started;
 
         blocks = new byte[Size * Size * Size];
 
@@ -159,6 +159,9 @@ public class Chunk{
         status = Status.Loaded;
 
         this.is_empty = CheckIsEmpty();
+        if(this.is_empty){
+            blocks = null;
+        }
         Main.ChunkArray[Main.ChunkCount] = this;
         Main.ChunkCount++;
 
@@ -191,11 +194,7 @@ public class Chunk{
         return true;
     }
     public void buildMesh(){
-        if(this.is_empty){
-            //System.out.println("Tried to build empty chunk at "+chunkPosition);
-            blocks = null;
-            return;
-        }
+        if(this.is_empty){return;}
         main_mesh = new Mesh(Block.TextureBufferObject);
         main_mesh.position = new Vec3(this.position);
 

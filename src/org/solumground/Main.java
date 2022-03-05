@@ -53,6 +53,8 @@ public class Main {
     public static int TextShaderProgram;
     public static int TextShader_Vertex;
     public static int TextShader_TextureCords;
+    public static int TextShader_TextPos;
+    public static int TextShader_Alpha;
 
     public static double mouse_past_X;
     public static double mouse_past_Y;
@@ -199,6 +201,7 @@ public class Main {
                         e.printStackTrace();
                     }
                     System.out.println("Saved ScreenShot as: "+TimeString+".png");
+                    Console.Print("Saved ScreenShot as: "+TimeString+".png");
                 }
             }
             if((mods & 0x0004) > 0) {
@@ -218,15 +221,18 @@ public class Main {
                     Player.is_flying = !Player.is_flying;
                 }
                 if(key == GLFW_KEY_R){
+                    Console.Print("Respawning");
                     Player.reSpawn();
                 }
                 if(key == GLFW_KEY_EQUAL){
                     RenderDistance++;
                     Player.ChunkReload = true;
+                    Console.Print("Increased Render Distance To: "+RenderDistance);
                 }
                 if(key == GLFW_KEY_MINUS){
                     RenderDistance--;
                     Player.ChunkReload = true;
+                    Console.Print("Decreased Render Distance To: "+RenderDistance);
                 }
             }
             if(key == GLFW_KEY_O){Player.move_hotbar(-1);}
@@ -234,11 +240,13 @@ public class Main {
             if((mods & 0x0002) > 0){
                 if(key == GLFW_KEY_S){
                     System.out.print("Saving...");
+                    Console.Print("Saving...");
                     for(int X=0;X<ChunkCount;X++){
                         ChunkArray[X].Save();
                     }
                     Player.Save();
                     System.out.println("Saved");
+                    Console.Add("Saved");
                 }
             }
         }
@@ -394,6 +402,8 @@ public class Main {
         glUseProgram(TextShaderProgram);
         TextShader_Vertex = glGetAttribLocation(TextShaderProgram, "a_position");
         TextShader_TextureCords = glGetAttribLocation(TextShaderProgram, "a_texcord");
+        TextShader_TextPos = glGetUniformLocation(TextShaderProgram, "TextPos");
+        TextShader_Alpha = glGetUniformLocation(TextShaderProgram, "Alpha");
         glEnableVertexAttribArray(TextShader_Vertex);
         glEnableVertexAttribArray(TextShader_TextureCords);
 
@@ -407,6 +417,7 @@ public class Main {
         Block.Init();
         SkyBox.Init();
         Chunk.Init();
+        Console.Init(FontPath);
 
 
 
@@ -420,9 +431,9 @@ public class Main {
         meshBuilder.start();
 
         Font DefaultFont = new Font(FontPath);
-        Text posText = new Text("",DefaultFont, .03f, new Vec3(-1f,1f-0.12f,0));
-        Text fpsText = new Text("",DefaultFont, .03f, new Vec3(-1f,1f-0.06f,0));
-        Text SelectedBlockText = new Text("", DefaultFont, 0.03f, new Vec3(-1f,1f,0));
+        Text posText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
+        Text fpsText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.06f,0));
+        Text SelectedBlockText = new Text("", DefaultFont, 0.03f, new Vec3(1f,1f,0));
 
         double PastTime = glfwGetTime();
         while (!glfwWindowShouldClose(win)){
@@ -484,6 +495,7 @@ public class Main {
             SelectedBlockText.render();
             posText.updateText(String.format("POS: %s", Player.position));
             posText.render();
+            Console.Draw();
 
             glfwSwapBuffers(win);
         }

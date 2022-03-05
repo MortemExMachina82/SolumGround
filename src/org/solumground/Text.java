@@ -8,6 +8,7 @@ public class Text {
     public String SText;
     public byte [] text;
     public float Size;
+    public float Alpha = 1;
     public float [] VertexArray;
     public int VertexBufferObject;
 
@@ -30,23 +31,23 @@ public class Text {
             float texWidth2 = this.font.getAcumWidth(this.text[X])/(float)this.font.Texture_width;
 
             int arrayStart = X*16;
-            this.VertexArray[arrayStart] = this.position.X + offsetX;
-            this.VertexArray[arrayStart + 1] = (this.position.Y-this.Size) + offsetY;
+            this.VertexArray[arrayStart] = offsetX;
+            this.VertexArray[arrayStart + 1] = offsetY - this.Size;
             this.VertexArray[arrayStart + 2] = texWidth1;
             this.VertexArray[arrayStart + 3] = 1;
 
-            this.VertexArray[arrayStart + 4] = this.position.X + offsetX;
-            this.VertexArray[arrayStart + 5] = this.position.Y + offsetY;
+            this.VertexArray[arrayStart + 4] = offsetX;
+            this.VertexArray[arrayStart + 5] = offsetY;
             this.VertexArray[arrayStart + 6] = texWidth1;
             this.VertexArray[arrayStart + 7] = 0;
 
-            this.VertexArray[arrayStart + 8] = this.position.X + offsetX + width;
-            this.VertexArray[arrayStart + 9] = this.position.Y + offsetY;
+            this.VertexArray[arrayStart + 8] = offsetX + width;
+            this.VertexArray[arrayStart + 9] = offsetY;
             this.VertexArray[arrayStart + 10] = texWidth2;
             this.VertexArray[arrayStart + 11] = 0;
 
-            this.VertexArray[arrayStart + 12] = this.position.X + offsetX + width;
-            this.VertexArray[arrayStart + 13] = (this.position.Y-this.Size) + offsetY;
+            this.VertexArray[arrayStart + 12] = offsetX + width;
+            this.VertexArray[arrayStart + 13] = offsetY - this.Size;
             this.VertexArray[arrayStart + 14] = texWidth2;
             this.VertexArray[arrayStart + 15] = 1;
 
@@ -81,6 +82,9 @@ public class Text {
 
         glVertexAttribPointer(Main.TextShader_Vertex, 2, GL_FLOAT, false, 16, 0);
         glVertexAttribPointer(Main.TextShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
+
+        glUniform2f(Main.TextShader_TextPos, -this.position.X, this.position.Y);
+        glUniform1f(Main.TextShader_Alpha, this.Alpha);
 
         glDrawArrays(GL_QUADS, 0, this.text.length*4);
     }
