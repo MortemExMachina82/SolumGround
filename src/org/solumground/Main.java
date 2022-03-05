@@ -34,6 +34,7 @@ public class Main {
     public static int monitor_H;
     public static boolean FullScreen;
     public static long win;
+    public static float Time;
     public static float TimeElapsed;
     public static float AvgTimeElapsed;
     public static float fps;
@@ -417,17 +418,16 @@ public class Main {
         Block.Init();
         SkyBox.Init();
         Chunk.Init();
-        Console.Init(FontPath);
+        Console.Init();
 
 
 
         ChunkLoader chunkLoader = new ChunkLoader();
         chunkLoader.loadAroundPlayer(3);
         MeshBuilder meshBuilder = new MeshBuilder();
-        meshBuilder.Build();
         chunkLoader.setDaemon(true);
-        meshBuilder.setDaemon(true);
         chunkLoader.start();
+        meshBuilder.setDaemon(true);
         meshBuilder.start();
 
         Font DefaultFont = new Font(FontPath);
@@ -438,6 +438,7 @@ public class Main {
         double PastTime = glfwGetTime();
         while (!glfwWindowShouldClose(win)){
             double CurentTime = glfwGetTime();
+            Time = (float)CurentTime;
             TimeElapsed = (float)(CurentTime-PastTime);
             PastTime = CurentTime;
             AvgTimeElapsed += (TimeElapsed-AvgTimeElapsed)/20;

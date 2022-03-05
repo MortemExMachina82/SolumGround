@@ -3,7 +3,6 @@ package org.solumground;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public class Console {
     public static Font DefaultFont;
@@ -13,8 +12,8 @@ public class Console {
     public static List<Text> TextBuffer = new ArrayList<>(BufferSize+1);
     public static List<Float> TimeBuffer = new ArrayList<>(BufferSize+1);
 
-    public static void Init(String FontPath){
-        DefaultFont = new Font(FontPath);
+    public static void Init(){
+        DefaultFont = new Font(Main.FontPath);
     }
 
     public static void Print(String text){
@@ -23,7 +22,7 @@ public class Console {
         }
         Text T = new Text(text, DefaultFont, TextSize/2, new Vec3(1-0.05f, -1+0.1f+TextSize, 0));
         TextBuffer.add(T);
-        TimeBuffer.add((float)glfwGetTime());
+        TimeBuffer.add(Main.Time);
         if(TextBuffer.size() > BufferSize){
             TextBuffer.remove(0);
             TimeBuffer.remove(0);
@@ -33,14 +32,14 @@ public class Console {
     public static void Add(String text){
         Text T = TextBuffer.get(TextBuffer.size()-1);
         T.updateText(T.SText+text);
-        TimeBuffer.set(TimeBuffer.size()-1, (float)glfwGetTime());
+        TimeBuffer.set(TimeBuffer.size()-1, Main.Time);
     }
 
     public static void Draw(){
         for(int X=0;X<TextBuffer.size();X++){
             Text text = TextBuffer.get(X);
             float Ttime = TimeBuffer.get(X);
-            float Ctime = (float)glfwGetTime();
+            float Ctime = Main.Time;
             float TimeElapsed = Ctime-Ttime;
             if(TimeElapsed <= .5f){
                 text.Alpha = TimeElapsed*2;

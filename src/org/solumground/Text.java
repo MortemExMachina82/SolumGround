@@ -53,8 +53,39 @@ public class Text {
 
             offsetX += width;
         }
-        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-        glBufferData(GL_ARRAY_BUFFER, this.VertexArray, GL_DYNAMIC_DRAW);
+
+        if(Thread.currentThread().getName().equals("main")){
+            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+            glBufferData(GL_ARRAY_BUFFER, VertexArray, GL_DYNAMIC_DRAW);
+        }
+        else{
+
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+            Main.glBindBuffer_In2 = this.VertexBufferObject;
+
+            Main.glBufferData_In1 = GL_ARRAY_BUFFER;
+            Main.glBufferData_In2 = VertexArray;
+            Main.glBufferData_In3 = GL_STATIC_DRAW;
+            Main.glBufferDataStatus = Main.GLStatus.Ready;
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+        }
     }
 
     public Text(String newtext, Font font, float Size, Vec3 pos){
@@ -64,7 +95,30 @@ public class Text {
         this.Size = Size*2;
         this.position = pos;
 
-        this.VertexBufferObject = glGenBuffers();
+        if(Thread.currentThread().getName().equals("main")) {
+            this.VertexBufferObject = glGenBuffers();
+        }
+        else {
+            while (Main.glGenBuffersStatus != Main.GLStatus.Done) {
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glGenBuffersStatus = Main.GLStatus.Ready;
+            while (Main.glGenBuffersStatus != Main.GLStatus.Done) {
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            this.VertexBufferObject = Main.glGenBuffers_Out;
+        }
+
 
         BuildAndUploadVertexData();
     }
