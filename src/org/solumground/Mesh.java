@@ -31,7 +31,8 @@ public class Mesh{
     int Texture_Buffer_Object;
     boolean TBO_gen;
     Vec3 position = new Vec3(0,0,0);
-    Vec3 Roation;
+    Vec3 Roation = new Vec3(0,0,0);
+    Vec3 Scale = new Vec3(1,1,1);
     boolean is_skyBox;
     boolean FullLight = false;
 
@@ -323,8 +324,6 @@ public class Mesh{
 
         this.TBO_gen = true;
 
-        this.position = new Vec3(0,0,0);
-        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
     }
     public Mesh(String Path, int type){
@@ -344,8 +343,6 @@ public class Mesh{
         LoadTexture(this.texturePath);
         this.TBO_gen = true;
 
-        this.position = new Vec3(0,0,0);
-        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
 
     }
@@ -361,8 +358,6 @@ public class Mesh{
         LoadSMOBJ(this.modelPath);
         this.TBO_gen = false;
 
-        this.position = new Vec3(0,0,0);
-        this.Roation = new Vec3(0,0,0);
         this.is_skyBox = false;
     }
 
@@ -753,7 +748,7 @@ public class Mesh{
         Texture_data[0] = color;
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1,1, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, Texture_data);
     }
-    public void Scale(float X,float Y,float Z){
+    public void ScaleData(float X, float Y, float Z){
         for(int V=0;V<this.Number_of_Verts;V++){
             this.Original_VertexArray[V*3] *= X;
             this.Original_VertexArray[V*3 + 1] *= Y;
@@ -773,6 +768,7 @@ public class Mesh{
     public void draw(){
         float [] FinalMat = new float[16];
         float [] RotationMat = new float[4*4];
+        float [] ScaleMat = new float[16];
         float [] TransMat = new float[16];
         if(this.is_skyBox){
             TransMat[0]=1;TransMat[5]=1;TransMat[10]=1;TransMat[15]=1;
@@ -788,8 +784,14 @@ public class Mesh{
             TransMat[13] = this.position.Y;
             TransMat[14] = this.position.Z;
             TransMat[15] = 1;
+            ScaleMat[0] = this.Scale.X;
+            ScaleMat[5] = this.Scale.Y;
+            ScaleMat[10] = this.Scale.Z;
+            ScaleMat[15] = 1;
             Math3D.Make3DRotationMatrix44(this.Roation, RotationMat);
-            Math3D.Matrix44_Multiply(RotationMat, TransMat, FinalMat);
+            float [] ScaleRot = new float[16];
+            Math3D.Matrix44_Multiply(ScaleMat, RotationMat, ScaleRot);
+            Math3D.Matrix44_Multiply(ScaleRot, TransMat, FinalMat);
             glUniformMatrix4fv(Main.MainShader_ModelMat, false, FinalMat);
         }
 

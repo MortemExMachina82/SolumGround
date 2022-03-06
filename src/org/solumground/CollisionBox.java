@@ -35,7 +35,7 @@ public class CollisionBox {
         this.wiremesh = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
         this.wiremesh.setWireFrame();
         wiremesh.setColor(0xFF0000FF);
-        this.wiremesh.Scale((this.BondPX-this.BondNX)*.501f, (this.BondPY-this.BondNY)*.501f, (this.BondPZ-this.BondNZ)*.501f);
+        this.wiremesh.ScaleData((this.BondPX-this.BondNX)*.501f, (this.BondPY-this.BondNY)*.501f, (this.BondPZ-this.BondNZ)*.501f);
     }
 
     public boolean detect_collision(CollisionBox box){

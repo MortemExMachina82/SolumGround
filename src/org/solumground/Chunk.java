@@ -372,12 +372,12 @@ public class Chunk{
                 this.is_empty = false;
             }
             Set(Lpos, BlockID);
-            ReBuildMesh();
+            //ReBuildMesh();
             return true;
         }
         return false;
     }
-    public void Delete(IVec3 blockpos){
+    public boolean Delete(IVec3 blockpos){
         GetNear();
         IVec3 Lpos = ConvertToLocal(blockpos);
         if(GetLocal(Lpos) != 0) {
@@ -396,7 +396,9 @@ public class Chunk{
                 }
             }
             ReBuildMesh();
+            return true;
         }
+        return false;
     }
 
     public boolean validCord(IVec3 Position) {

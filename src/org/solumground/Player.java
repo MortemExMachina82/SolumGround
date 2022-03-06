@@ -24,7 +24,11 @@ public class Player{
     public static Mesh wireframe;
     public static int hotbar_selected;
     public static CollisionBox collisionBox;
-    public static Chunk[] chunks = new Chunk[11];
+    public static Mesh AnimationMesh;
+    public static boolean AnimationBreak = false;
+    public static boolean AnimationPlace = false;
+    public static float AnimationStartTime;
+    public static IVec3 AnimationPos;
     public static boolean ChunkReload = false;
 
 
@@ -37,6 +41,8 @@ public class Player{
         Rotation = new Vec3();
         LookingAt = new IVec3();
         hotbar_selected = 0;
+
+
 
         String DataPath = Main.SaveFolder+"/Player.dat";
         File file = new File(DataPath);
@@ -87,7 +93,7 @@ public class Player{
 
         wireframe = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
         wireframe.setWireFrame();
-        wireframe.Scale(.504f,.504f,.504f);
+        wireframe.ScaleData(.504f,.504f,.504f);
         wireframe.setColor(0x0000FFFF);
 
         set_Projection();
@@ -139,21 +145,58 @@ public class Player{
 
         wireframe.position = new Vec3(LookingAt);
     }
+    public static void StartAnimation(Block block){
+        if(AnimationMesh == null){
+            AnimationMesh = new Mesh(Block.TextureBufferObject);
+        }
+        AnimationMesh.Number_of_TriFaces = 0;
+        AnimationMesh.Number_of_QuadFaces = 0;
+        AnimationMesh.Number_of_Verts = 0;
+        AnimationMesh.Number_of_vtcords = 0;
+        AnimationMesh.Roation = new Vec3(0,0,0);
 
+        if(block.Full){
+            for(int X=0;X<6;X++) {
+                Mesh mesh = block.Sides[X];
+                mesh.position = new Vec3(0,0,0);
+                AnimationMesh.add(mesh);
+            }
+        }
+        else{
+            Mesh mesh = block.mesh;
+            mesh.position = new Vec3(0,0,0);
+            AnimationMesh.add(mesh);
+        }
+
+        AnimationStartTime = Main.Time;
+        AnimationPos = new IVec3(LookingAt);
+        AnimationMesh.position = AnimationPos.ToFloat();
+
+        AnimationMesh.upload_Vertex_data();
+    }
     public static void place_block(){
         if(LookingAtBlock.ID == 0) {
             Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
             if (selected_chunk == null) {
                 return;
             }
-            selected_chunk.Place(hotbar_selected, LookingAt);
+            boolean Placed = false;
+            Placed = selected_chunk.Place(hotbar_selected, LookingAt);
+            if(Placed){
+                StartAnimation(Block.Blocks[hotbar_selected]);
+                AnimationPlace = true;
+            }
         }
     }
-
     public static void break_block(){
         Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
+        boolean Broke = false;
         if(selected_chunk != null){
-            selected_chunk.Delete(LookingAt);
+            Broke = selected_chunk.Delete(LookingAt);
+        }
+        if(Broke){
+            StartAnimation(LookingAtBlock);
+            AnimationBreak = true;
         }
     }
 
@@ -174,7 +217,6 @@ public class Player{
         position.X -= (float)Math.sin(Rotation.Y*3.1415/180)*distance;
         position.Z -= (float)Math.cos(Rotation.Y*3.1415/180)*distance;
     }
-
     public static void Rotate_Y(float distance){
         Rotation.Y += distance;
     }
@@ -236,6 +278,58 @@ public class Player{
         wireframe.draw();
         if(Main.showCollisionBox) {
             collisionBox.draw();
+        }
+        if(AnimationBreak){
+            float LerpValue = (Main.Time-AnimationStartTime)/0.5f;
+            if(LerpValue < 0.2f){
+                float Scale = 1-(LerpValue/0.2f)*0.7f;
+                AnimationMesh.Scale.X = Scale;
+                AnimationMesh.Scale.Y = Scale;
+                AnimationMesh.Scale.Z = Scale;
+            }
+            if(LerpValue < 1) {
+                AnimationMesh.position.X = AnimationPos.X*(1-LerpValue) + position.X*LerpValue;
+                AnimationMesh.position.Y = AnimationPos.Y*(1-LerpValue) + (position.Y-1)*LerpValue;
+                AnimationMesh.position.Z = AnimationPos.Z*(1-LerpValue) + position.Z*LerpValue;
+
+                AnimationMesh.Roation.X += 30*Main.TimeElapsed;
+                AnimationMesh.Roation.Y += 60*Main.TimeElapsed;
+                AnimationMesh.Roation.Z += 20*Main.TimeElapsed;
+            }
+            else{
+                AnimationBreak = false;
+            }
+            AnimationMesh.draw();
+        }
+        if(AnimationPlace){
+            float LerpValue = (Main.Time-AnimationStartTime)/0.5f;
+
+            if(LerpValue < 0.8f){
+                AnimationMesh.Roation.X += 30*Main.TimeElapsed;
+                AnimationMesh.Roation.Y += 60*Main.TimeElapsed;
+                AnimationMesh.Roation.Z += 20*Main.TimeElapsed;
+            }
+            if(LerpValue > 0.8f){
+                float LocalLerp = (LerpValue-0.8f)*5;
+                float Scale = 0.3f* (1-LocalLerp) + 1*LocalLerp;
+                AnimationMesh.Scale.X = Scale;
+                AnimationMesh.Scale.Y = Scale;
+                AnimationMesh.Scale.Z = Scale;
+                AnimationMesh.Roation.X = AnimationMesh.Roation.X*(1-LocalLerp);
+                AnimationMesh.Roation.Y = AnimationMesh.Roation.Y*(1-LocalLerp);
+                AnimationMesh.Roation.Z = AnimationMesh.Roation.Z*(1-LocalLerp);
+            }
+            if(LerpValue < 1) {
+                AnimationMesh.position.X = AnimationPos.X*LerpValue + position.X*(1-LerpValue);
+                AnimationMesh.position.Y = AnimationPos.Y*LerpValue + (position.Y-1)*(1-LerpValue);
+                AnimationMesh.position.Z = AnimationPos.Z*LerpValue + position.Z*(1-LerpValue);
+            }
+            else{
+                Chunk selected_chunk = Chunk.FromPos(AnimationPos.ToFloat());
+                selected_chunk.ReBuildMesh();
+                AnimationPlace = false;
+            }
+            AnimationMesh.draw();
         }
     }
 
