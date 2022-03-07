@@ -22,7 +22,7 @@ public class Chunk{
     public Status status;
     public Chunk [] NearChunks = new Chunk[27];
 
-    enum Status{
+    public enum Status{
         Started,
         Loaded,
         MeshBuilt,

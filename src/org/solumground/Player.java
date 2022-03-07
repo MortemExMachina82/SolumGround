@@ -32,9 +32,8 @@ public class Player{
     public static boolean ChunkReload = false;
 
 
-    public static void Init(){
-
-        reSpawnPosition = new Vec3(0,40,0);
+    public static void Init() {
+        reSpawnPosition = new Vec3(0, 40, 0);
         position = new Vec3(reSpawnPosition);
         StandingInChunk = Chunk.convert_to_chunk_pos(position);
 
@@ -42,8 +41,28 @@ public class Player{
         LookingAt = new IVec3();
         hotbar_selected = 0;
 
+        collisionBox = new CollisionBox(position, .33f, .1f, .33f, -.33f, -1.8f, -.33f);
+        collisionBox.set_Is_player(true);
 
 
+        WorldMatrix = new float[4*4];
+        Math3D.Make3DRotationMatrix44(Rotation, WorldMatrix);
+
+        is_jumping = false;
+        is_flying = false;
+
+        fall_time = (float)glfwGetTime();
+
+
+
+        wireframe = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
+        wireframe.setWireFrame();
+        wireframe.ScaleData(.504f,.504f,.504f);
+        wireframe.setColor(0x0000FFFF);
+
+        set_Projection();
+    }
+    public static void Load(){
         String DataPath = Main.SaveFolder+"/Player.dat";
         File file = new File(DataPath);
         int bytesRead = 0;
@@ -77,27 +96,7 @@ public class Player{
                 e.printStackTrace();
             }
         }
-
-        collisionBox = new CollisionBox(position, .33f,.1f,.33f, -.33f,-1.8f,-.33f);
-        collisionBox.set_Is_player(true);
-
-        WorldMatrix = new float[4*4];
-        Math3D.Make3DRotationMatrix44(Rotation, WorldMatrix);
-
-        is_jumping = false;
-        is_flying = false;
-
         fall_time = (float)glfwGetTime();
-
-
-
-        wireframe = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
-        wireframe.setWireFrame();
-        wireframe.ScaleData(.504f,.504f,.504f);
-        wireframe.setColor(0x0000FFFF);
-
-        set_Projection();
-
     }
     public static void set_Projection(){
         float [] projection_mat = new float[4*4];
@@ -175,7 +174,7 @@ public class Player{
         AnimationMesh.upload_Vertex_data();
     }
     public static void place_block(){
-        if(LookingAtBlock.ID == 0) {
+        if(LookingAtBlock.ID == 0 && Block.Blocks[hotbar_selected].ID != 0) {
             Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
             if (selected_chunk == null) {
                 return;

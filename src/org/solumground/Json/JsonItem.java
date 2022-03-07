@@ -82,6 +82,9 @@ public class JsonItem {
     public JsonArray GetArray(){
         return this.valueJsonArray;
     }
+    public JsonObject GetObject(){
+        return  this.valueJsonObject;
+    }
 
     public JsonItem(JsonObject parent){
         this.Parent = parent;

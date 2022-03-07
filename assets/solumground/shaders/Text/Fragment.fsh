@@ -12,6 +12,5 @@ void main(){
     if(sample.a == 0.0){
         discard;
     }
-
     gl_FragColor = sample;
 }

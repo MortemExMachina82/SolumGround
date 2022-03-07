@@ -84,13 +84,8 @@ public class Font {
         int [] Texture_data = new int[Texture_width * Texture_hight];
         img.getRGB(0, 0, Texture_width, Texture_hight, Texture_data, 0, Texture_width);
 
-
-        Texture_data = new int[Texture_width * Texture_hight];
-        img.getRGB(0, 0, Texture_width, Texture_hight, Texture_data, 0, Texture_width);
-
-
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture_width, Texture_hight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, Texture_data);
-
+        glEnableVertexAttribArray(Main.TextShader_TextureCords);
     }
     public int getWidth(int X){
         return this.widths[X-1]-this.widths[X-2];

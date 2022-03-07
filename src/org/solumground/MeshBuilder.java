@@ -3,7 +3,7 @@ package org.solumground;
 import java.util.ArrayList;
 import java.util.List;
 
-class MeshBuilder extends Thread{
+public class MeshBuilder extends Thread{
     public static List<Chunk> Genbuffer = new ArrayList<>(100);
     public static List<Chunk> ReGenBuffer = new ArrayList<>(10);
     public static List<Chunk> LightUpdateBuffer = new ArrayList<>(10);

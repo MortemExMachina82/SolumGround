@@ -9,6 +9,7 @@ public class JsonArray {
     public JsonObject Parent;
 
     public List<JsonItem> jsonItems = new ArrayList<>(10);
+    public int Size = 0;
 
     public JsonItem Get(int Index){
         return jsonItems.get(Index);
@@ -24,6 +25,7 @@ public class JsonArray {
             boolean EOA = JsonParser.ParseValue(In, I, this.Parent);
             if(I.Exists) {
                 jsonItems.add(I);
+                Size++;
             }
             if(EOA){
                 return;

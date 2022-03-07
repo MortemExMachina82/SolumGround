@@ -11,6 +11,8 @@ public class Text {
     public float Alpha = 1;
     public float [] VertexArray;
     public int VertexBufferObject;
+    public float NormalizedTotalHight;
+    public float NormalizedTotalWidth;
 
     public void BuildAndUploadVertexData(){
         this.VertexArray = new float[this.text.length*16];
@@ -53,6 +55,8 @@ public class Text {
 
             offsetX += width;
         }
+        NormalizedTotalHight = offsetY;
+        NormalizedTotalWidth = offsetX;
 
         if(Thread.currentThread().getName().equals("main")){
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);

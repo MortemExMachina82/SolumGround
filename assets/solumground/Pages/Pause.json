@@ -1,0 +1,24 @@
+{
+    "ID":2,
+    "Name":"Pause",
+    "GameBackground":true,
+    "IsGame":false,
+    "Buttons":[
+        {
+            "PosX":0.0,
+            "PosY":0.3,
+            "SizeX":0.5,
+            "SizeY":0.2,
+            "Text":"Resume",
+            "OnPress":0,
+        },
+        {
+            "PosX":0.0,
+            "PosY":-0.3,
+            "SizeX":0.5,
+            "SizeY":0.2,
+            "Text":"Menu",
+            "OnPress":1,
+        }
+    ],
+}

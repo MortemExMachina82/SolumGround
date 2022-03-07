@@ -1,0 +1,24 @@
+{
+    "ID":1,
+    "Name":"Main",
+    "GameBackground":false,
+    "IsGame":false,
+    "Buttons":[
+        {
+            "PosX":0.0,
+            "PosY":0.3,
+            "SizeX":0.5,
+            "SizeY":0.2,
+            "Text":"Play Game",
+            "OnPress":3,
+        },
+        {
+            "PosX":0.0,
+            "PosY":-0.3,
+            "SizeX":0.5,
+            "SizeY":0.2,
+            "Text":"Quit",
+            "OnPress":-1,
+        }
+    ],
+}

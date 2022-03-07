@@ -1,18 +1,14 @@
 package org.solumground;
 
 import org.solumground.Json.*;
+import org.solumground.Menu.*;
 
-import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.file.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.util.Calendar;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
 
-import static java.util.Calendar.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL21.*;
 
@@ -70,6 +66,9 @@ public class Main {
     public static Chunk [] ChunkArray = new Chunk[MaxChunks];
 
     public static CollisionBox unit_cube_collisionBox;
+
+    public static ChunkLoader chunkLoader;
+    public static MeshBuilder meshBuilder;
 
     enum GLStatus{
         Ready,
@@ -148,111 +147,7 @@ public class Main {
 
         return shaderProgram;
     }
-    public static void wincallback(long window, int X, int Y){
-        win_X = X;
-        win_Y = Y;
-        aspectRatio = (float)X/(float)Y;
-        glViewport(0,0, X, Y);
-        Player.set_Projection();
-    }
-    public static void mouseMoveCallback(long window, double X, double Y){
-        float distX = (float)(mouse_past_X-X);
-        float distY = (float)(mouse_past_Y-Y);
-        mouse_past_X = X;
-        mouse_past_Y = Y;
-        Player.Rotate_Y(playerRotateSpeedMouse*TimeElapsed*distX);
-        Player.Rotate_X(playerRotateSpeedMouse*TimeElapsed*distY);
-    }
-    public static void mouseButtonCallback(long win, int button, int action, int mods){
-        if(action == GLFW_PRESS){
-            if(button == GLFW_MOUSE_BUTTON_RIGHT){
-                Player.place_block();
-            }
-            if(button == GLFW_MOUSE_BUTTON_LEFT){
-                Player.break_block();
-            }
-        }
-    }
-    public static void keycallback(long window, int key, int scancode, int action, int mods){
-        if (key == GLFW_KEY_ESCAPE) {
-            glfwSetWindowShouldClose(window, true);
-        }
-        if(action == GLFW_PRESS){
-            if(mods == 0){
-                if(key == GLFW_KEY_F10){
-                    int [] RawScreenData = new int[win_X*win_Y*3];
-                    glReadBuffer(GL_BACK);
-                    glReadPixels(0,0, win_X,win_Y, GL_RGB, GL_UNSIGNED_INT, RawScreenData);
-                    int [] FlipedScreenData = new int[RawScreenData.length];
-                    for(int Y=0;Y<win_Y;Y++){
-                        System.arraycopy(RawScreenData, (win_Y-(Y+1))*win_X*3, FlipedScreenData, Y*win_X*3, win_X*3);
-                    }
-                    BufferedImage img = new BufferedImage(win_X, win_Y, BufferedImage.TYPE_INT_RGB);
-                    WritableRaster wr  = img.getRaster();
-                    wr.setPixels(0,0,win_X,win_Y, FlipedScreenData);
-                    Calendar Time = Calendar.getInstance();
-                    String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
-                            Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
-                    File ScreenShotFile = new File(jar_folder_path+"/screenshots/"+TimeString+".png");
-                    ScreenShotFile.mkdirs();
-                    try {
-                        ImageIO.write(img, "png", ScreenShotFile);
-                    }
-                    catch(Exception e){
-                        e.printStackTrace();
-                    }
-                    System.out.println("Saved ScreenShot as: "+TimeString+".png");
-                    Console.Print("Saved ScreenShot as: "+TimeString+".png");
-                }
-            }
-            if((mods & 0x0004) > 0) {
-                if (key == GLFW_KEY_F) {
-                    FullScreen = !FullScreen;
-                    win_X /= 2;
-                    win_Y /= 2;
-                    update_fullscreen();
-                }
-                if(key == GLFW_KEY_S){
-                    DrawSkyBox = !DrawSkyBox;
-                }
-                if(key == GLFW_KEY_C){
-                    showCollisionBox = !showCollisionBox;
-                }
-                if(key == GLFW_KEY_K) {
-                    Player.is_flying = !Player.is_flying;
-                }
-                if(key == GLFW_KEY_R){
-                    Console.Print("Respawning");
-                    Player.reSpawn();
-                }
-                if(key == GLFW_KEY_EQUAL){
-                    RenderDistance++;
-                    Player.ChunkReload = true;
-                    Console.Print("Increased Render Distance To: "+RenderDistance);
-                }
-                if(key == GLFW_KEY_MINUS){
-                    RenderDistance--;
-                    Player.ChunkReload = true;
-                    Console.Print("Decreased Render Distance To: "+RenderDistance);
-                }
-            }
-            if(key == GLFW_KEY_O){Player.move_hotbar(-1);}
-            if(key == GLFW_KEY_P){Player.move_hotbar(1);}
-            if((mods & 0x0002) > 0){
-                if(key == GLFW_KEY_S){
-                    System.out.print("Saving...");
-                    Console.Print("Saving...");
-                    for(int X=0;X<ChunkCount;X++){
-                        ChunkArray[X].Save();
-                    }
-                    Player.Save();
-                    System.out.println("Saved");
-                    Console.Add("Saved");
-                }
-            }
-        }
 
-    }
     public static void update_fullscreen(){
         if(FullScreen) {
             glfwSetWindowMonitor(win, monitor, 0,0, monitor_W,monitor_H, 0);
@@ -369,14 +264,8 @@ public class Main {
         GL.createCapabilities();
 
         update_fullscreen();
-        glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        if (glfwRawMouseMotionSupported()) {
-            glfwSetInputMode(win, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-        }
-        glfwSetKeyCallback(win, Main::keycallback);
-        glfwSetWindowSizeCallback(win, Main::wincallback);
-        glfwSetCursorPosCallback(win, Main::mouseMoveCallback);
-        glfwSetMouseButtonCallback(win, Main::mouseButtonCallback);
+
+
         glfwSwapInterval(1);
 
         glClearColor(0,0,0,1);
@@ -386,7 +275,6 @@ public class Main {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         MainShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Main");
         glUseProgram(MainShaderProgram);
         MainShader_Vertex = glGetAttribLocation(MainShaderProgram, "a_position");
@@ -412,104 +300,13 @@ public class Main {
 
         unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
-
         Player.Init();
-        Player.is_flying = false;
-        Block.Init();
         SkyBox.Init();
+        Block.Init();
         Chunk.Init();
         Console.Init();
+        Page.Init();
 
-
-
-        ChunkLoader chunkLoader = new ChunkLoader();
-        chunkLoader.loadAroundPlayer(3);
-        MeshBuilder meshBuilder = new MeshBuilder();
-        chunkLoader.setDaemon(true);
-        chunkLoader.start();
-        meshBuilder.setDaemon(true);
-        meshBuilder.start();
-
-        Font DefaultFont = new Font(FontPath);
-        Text posText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
-        Text fpsText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.06f,0));
-        Text SelectedBlockText = new Text("", DefaultFont, 0.03f, new Vec3(1f,1f,0));
-
-        double PastTime = glfwGetTime();
-        while (!glfwWindowShouldClose(win)){
-            double CurentTime = glfwGetTime();
-            Time = (float)CurentTime;
-            TimeElapsed = (float)(CurentTime-PastTime);
-            PastTime = CurentTime;
-            AvgTimeElapsed += (TimeElapsed-AvgTimeElapsed)/20;
-            fps = 1/AvgTimeElapsed;
-
-            MakeGLCalls();
-            glfwPollEvents();
-
-            playerMoveSpeedSprint = 1.0f;
-            if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == 1) {
-                if (Player.is_flying) {
-                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed * -1);
-                } else {
-                    playerMoveSpeedSprint = 1.5f;
-                }
-            }
-            if(glfwGetKey(win, GLFW_KEY_SPACE) == 1){
-                if(Player.is_flying) {
-                    Player.Move_Y(playerMoveSpeed * playerMoveSpeedSprint * TimeElapsed);
-                }
-                else{
-                    Player.jump();
-                }
-            }
-            if(glfwGetKey(win, GLFW_KEY_W) == 1){Player.Move_Z(playerMoveSpeed*playerMoveSpeedSprint*TimeElapsed);}
-            if(glfwGetKey(win, GLFW_KEY_A) == 1){Player.Move_X(playerMoveSpeed*playerMoveSpeedSprint*TimeElapsed);}
-            if(glfwGetKey(win, GLFW_KEY_S) == 1){Player.Move_Z(playerMoveSpeed*playerMoveSpeedSprint*TimeElapsed*-1);}
-            if(glfwGetKey(win, GLFW_KEY_D) == 1){Player.Move_X(playerMoveSpeed*playerMoveSpeedSprint*TimeElapsed*-1);}
-            if(glfwGetKey(win, GLFW_KEY_LEFT) == 1){Player.Rotate_Y(playerRotateSpeedKey*TimeElapsed);}
-            if(glfwGetKey(win, GLFW_KEY_RIGHT) == 1){Player.Rotate_Y(playerRotateSpeedKey*TimeElapsed*-1);}
-            if(glfwGetKey(win, GLFW_KEY_UP) == 1){Player.Rotate_X(playerRotateSpeedKey*TimeElapsed);}
-            if(glfwGetKey(win, GLFW_KEY_DOWN) == 1){Player.Rotate_X(playerRotateSpeedKey*TimeElapsed*-1);}
-
-            if(!Player.is_flying){
-                Player.applyGravity();
-            }
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glUseProgram(MainShaderProgram);
-            Player.update();
-            if(DrawSkyBox) {
-                SkyBox.draw();
-            }
-            Player.Draw();
-            for(int X=0;X<ChunkCount;X++){
-                if(ChunkArray[X] != null) {
-                    if(ChunkArray[X].status == Chunk.Status.Complete) {
-                        ChunkArray[X].main_mesh.draw();
-                    }
-                }
-            }
-            glUseProgram(TextShaderProgram);
-            fpsText.updateText("FPS:"+ Math.round(fps));
-            fpsText.render();
-            SelectedBlockText.updateText("Selected Block:"+Block.Blocks[Player.hotbar_selected].Name);
-            SelectedBlockText.render();
-            posText.updateText(String.format("POS: %s", Player.position));
-            posText.render();
-            Console.Draw();
-
-            glfwSwapBuffers(win);
-        }
-
-        chunkLoader.close();
-        meshBuilder.close();
-        System.out.print("Saving...");
-        for(int X=0;X<ChunkCount;X++){
-            ChunkArray[X].Save();
-        }
-        Player.Save();
-        System.out.println("Saved");
-        glfwDestroyWindow(win);
-        glfwTerminate();
+        Page.Run();
     }
 }
