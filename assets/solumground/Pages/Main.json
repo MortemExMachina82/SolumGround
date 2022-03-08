@@ -10,7 +10,7 @@
             "SizeX":0.5,
             "SizeY":0.2,
             "Text":"Play Game",
-            "OnPress":3,
+            "OnPress":0,
         },
         {
             "PosX":0.0,

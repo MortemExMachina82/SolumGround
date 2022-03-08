@@ -377,10 +377,6 @@ public class Page {
                 }
 
                 glfwSwapBuffers(Main.win);
-                if(SelectedPage == 3){
-                    SelectedPage = 0;
-                    Interupt = true;
-                }
             }
         }
     }
