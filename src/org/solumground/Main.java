@@ -47,11 +47,11 @@ public class Main {
     public static int MainShader_ModelMat;
     public static int MainShader_WorldMat;
 
-    public static int TextShaderProgram;
-    public static int TextShader_Vertex;
-    public static int TextShader_TextureCords;
-    public static int TextShader_TextPos;
-    public static int TextShader_Alpha;
+    public static int TwoDShaderProgram;
+    public static int TwoDShader_Vertex;
+    public static int TwoDShader_TextureCords;
+    public static int TwoDShader_TextPos;
+    public static int TwoDShader_Alpha;
 
     public static double mouse_past_X;
     public static double mouse_past_Y;
@@ -265,16 +265,14 @@ public class Main {
 
         update_fullscreen();
 
-
         glfwSwapInterval(1);
-
-        glClearColor(0,0,0,1);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         MainShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Main");
         glUseProgram(MainShaderProgram);
         MainShader_Vertex = glGetAttribLocation(MainShaderProgram, "a_position");
@@ -287,14 +285,14 @@ public class Main {
         glEnableVertexAttribArray(MainShader_TextureCords);
         glEnableVertexAttribArray(MainShader_light);
 
-        TextShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Text");
-        glUseProgram(TextShaderProgram);
-        TextShader_Vertex = glGetAttribLocation(TextShaderProgram, "a_position");
-        TextShader_TextureCords = glGetAttribLocation(TextShaderProgram, "a_texcord");
-        TextShader_TextPos = glGetUniformLocation(TextShaderProgram, "TextPos");
-        TextShader_Alpha = glGetUniformLocation(TextShaderProgram, "Alpha");
-        glEnableVertexAttribArray(TextShader_Vertex);
-        glEnableVertexAttribArray(TextShader_TextureCords);
+        TwoDShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/2D");
+        glUseProgram(TwoDShaderProgram);
+        TwoDShader_Vertex = glGetAttribLocation(TwoDShaderProgram, "a_position");
+        TwoDShader_TextureCords = glGetAttribLocation(TwoDShaderProgram, "a_texcord");
+        TwoDShader_TextPos = glGetUniformLocation(TwoDShaderProgram, "TextPos");
+        TwoDShader_Alpha = glGetUniformLocation(TwoDShaderProgram, "Alpha");
+        glEnableVertexAttribArray(TwoDShader_Vertex);
+        glEnableVertexAttribArray(TwoDShader_TextureCords);
 
         glUseProgram(MainShaderProgram);
 

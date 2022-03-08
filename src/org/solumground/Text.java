@@ -138,11 +138,11 @@ public class Text {
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, font.Texture_Buffer_Object);
 
-        glVertexAttribPointer(Main.TextShader_Vertex, 2, GL_FLOAT, false, 16, 0);
-        glVertexAttribPointer(Main.TextShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
+        glVertexAttribPointer(Main.TwoDShader_Vertex, 2, GL_FLOAT, false, 16, 0);
+        glVertexAttribPointer(Main.TwoDShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
 
-        glUniform2f(Main.TextShader_TextPos, -this.position.X, this.position.Y);
-        glUniform1f(Main.TextShader_Alpha, this.Alpha);
+        glUniform2f(Main.TwoDShader_TextPos, -this.position.X, this.position.Y);
+        glUniform1f(Main.TwoDShader_Alpha, this.Alpha);
 
         glDrawArrays(GL_QUADS, 0, this.text.length*4);
     }

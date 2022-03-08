@@ -42,7 +42,7 @@ public class Button {
     }
 
     public void Draw(){
-        glUseProgram(Main.TextShaderProgram);
+        glUseProgram(Main.TwoDShaderProgram);
         float [] VertexArray = new float[16];
         VertexArray[0] = this.SizeX;
         VertexArray[1] = this.SizeY;
@@ -70,11 +70,11 @@ public class Button {
         tex[0] = 0x7F7F7FFF;
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1,1,0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, tex);
 
-        glVertexAttribPointer(Main.TextShader_Vertex, 2, GL_FLOAT, false, 16, 0);
-        glVertexAttribPointer(Main.TextShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
+        glVertexAttribPointer(Main.TwoDShader_Vertex, 2, GL_FLOAT, false, 16, 0);
+        glVertexAttribPointer(Main.TwoDShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
 
-        glUniform2f(Main.TextShader_TextPos, this.PosX-(this.SizeX/2), this.PosY-(this.SizeY/2));
-        glUniform1f(Main.TextShader_Alpha, 1);
+        glUniform2f(Main.TwoDShader_TextPos, this.PosX-(this.SizeX/2), this.PosY-(this.SizeY/2));
+        glUniform1f(Main.TwoDShader_Alpha, 1);
 
         glDrawArrays(GL_QUADS, 0, 4);
 

@@ -232,6 +232,7 @@ public class Page {
         if(Main.DrawSkyBox) {
             SkyBox.draw();
         }
+        glEnable(GL_DEPTH_TEST);
         Player.Draw();
         for(int X=0;X<Main.ChunkCount;X++){
             if(Main.ChunkArray[X] != null) {
@@ -240,7 +241,8 @@ public class Page {
                 }
             }
         }
-        glUseProgram(Main.TextShaderProgram);
+        glUseProgram(Main.TwoDShaderProgram);
+        glDisable(GL_DEPTH_TEST);
         GameFpsText.updateText("FPS:"+ Math.round(Main.fps));
         GameFpsText.render();
         GameSelectedBlockText.updateText("Selected Block:"+Block.Blocks[Player.hotbar_selected].Name);
@@ -370,8 +372,8 @@ public class Page {
                     DrawGame();
                 }
 
-                glUseProgram(Main.TextShaderProgram);
                 glDisable(GL_DEPTH_TEST);
+                glUseProgram(Main.TwoDShaderProgram);
                 for(Button button : Buttons){
                     button.Draw();
                 }

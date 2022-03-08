@@ -799,7 +799,6 @@ public class Mesh{
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
 
-        if(this.is_skyBox){glDisable(GL_DEPTH_TEST);}
         if(this.has_triangles) {
             glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, VertexStart*4);
             glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, TextureCordsStart*4);
@@ -813,7 +812,6 @@ public class Mesh{
             glDrawArrays(GL_QUADS, this.Number_of_TriFaces * 3, this.Number_of_QuadFaces * 4);
         }
         if(this.is_skyBox){
-            glEnable(GL_DEPTH_TEST);
             glUniformMatrix4fv(Main.MainShader_WorldMat, false, Player.WorldMatrix);
         }
     }
