@@ -227,7 +227,10 @@ public class Main {
 
     public static void main(String[] args){
         try {
-            jar_folder_path = System.getProperty("user.dir");
+            //Use In InteliJ
+            //jar_folder_path = System.getProperty("user.dir");
+            //Use For Manual Compiling
+            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
             System.out.println("Faile");
