@@ -3,12 +3,19 @@ package org.solumground;
 import org.solumground.Json.*;
 import org.solumground.Menu.*;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Calendar;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
 
+import javax.imageio.ImageIO;
+
+import static java.util.Calendar.*;
+import static java.util.Calendar.SECOND;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL21.*;
 
@@ -224,13 +231,38 @@ public class Main {
             glDeleteBuffersStatus = GLStatus.Done;
         }
     }
+    public static void TakeScreenShot(){
+        int [] RawScreenData = new int[Main.win_X*Main.win_Y*3];
+        glReadBuffer(GL_BACK);
+        glReadPixels(0,0, Main.win_X,Main.win_Y, GL_RGB, GL_UNSIGNED_INT, RawScreenData);
+        int [] FlipedScreenData = new int[RawScreenData.length];
+        for(int Y=0;Y<Main.win_Y;Y++){
+            System.arraycopy(RawScreenData, (Main.win_Y-(Y+1))*Main.win_X*3, FlipedScreenData, Y*Main.win_X*3, Main.win_X*3);
+        }
+        BufferedImage img = new BufferedImage(Main.win_X, Main.win_Y, BufferedImage.TYPE_INT_RGB);
+        WritableRaster wr  = img.getRaster();
+        wr.setPixels(0,0,Main.win_X,Main.win_Y, FlipedScreenData);
+        Calendar Time = Calendar.getInstance();
+        String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
+                Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
+        File ScreenShotFile = new File(Main.jar_folder_path+"/screenshots/"+TimeString+".png");
+        ScreenShotFile.mkdirs();
+        try {
+            ImageIO.write(img, "png", ScreenShotFile);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        System.out.println("Saved ScreenShot as: "+TimeString+".png");
+        Console.Print("Saved ScreenShot as: "+TimeString+".png");
+    }
 
     public static void main(String[] args){
         try {
             //Use In InteliJ
-            //jar_folder_path = System.getProperty("user.dir");
+            jar_folder_path = System.getProperty("user.dir");
             //Use For Manual Compiling
-            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            //jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
             System.out.println("Faile");

@@ -111,6 +111,20 @@ public class Player{
     }
 
     public static void update(){
+        if(Main.showCollisionBox){
+            float [] RotationMat = new float[16];
+            Math3D.Make3DRotationMatrix44(Rotation, RotationMat);
+            float [] TransMat = new float[16];
+            TransMat[0] = 1;
+            TransMat[5] = 1;
+            TransMat[10] = 1;
+            TransMat[12] = -position.X;
+            TransMat[13] = -position.Y;
+            TransMat[14] = -position.Z;
+            TransMat[15] = 1;
+            Math3D.Matrix44_Multiply(TransMat,RotationMat, WorldMatrix);
+            glUniformMatrix4fv(Main.MainShader_WorldMat, false, WorldMatrix);
+        }
         collisionBox.active_update();
 
         float [] RotationMat = new float[16];

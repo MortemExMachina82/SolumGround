@@ -14,6 +14,8 @@ import static java.util.Calendar.SECOND;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT32;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class Page {
@@ -66,29 +68,7 @@ public class Page {
         if(action == GLFW_PRESS){
             if(mods == 0){
                 if(key == GLFW_KEY_F10){
-                    int [] RawScreenData = new int[Main.win_X*Main.win_Y*3];
-                    glReadBuffer(GL_BACK);
-                    glReadPixels(0,0, Main.win_X,Main.win_Y, GL_RGB, GL_UNSIGNED_INT, RawScreenData);
-                    int [] FlipedScreenData = new int[RawScreenData.length];
-                    for(int Y=0;Y<Main.win_Y;Y++){
-                        System.arraycopy(RawScreenData, (Main.win_Y-(Y+1))*Main.win_X*3, FlipedScreenData, Y*Main.win_X*3, Main.win_X*3);
-                    }
-                    BufferedImage img = new BufferedImage(Main.win_X, Main.win_Y, BufferedImage.TYPE_INT_RGB);
-                    WritableRaster wr  = img.getRaster();
-                    wr.setPixels(0,0,Main.win_X,Main.win_Y, FlipedScreenData);
-                    Calendar Time = Calendar.getInstance();
-                    String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
-                            Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
-                    File ScreenShotFile = new File(Main.jar_folder_path+"/screenshots/"+TimeString+".png");
-                    ScreenShotFile.mkdirs();
-                    try {
-                        ImageIO.write(img, "png", ScreenShotFile);
-                    }
-                    catch(Exception e){
-                        e.printStackTrace();
-                    }
-                    System.out.println("Saved ScreenShot as: "+TimeString+".png");
-                    Console.Print("Saved ScreenShot as: "+TimeString+".png");
+                    Main.TakeScreenShot();
                 }
             }
             if((mods & 0x0004) > 0) {
@@ -229,10 +209,12 @@ public class Page {
 
     public static void DrawGame(){
         glUseProgram(Main.MainShaderProgram);
+
         if(Main.DrawSkyBox) {
+            glDisable(GL_DEPTH_TEST);
             SkyBox.draw();
+            glEnable(GL_DEPTH_TEST);
         }
-        glEnable(GL_DEPTH_TEST);
         Player.Draw();
         for(int X=0;X<Main.ChunkCount;X++){
             if(Main.ChunkArray[X] != null) {
@@ -250,6 +232,7 @@ public class Page {
         GamePosText.updateText(String.format("POS: %s", Player.position));
         GamePosText.render();
         Console.Draw();
+        glEnable(GL_DEPTH_TEST);
     }
 
     public void DO(){
