@@ -156,7 +156,37 @@ public class Main {
 
         return shaderProgram;
     }
+    public static int LoadTexture(String texture_Path, int Color){
+        int Texture_Buffer_Object = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, Texture_Buffer_Object);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+        if(!texture_Path.equals("")) {
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(new File(texture_Path));
+            } catch (IOException e) {
+                System.out.print("Failed to load Texture: ");
+                System.out.println(texture_Path);
+                e.printStackTrace();
+            }
+            assert img != null;
+            int Texture_width = img.getTileWidth();
+            int Texture_hight = img.getTileHeight();
+            int [] Texture_data = new int[Texture_width * Texture_hight];
+            img.getRGB(0, 0, Texture_width, Texture_hight, Texture_data, 0, Texture_width);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture_width, Texture_hight, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, Texture_data);
+        }
+        else{
+            int [] Texture_data = new int[2];
+            Texture_data[0] = Color;
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1,1, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, Texture_data);
+        }
+        return Texture_Buffer_Object;
+    }
     public static void update_fullscreen(){
         if(FullScreen) {
             glfwSetWindowMonitor(win, monitor, 0,0, monitor_W,monitor_H, 0);
@@ -262,9 +292,9 @@ public class Main {
     public static void main(String[] args){
         try {
             //Use In InteliJ
-            jar_folder_path = System.getProperty("user.dir");
+            //jar_folder_path = System.getProperty("user.dir");
             //Use For Manual Compiling
-            //jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
             System.out.println("Faile");

@@ -3,22 +3,25 @@
     "Name":"Main",
     "GameBackground":false,
     "IsGame":false,
+    "BackGroundTexture":"assets/solumground/textures/dirt.png",
     "Buttons":[
         {
             "PosX":0.0,
             "PosY":0.3,
-            "SizeX":0.5,
-            "SizeY":0.2,
+            "SizeX":0.25,
+            "SizeY":0.1,
             "Text":"Play Game",
             "OnPress":0,
+            "BackGroundTexture":"assets/solumground/textures/stone.png",
         },
         {
             "PosX":0.0,
             "PosY":-0.3,
-            "SizeX":0.5,
-            "SizeY":0.2,
+            "SizeX":0.25,
+            "SizeY":0.1,
             "Text":"Quit",
             "OnPress":-1,
+            "BackGroundTexture":"assets/solumground/textures/stone.png",
         }
     ],
     "Text":[

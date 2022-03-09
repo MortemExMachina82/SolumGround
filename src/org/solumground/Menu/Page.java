@@ -8,12 +8,15 @@ import java.io.File;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL20.glUniform1f;
 
 public class Page {
     public static Page[] Pages;
     public static int SelectedPage = 1;
     public static boolean Interupt = false;
+    public static int VertexBufferObject = glGenBuffers();
 
     public static Text GamePosText = new Text("",Main.DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
     public static Text GameFpsText = new Text("",Main.DefaultFont, .03f, new Vec3(1f,1f-0.06f,0));
@@ -25,6 +28,8 @@ public class Page {
     public Button[] Buttons = new Button[0];
     public boolean GameBackground;
     public boolean IsGame;
+    public String BackGroundTexture;
+    public int TextureBufferObject;
 
     public static void Wincallback(long window, int X, int Y){
         Main.win_X = X;
@@ -184,6 +189,7 @@ public class Page {
             Name = object.Get("Name").GetString();
             GameBackground = object.Get("GameBackground").GetBoolean();
             IsGame = object.Get("IsGame").GetBoolean();
+            this.BackGroundTexture = object.Get("BackGroundTexture").GetString();
             JsonArray array = object.Get("Buttons").GetArray();
             if(array != null) {
                 Buttons = new Button[array.Size];
@@ -194,8 +200,10 @@ public class Page {
                             object1.Get("PosY").GetFloat(),
                             object1.Get("SizeX").GetFloat(),
                             object1.Get("SizeY").GetFloat(),
+                            object1.Get("BackGroundTexture").GetString(),
                             object1.Get("Text").GetString(),
                             object1.Get("OnPress").GetInt()
+
                     );
                     Buttons[X] = button;
                 }
@@ -218,6 +226,7 @@ public class Page {
         catch(Exception e){
             e.printStackTrace();
         }
+        this.TextureBufferObject = Main.LoadTexture(this.BackGroundTexture, 0x7F7F7FFF);
     }
 
     public static void DrawGame(){
@@ -247,6 +256,42 @@ public class Page {
         Console.Draw();
         glEnable(GL_DEPTH_TEST);
     }
+    public static void DrawBackGround(){
+        glUseProgram(Main.TwoDShaderProgram);
+        float [] VertexArray = new float[16];
+        VertexArray[0] = -1;
+        VertexArray[1] = -1;
+        VertexArray[2] = 0;
+        VertexArray[3] = 0;
+
+        VertexArray[4] = -1;
+        VertexArray[5] = 1;
+        VertexArray[6] = 1;
+        VertexArray[7] = 0;
+
+        VertexArray[8] = 1;
+        VertexArray[9] = 1;
+        VertexArray[10] = 1;
+        VertexArray[11] = 1;
+
+        VertexArray[12] = 1;
+        VertexArray[13] = -1;
+        VertexArray[14] = 0;
+        VertexArray[15] = 1;
+        glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+        glBufferData(GL_ARRAY_BUFFER, VertexArray, GL_DYNAMIC_DRAW);
+
+        glBindTexture(GL_TEXTURE_2D, Pages[SelectedPage].TextureBufferObject);
+
+
+        glVertexAttribPointer(Main.TwoDShader_Vertex, 2, GL_FLOAT, false, 16, 0);
+        glVertexAttribPointer(Main.TwoDShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
+
+        glUniform2f(Main.TwoDShader_TextPos, 0, 0);
+        glUniform1f(Main.TwoDShader_Alpha, 1);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
 
     public void DO(){
         if(this.IsGame){
@@ -260,7 +305,6 @@ public class Page {
             glfwSetKeyCallback(Main.win, Page::GameKeyCallback);
             glfwSetCursorPosCallback(Main.win, Page::GameMouseMoveCallback);
             glfwSetMouseButtonCallback(Main.win, Page::GameMouseButtonCallback);
-            glClearColor(0,0,0,1);
 
             Main.chunkLoader = new ChunkLoader();
             Main.chunkLoader.loadAroundPlayer(3);
@@ -351,21 +395,18 @@ public class Page {
             glfwSetMouseButtonCallback(Main.win, Page::MenuMouseButtonCallback);
             glfwSetKeyCallback(Main.win, Page::MenuKeyCallback);
 
-            if(!GameBackground) {
-                glClearColor(.3f, .3f, .3f, 1);
-            }
-
-
             while(!Interupt && !glfwWindowShouldClose(Main.win)) {
                 double CurentTime = glfwGetTime();
                 Main.Time = (float)CurentTime;
 
-                glfwPollEvents();
                 Main.MakeGLCalls();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 if(GameBackground){
                     DrawGame();
+                }
+                else{
+                    DrawBackGround();
                 }
 
                 glDisable(GL_DEPTH_TEST);
@@ -378,6 +419,7 @@ public class Page {
                 }
                 glEnable(GL_DEPTH_TEST);
                 glfwSwapBuffers(Main.win);
+                glfwPollEvents();
             }
         }
     }

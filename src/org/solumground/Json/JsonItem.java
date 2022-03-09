@@ -37,7 +37,7 @@ public class JsonItem {
             case Bool:
                 return String.valueOf(this.ValueBoolean);
             case Null:
-                return String.valueOf(this.ValueNull);
+                return "";
             case Object:
                 return "O_"+this.valueJsonObject.Name;
             case Array:
