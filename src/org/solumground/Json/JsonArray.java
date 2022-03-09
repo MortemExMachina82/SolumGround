@@ -12,7 +12,10 @@ public class JsonArray {
     public int Size = 0;
 
     public JsonItem Get(int Index){
-        return jsonItems.get(Index);
+        if(Index < jsonItems.size()) {
+            return jsonItems.get(Index);
+        }
+        return this.Parent.jsonParser.ItemNull;
     }
 
     public JsonArray(FileInputStream In, JsonObject P, String N) throws Exception{

@@ -6,6 +6,8 @@ public class JsonParser {
     public String FilePath;
     public JsonObject mainJsonObject;
 
+    public JsonItem ItemNull = new JsonItem(null);
+
     public static int SkipWhiteSpace(FileInputStream In, JsonObject O) throws Exception{
         for (int X = 0; X < 100; X++) {
             int Char = In.read();

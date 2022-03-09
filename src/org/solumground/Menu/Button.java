@@ -21,7 +21,7 @@ public class Button {
         this.PosY = Y;
         this.SizeX = Sx;
         this.SizeY = Sy;
-        this.text = new Text(text, Page.DefaultFont, this.SizeY*.15f, new Vec3(0, 0, 0));
+        this.text = new Text(text, Main.DefaultFont, this.SizeY*.15f, new Vec3(0, 0, 0));
         this.text.position.X = this.PosX + (this.text.NormalizedTotalWidth/2);
         this.text.position.Y = this.PosY + this.SizeY*.1f;
         this.OnPress = OnPress;

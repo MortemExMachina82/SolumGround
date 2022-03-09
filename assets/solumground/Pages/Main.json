@@ -21,4 +21,12 @@
             "OnPress":-1,
         }
     ],
+    "Text":[
+        {
+            "PosX":0.0,
+            "PosY":0.8,
+            "Size":0.05,
+            "Text":"SolumGround"
+        }
+    ]
 }

@@ -9,6 +9,8 @@ public class JsonObject {
     public String Name;
     public JsonObject Parent;
 
+
+
     public List<JsonItem> jsonItems = new ArrayList<>(10);
 
     public String GetParentTree() {
@@ -28,7 +30,7 @@ public class JsonObject {
                 return I;
             }
         }
-        return null;
+        return this.jsonParser.ItemNull;
     }
 
     public JsonObject(JsonParser json, FileInputStream In, JsonObject Parent, String Name) throws Exception {

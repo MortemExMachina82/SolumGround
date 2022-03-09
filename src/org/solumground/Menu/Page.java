@@ -3,19 +3,11 @@ package org.solumground.Menu;
 import org.solumground.*;
 import org.solumground.Json.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.File;
-import java.util.Calendar;
 
-import static java.util.Calendar.*;
-import static java.util.Calendar.SECOND;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT32;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class Page {
@@ -23,15 +15,14 @@ public class Page {
     public static int SelectedPage = 1;
     public static boolean Interupt = false;
 
-    public static Font DefaultFont = new Font(Main.FontPath);
-    public static Text GamePosText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
-    public static Text GameFpsText = new Text("",DefaultFont, .03f, new Vec3(1f,1f-0.06f,0));
-    public static Text GameSelectedBlockText = new Text("", DefaultFont, 0.03f, new Vec3(1f,1f,0));
+    public static Text GamePosText = new Text("",Main.DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
+    public static Text GameFpsText = new Text("",Main.DefaultFont, .03f, new Vec3(1f,1f-0.06f,0));
+    public static Text GameSelectedBlockText = new Text("", Main.DefaultFont, 0.03f, new Vec3(1f,1f,0));
 
     public int ID;
     public String Name;
-    public Text[] Texts;
-    public Button[] Buttons;
+    public TextObject[] Texts = new TextObject[0];
+    public Button[] Buttons = new Button[0];
     public boolean GameBackground;
     public boolean IsGame;
 
@@ -154,6 +145,12 @@ public class Page {
                     Interupt = true;
                 }
             }
+            if(key == GLFW_KEY_F){
+                Main.FullScreen = !Main.FullScreen;
+                Main.win_X /= 2;
+                Main.win_Y /= 2;
+                Main.update_fullscreen();
+            }
         }
     }
 
@@ -188,18 +185,34 @@ public class Page {
             GameBackground = object.Get("GameBackground").GetBoolean();
             IsGame = object.Get("IsGame").GetBoolean();
             JsonArray array = object.Get("Buttons").GetArray();
-            Buttons = new Button[array.Size];
-            for(int X=0;X<array.Size;X++){
-                JsonObject object1 = array.Get(X).GetObject();
-                Button button = new Button(
-                        object1.Get("PosX").GetFloat(),
-                        object1.Get("PosY").GetFloat(),
-                        object1.Get("SizeX").GetFloat(),
-                        object1.Get("SizeY").GetFloat(),
-                        object1.Get("Text").GetString(),
-                        object1.Get("OnPress").GetInt()
-                );
-                Buttons[X] = button;
+            if(array != null) {
+                Buttons = new Button[array.Size];
+                for (int X = 0; X < array.Size; X++) {
+                    JsonObject object1 = array.Get(X).GetObject();
+                    Button button = new Button(
+                            object1.Get("PosX").GetFloat(),
+                            object1.Get("PosY").GetFloat(),
+                            object1.Get("SizeX").GetFloat(),
+                            object1.Get("SizeY").GetFloat(),
+                            object1.Get("Text").GetString(),
+                            object1.Get("OnPress").GetInt()
+                    );
+                    Buttons[X] = button;
+                }
+            }
+            array = object.Get("Text").GetArray();
+            if(array != null) {
+                Texts = new TextObject[array.Size];
+                for (int X = 0; X < array.Size; X++) {
+                    JsonObject object1 = array.Get(X).GetObject();
+                    TextObject text = new TextObject(
+                            object1.Get("PosX").GetFloat(),
+                            object1.Get("PosY").GetFloat(),
+                            object1.Get("Size").GetFloat(),
+                            object1.Get("Text").GetString()
+                    );
+                    Texts[X] = text;
+                }
             }
         }
         catch(Exception e){
@@ -360,7 +373,10 @@ public class Page {
                 for(Button button : Buttons){
                     button.Draw();
                 }
-
+                for(TextObject text : Texts){
+                    text.Draw();
+                }
+                glEnable(GL_DEPTH_TEST);
                 glfwSwapBuffers(Main.win);
             }
         }

@@ -77,6 +77,8 @@ public class Main {
     public static ChunkLoader chunkLoader;
     public static MeshBuilder meshBuilder;
 
+    public static Font DefaultFont;
+
     enum GLStatus{
         Ready,
         Working,
@@ -332,6 +334,8 @@ public class Main {
         glUseProgram(MainShaderProgram);
 
         unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
+
+        DefaultFont = new Font(Main.FontPath);
 
         Player.Init();
         SkyBox.Init();
