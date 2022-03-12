@@ -3,4 +3,5 @@
     "Name":"Game",
     "GameBackground":false,
     "IsGame":true,
+    "OnExit":2
 }

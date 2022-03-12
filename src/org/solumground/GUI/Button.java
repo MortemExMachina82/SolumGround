@@ -1,4 +1,4 @@
-package org.solumground.Menu;
+package org.solumground.GUI;
 
 import org.solumground.*;
 

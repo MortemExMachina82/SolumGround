@@ -4,6 +4,7 @@
     "GameBackground":false,
     "IsGame":false,
     "BackGroundTexture":"assets/solumground/textures/dirt.png",
+    "OnExit":-1,
     "Buttons":[
         {
             "PosX":0.0,

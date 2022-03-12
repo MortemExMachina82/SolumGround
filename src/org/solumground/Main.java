@@ -1,7 +1,7 @@
 package org.solumground;
 
 import org.solumground.Json.*;
-import org.solumground.Menu.*;
+import org.solumground.GUI.*;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;

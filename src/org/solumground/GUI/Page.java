@@ -1,4 +1,4 @@
-package org.solumground.Menu;
+package org.solumground.GUI;
 
 import org.solumground.*;
 import org.solumground.Json.*;
@@ -28,6 +28,7 @@ public class Page {
     public Button[] Buttons = new Button[0];
     public boolean GameBackground;
     public boolean IsGame;
+    public int OnExit;
     public String BackGroundTexture;
     public int TextureBufferObject;
 
@@ -58,7 +59,7 @@ public class Page {
     }
     public static void GameKeyCallback(long window, int key, int scancode, int action, int mods){
         if (key == GLFW_KEY_ESCAPE) {
-            SelectedPage = 2;
+            SelectedPage = Pages[SelectedPage].OnExit;
             Interupt = true;
         }
         if(action == GLFW_PRESS){
@@ -141,14 +142,8 @@ public class Page {
     public static void MenuKeyCallback(long win, int key, int scancode, int action, int mods){
         if(action == GLFW_PRESS) {
             if (key == GLFW_KEY_ESCAPE) {
-                if(Pages[SelectedPage].Name.equals("Main")) {
-                    glfwSetWindowShouldClose(Main.win, true);
-                    Interupt = true;
-                }
-                if(Pages[SelectedPage].Name.equals("Pause")){
-                    SelectedPage = 1;
-                    Interupt = true;
-                }
+                SelectedPage = Pages[SelectedPage].OnExit;
+                Interupt = true;
             }
             if(key == GLFW_KEY_F){
                 Main.FullScreen = !Main.FullScreen;
@@ -175,6 +170,10 @@ public class Page {
 
         while(!glfwWindowShouldClose(Main.win)) {
             Interupt = false;
+            if(SelectedPage < 0){
+                glfwSetWindowShouldClose(Main.win, true);
+                continue;
+            }
             Page page = Pages[SelectedPage];
             page.DO();
         }
@@ -190,6 +189,7 @@ public class Page {
             GameBackground = object.Get("GameBackground").GetBoolean();
             IsGame = object.Get("IsGame").GetBoolean();
             this.BackGroundTexture = object.Get("BackGroundTexture").GetString();
+            this.OnExit = object.Get("OnExit").GetInt();
             JsonArray array = object.Get("Buttons").GetArray();
             if(array != null) {
                 Buttons = new Button[array.Size];
