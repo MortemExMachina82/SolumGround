@@ -1,6 +1,7 @@
 package org.solumground.Json;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +18,18 @@ public class JsonArray {
         }
         return this.Parent.jsonParser.ItemNull;
     }
+    public void Add(JsonItem item){
+        item.Name = null;
+        jsonItems.add(item);
+    }
 
-    public JsonArray(FileInputStream In, JsonObject P, String N) throws Exception{
+    public JsonArray Load(FileInputStream In, JsonObject P, String N) throws Exception{
         this.Name = N;
         this.Parent = P;
 
         while(true) {
-            JsonItem I = new JsonItem(this.Parent);
+            JsonItem I = new JsonItem();
+            I.Parent = this.Parent;
             I.Name = null;
             boolean EOA = JsonParser.ParseValue(In, I, this.Parent);
             if(I.Exists) {
@@ -31,8 +37,21 @@ public class JsonArray {
                 Size++;
             }
             if(EOA){
-                return;
+                return this;
             }
         }
+    }
+    public void write(FileOutputStream Out) throws Exception{
+        Out.write('[');
+        Out.write('\n');
+        for(int X=0;X<jsonItems.size();X++){
+            jsonItems.get(X).write(Out);
+            if(X < jsonItems.size()-1) {
+                Out.write(',');
+                Out.write('\n');
+            }
+        }
+        Out.write('\n');
+        Out.write(']');
     }
 }

@@ -6,7 +6,7 @@ public class JsonParser {
     public String FilePath;
     public JsonObject mainJsonObject;
 
-    public JsonItem ItemNull = new JsonItem(null);
+    public JsonItem ItemNull = new JsonItem();
 
     public static int SkipWhiteSpace(FileInputStream In, JsonObject O) throws Exception{
         for (int X = 0; X < 100; X++) {
@@ -95,12 +95,12 @@ public class JsonParser {
         }
         if(Char == '{'){
             I.type = JsonItem.Type.Object;
-            I.valueJsonObject = new JsonObject(O.jsonParser, In, I.Parent, I.Name);
+            I.valueJsonObject = new JsonObject().Load(O.jsonParser, In, I.Parent, I.Name);
             return false;
         }
         if(Char == '['){
             I.type = JsonItem.Type.Array;
-            I.valueJsonArray = new JsonArray(In, I.Parent, I.Name);
+            I.valueJsonArray = new JsonArray().Load(In, I.Parent, I.Name);
             return false;
         }
         if(Char == 't'){
@@ -212,7 +212,7 @@ public class JsonParser {
         if(First != '{'){
             throw new Exception("Cant Read File Contents: "+FilePath);
         }
-        mainJsonObject = new JsonObject(this, In, null, "");
-
+        mainJsonObject = new JsonObject().Load(this, In, null, "");
+        In.close();
     }
 }

@@ -1,6 +1,9 @@
 package org.solumground.Json;
 
 
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+
 public class JsonItem {
     public String Name;
     public JsonObject Parent;
@@ -86,7 +89,90 @@ public class JsonItem {
             return this.valueJsonObject;
     }
 
-    public JsonItem(JsonObject parent){
-        this.Parent = parent;
+    public JsonItem(){}
+    public JsonItem(String s){
+        this.type = Type.String;
+        this.ValueString = s;
+    }
+    public JsonItem(float f){
+        this.type = Type.Float;
+        this.ValueFloat = f;
+    }
+    public JsonItem(int i){
+        this.type = Type.Long;
+        this.ValueLong = i;
+    }
+    public JsonItem(boolean b){
+        this.type = Type.Bool;
+        this.ValueBoolean = b;
+    }
+    public JsonItem(JsonArray arr){
+        this.type = Type.Array;
+        this.valueJsonArray = arr;
+    }
+    public JsonItem(JsonObject obj){
+        this.type = Type.Object;
+        this.valueJsonObject = obj;
+    }
+    public JsonItem(String name, String s){
+        this.Name = name;
+        this.type = Type.String;
+        this.ValueString = s;
+    }
+    public JsonItem(String name, float f){
+        this.Name = name;
+        this.type = Type.Float;
+        this.ValueFloat = f;
+    }
+    public JsonItem(String name, int i){
+        this.Name = name;
+        this.type = Type.Long;
+        this.ValueLong = i;
+    }
+    public JsonItem(String name, boolean b){
+        this.Name = name;
+        this.type = Type.Bool;
+        this.ValueBoolean = b;
+    }
+    public JsonItem(String name, JsonArray arr){
+        this.Name = name;
+        this.type = Type.Array;
+        this.valueJsonArray = arr;
+    }
+    public JsonItem(String name, JsonObject obj){
+        this.Name = name;
+        this.type = Type.Object;
+        this.valueJsonObject = obj;
+    }
+
+    public void write(FileOutputStream Out) throws Exception{
+        if(this.Name != null) {
+            Out.write('"');
+            Out.write(this.Name.getBytes(StandardCharsets.UTF_8));
+            Out.write('"');
+            Out.write(':');
+        }
+        switch(this.type){
+            case String:
+                Out.write('"');
+                Out.write(this.ValueString.getBytes(StandardCharsets.UTF_8));
+                Out.write('"');
+                break;
+            case Float:
+                Out.write(this.ValueFloat.toString().getBytes(StandardCharsets.UTF_8));
+                break;
+            case Long:
+                Out.write(String.valueOf(ValueLong).getBytes(StandardCharsets.UTF_8));
+                break;
+            case Bool:
+                Out.write(String.valueOf(this.ValueBoolean).getBytes(StandardCharsets.UTF_8));
+                break;
+            case Array:
+                this.valueJsonArray.write(Out);
+                break;
+            case Object:
+                this.valueJsonObject.write(Out);
+                break;
+        }
     }
 }
