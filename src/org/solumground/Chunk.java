@@ -10,6 +10,7 @@ public class Chunk{
     public static int Size = 16;
     public static byte [] noisemap;
     public static Random RNG = new Random();
+    public static int GenHeight = 64;
 
     public boolean is_empty;
     public String FilePath;
@@ -428,34 +429,31 @@ public class Chunk{
     public void GenChunk(){
         for (int X = 0; X < Size;X++) {
             for (int Z = 0; Z < Size; Z++) {
-                int h;
-                try {
-                    h = Byte.toUnsignedInt(noisemap[(int) (this.position.X + (PerlinNoise2D.sizeX / 2) + X) * PerlinNoise2D.sizeX + (int) (this.position.Z + (PerlinNoise2D.sizeX / 2) + Z)]);
-                }
-                catch(Exception e){
-                    h = Size;
-                }
-                float a = h/255.0f;
-                a *= 1f;
-                float b = 4;
-                int cb = (int)this.chunkPosition.Y;
-                h = -1;
+                int NoiseX = this.position.X + (PerlinNoise2D.sizeX / 2) + X;
+                int NoiseZ = this.position.Z + (PerlinNoise2D.sizeY / 2) + Z;
+                if(NoiseX >= PerlinNoise2D.sizeX){NoiseX = (PerlinNoise2D.sizeX-1) - (NoiseX % PerlinNoise2D.sizeX);}
+                if(NoiseX <= 0){NoiseX = -NoiseX % PerlinNoise2D.sizeX;}
+                if(NoiseZ >= PerlinNoise2D.sizeY){NoiseZ = (PerlinNoise2D.sizeY-1) - (NoiseZ % PerlinNoise2D.sizeY);}
+                if(NoiseZ <= 0){NoiseZ = -NoiseZ % PerlinNoise2D.sizeY;}
+                int NoiseH = Byte.toUnsignedInt(noisemap[NoiseX * PerlinNoise2D.sizeX + NoiseZ]);
+
+                int GH = (int)(NoiseH*GenHeight / 255.0f);
+                int LH = -1;
 
                 boolean isFull = false;
-                if(a > ((cb+1) / b)){
-                    h = Size-1;
+                if(GH > this.position.Y){
+                    LH = Size-1;
                     isFull = true;
                 }
-                if (a > (cb / b) && a < ((cb+1)/b)) {
-                    h = (int) (((a - (cb / b)) * b) * Size);
+                else {
+                    if (GH > this.position.Y - Size) {
+                        LH = GH - ((this.position.Y - Size) + 1);
+                    }
                 }
 
-
-
-
-                for(int Y=h;Y!=-1;Y--) {
+                for(int Y=LH;Y!=-1;Y--) {
                     byte blockType = 3;
-                    if(Y == h){
+                    if(Y == LH){
                         blockType = 1;
                         float r = RNG.nextFloat();
                         if(r < 0.01){

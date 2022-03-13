@@ -33,7 +33,7 @@ public class Player{
 
 
     public static void Init() {
-        reSpawnPosition = new Vec3(0, 40, 0);
+        reSpawnPosition = new Vec3(0, 64, 0);
         position = new Vec3(reSpawnPosition);
         StandingInChunk = Chunk.convert_to_chunk_pos(position);
 
@@ -153,6 +153,9 @@ public class Player{
                 if (LookingAtBlock.ID != 0) {
                     break;
                 }
+            }
+            else{
+                LookingAtBlock = Block.Blocks[0];
             }
         }
 

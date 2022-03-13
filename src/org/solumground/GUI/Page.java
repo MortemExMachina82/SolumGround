@@ -303,7 +303,7 @@ public class Page {
     public void DO(){
         if(this.IsGame){
             Player.Load();
-            Player.is_flying = false;
+            Player.is_flying = true;
 
             glfwSetInputMode(Main.win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             if (glfwRawMouseMotionSupported()) {

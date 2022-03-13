@@ -25,8 +25,10 @@ class Light{
     }
 
     public static Vec3 getLight(Vec3 pos){
-        Vec3 l = new Vec3(.2f,.2f,.2f);
-        for(Light light : lights) {
+        Vec3 l = new Vec3(.8f,.8f,.8f);
+        Light light;
+        for(int X=0;X<lights.size();X++) {
+            light = lights.get(X);
             float dist = (light.position.X - pos.X) * (light.position.X - pos.X) +
                     (light.position.Y - pos.Y) * (light.position.Y - pos.Y) +
                     (light.position.Z - pos.Z) * (light.position.Z - pos.Z);
