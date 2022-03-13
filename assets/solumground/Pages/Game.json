@@ -3,5 +3,5 @@
     "Name":"Game",
     "GameBackground":false,
     "IsGame":true,
-    "OnExit":2
+    "OnExit":"Page.SetPage(2);",
 }

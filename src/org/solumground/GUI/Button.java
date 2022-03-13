@@ -11,14 +11,14 @@ public class Button {
     public float SizeX;
     public float SizeY;
     public Text text;
-    public int OnPress;
+    public Script OnPress;
     public String BackGroundTexture;
     public int TextureBufferObject;
     public static int VertexBufferObject = glGenBuffers();
 
 
 
-    public Button(float X, float Y, float Sx, float Sy, String BackTex, String text, int OnPress){
+    public Button(float X, float Y, float Sx, float Sy, String BackTex, String text, String OnPress){
         this.PosX = X;
         this.PosY = Y;
         this.SizeX = Sx*2;
@@ -26,7 +26,7 @@ public class Button {
         this.text = new Text(text, Main.DefaultFont, this.SizeY*.15f, new Vec3(0, 0, 0));
         this.text.position.X = this.PosX + (this.text.NormalizedTotalWidth/2);
         this.text.position.Y = this.PosY + this.SizeY*.1f;
-        this.OnPress = OnPress;
+        this.OnPress = new Script(OnPress);
         this.BackGroundTexture = BackTex;
         this.TextureBufferObject = Main.LoadTexture(Main.jar_folder_path+"/"+this.BackGroundTexture, 0x3F3F3FFF);
     }

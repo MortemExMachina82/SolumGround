@@ -4,7 +4,7 @@
     "GameBackground":true,
     "IsGame":false,
     "BackGroundTexture":"assets/solumground/textures/dirt.png",
-    "OnExit":1,
+    "OnExit":"Page.SetPage(1);",
     "Buttons":[
         {
             "PosX":0.0,
@@ -12,7 +12,7 @@
             "SizeX":0.25,
             "SizeY":0.1,
             "Text":"Resume",
-            "OnPress":0,
+            "OnPress":"Page.SetPage(0);",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         },
         {
@@ -21,7 +21,7 @@
             "SizeX":0.25,
             "SizeY":0.1,
             "Text":"Menu",
-            "OnPress":1,
+            "OnPress":"Page.SetPage(1);",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         }
     ],

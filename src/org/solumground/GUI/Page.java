@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL20.glUniform1f;
 public class Page {
     public static Page[] Pages;
     public static int SelectedPage = 1;
-    public static boolean Interupt = false;
+    public static boolean Interrupt = false;
     public static int VertexBufferObject = glGenBuffers();
 
     public static Text GamePosText = new Text("",Main.DefaultFont, .03f, new Vec3(1f,1f-0.12f,0));
@@ -28,9 +28,14 @@ public class Page {
     public Button[] Buttons = new Button[0];
     public boolean GameBackground;
     public boolean IsGame;
-    public int OnExit;
+    public Script OnExit;
     public String BackGroundTexture;
     public int TextureBufferObject;
+
+    public static void SetPage(int ID){
+        SelectedPage = ID;
+        Interrupt = true;
+    }
 
     public static void Wincallback(long window, int X, int Y){
         Main.win_X = X;
@@ -59,8 +64,7 @@ public class Page {
     }
     public static void GameKeyCallback(long window, int key, int scancode, int action, int mods){
         if (key == GLFW_KEY_ESCAPE) {
-            SelectedPage = Pages[SelectedPage].OnExit;
-            Interupt = true;
+            Pages[SelectedPage].OnExit.Run();
         }
         if(action == GLFW_PRESS){
             if(mods == 0){
@@ -133,14 +137,7 @@ public class Page {
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
                 for (Button button1 : Pages[SelectedPage].Buttons) {
                     if (button1.TestOver()) {
-                        if(button1.OnPress == -1){
-                            glfwSetWindowShouldClose(Main.win, true);
-                            Interupt = true;
-                            return;
-                        }
-                        SelectedPage = button1.OnPress;
-                        Interupt = true;
-                        break;
+                        button1.OnPress.Run();
                     }
                 }
             }
@@ -149,8 +146,7 @@ public class Page {
     public static void MenuKeyCallback(long win, int key, int scancode, int action, int mods){
         if(action == GLFW_PRESS) {
             if (key == GLFW_KEY_ESCAPE) {
-                SelectedPage = Pages[SelectedPage].OnExit;
-                Interupt = true;
+                Pages[SelectedPage].OnExit.Run();
             }
             if(key == GLFW_KEY_F){
                 Main.FullScreen = !Main.FullScreen;
@@ -176,7 +172,7 @@ public class Page {
         glfwSetWindowSizeCallback(Main.win, Page::Wincallback);
 
         while(!glfwWindowShouldClose(Main.win)) {
-            Interupt = false;
+            Interrupt = false;
             if(SelectedPage < 0){
                 glfwSetWindowShouldClose(Main.win, true);
                 continue;
@@ -196,7 +192,7 @@ public class Page {
             GameBackground = object.Get("GameBackground").GetBoolean();
             IsGame = object.Get("IsGame").GetBoolean();
             this.BackGroundTexture = object.Get("BackGroundTexture").GetString();
-            this.OnExit = object.Get("OnExit").GetInt();
+            this.OnExit = new Script(object.Get("OnExit").GetString());
             JsonArray array = object.Get("Buttons").GetArray();
             if(array != null) {
                 Buttons = new Button[array.Size];
@@ -209,7 +205,7 @@ public class Page {
                             object1.Get("SizeY").GetFloat(),
                             object1.Get("BackGroundTexture").GetString(),
                             object1.Get("Text").GetString(),
-                            object1.Get("OnPress").GetInt()
+                            object1.Get("OnPress").GetString()
 
                     );
                     Buttons[X] = button;
@@ -303,7 +299,7 @@ public class Page {
     public void DO(){
         if(this.IsGame){
             Player.Load();
-            Player.is_flying = true;
+            Player.is_flying = false;
 
             glfwSetInputMode(Main.win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             if (glfwRawMouseMotionSupported()) {
@@ -323,7 +319,7 @@ public class Page {
             Main.meshBuilder.start();
 
             double PastTime = glfwGetTime();
-            while (!Interupt && !glfwWindowShouldClose(Main.win)){
+            while (!Interrupt && !glfwWindowShouldClose(Main.win)){
 
                 double CurentTime = glfwGetTime();
                 Main.Time = (float)CurentTime;
@@ -388,7 +384,7 @@ public class Page {
                 Main.ChunkArray[X].Save();
             }
             Player.Save();
-            Main.SaveSettings(Main.jar_folder_path+"/"+Main.SettingsPath);
+            Main.SaveSettings();
             System.out.println("Saved");
             Console.Add("Saved");
             return;
@@ -403,7 +399,7 @@ public class Page {
             glfwSetMouseButtonCallback(Main.win, Page::MenuMouseButtonCallback);
             glfwSetKeyCallback(Main.win, Page::MenuKeyCallback);
 
-            while(!Interupt && !glfwWindowShouldClose(Main.win)) {
+            while(!Interrupt && !glfwWindowShouldClose(Main.win)) {
                 double CurentTime = glfwGetTime();
                 Main.Time = (float)CurentTime;
 

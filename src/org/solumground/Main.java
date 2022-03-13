@@ -21,9 +21,7 @@ import static org.lwjgl.opengl.GL21.*;
 
 public class Main {
     public static String jar_folder_path;
-    public static String RelativeSaveFolder;
     public static String SaveFolder;
-    public static String RelativeFontPath;
     public static String FontPath;
     public static String SettingsPath = "assets/solumground/Settings.json";
 
@@ -198,12 +196,11 @@ public class Main {
             glfwSetWindowMonitor(win, 0, (monitor_W/2)-(OriginalWinX/2), (monitor_H/2)-(OriginalWinY/2), OriginalWinX, OriginalWinY, 0);
         }
     }
-    public static void LoadSettings(String Path) {
+    public static void LoadSettings() {
         try {
-            JsonObject jsonObject = new JsonParser(Path).mainJsonObject;
+            JsonObject jsonObject = new JsonParser(SettingsPath).mainJsonObject;
 
-            RelativeSaveFolder = jsonObject.Get("SaveFolder").GetString();
-            SaveFolder = jar_folder_path+"/"+ RelativeSaveFolder;
+            SaveFolder = jsonObject.Get("SaveFolder").GetString();
             FOV = jsonObject.Get("FOV").GetFloat();
             nearPlane = jsonObject.Get("NearClippingPlane").GetFloat();
             farPlane = jsonObject.Get("FarClippingPlane").GetFloat();
@@ -223,18 +220,17 @@ public class Main {
             playerRotateSpeedMouse = jsonObject.Get("playerRotateSpeedMouse").GetFloat();
             RenderDistance = jsonObject.Get("RenderDistance").GetInt();
 
-            RelativeFontPath = jsonObject.Get("Font").GetString();
-            FontPath = jar_folder_path+"/"+ RelativeFontPath;
+            FontPath = jsonObject.Get("Font").GetString();
 
         } catch (Exception e) {
             System.out.print("Error While Parseing Settings: ");
-            System.out.println(Path);
+            System.out.println(SettingsPath);
             e.printStackTrace();
         }
     }
-    public static void SaveSettings(String Path){
+    public static void SaveSettings(){
         JsonObject object = new JsonObject();
-        object.Add(new JsonItem("SaveFolder", RelativeSaveFolder));
+        object.Add(new JsonItem("SaveFolder", SaveFolder));
         object.Add(new JsonItem("FOV", FOV));
         object.Add(new JsonItem("NearClippingPlane", nearPlane));
         object.Add(new JsonItem("FarClippingPlane", farPlane));
@@ -246,10 +242,10 @@ public class Main {
         object.Add(new JsonItem("playerRotateSpeedKey", playerRotateSpeedKey));
         object.Add(new JsonItem("playerRotateSpeedMouse", playerRotateSpeedMouse));
         object.Add(new JsonItem("RenderDistance", RenderDistance));
-        object.Add(new JsonItem("Font", RelativeFontPath));
+        object.Add(new JsonItem("Font", FontPath));
 
         try{
-            FileOutputStream Out = new FileOutputStream(Path);
+            FileOutputStream Out = new FileOutputStream(SettingsPath);
             object.write(Out);
             Out.close();
         }
@@ -330,13 +326,13 @@ public class Main {
             e.printStackTrace();
             return;
         }
-        LoadSettings(jar_folder_path+"/"+SettingsPath);
+        LoadSettings();
 
-        File save_folder_file = new File(SaveFolder);
+        File save_folder_file = new File(jar_folder_path+"/"+SaveFolder);
         if(!save_folder_file.exists()){
             save_folder_file.mkdirs(); // create file path if it doesn't exist
         }
-        File playerData = new File(Main.SaveFolder+"/Player.dat");
+        File playerData = new File(jar_folder_path+"/"+Main.SaveFolder+"/Player.dat");
         try {
             playerData.createNewFile();
         }
@@ -394,7 +390,7 @@ public class Main {
 
         unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
-        DefaultFont = new Font(Main.FontPath);
+        DefaultFont = new Font(Main.jar_folder_path+"/"+Main.FontPath);
 
         Player.Init();
         SkyBox.Init();

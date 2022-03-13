@@ -25,7 +25,7 @@ class Light{
     }
 
     public static Vec3 getLight(Vec3 pos){
-        Vec3 l = new Vec3(.8f,.8f,.8f);
+        Vec3 l = new Vec3(.2f,.2f,.2f);
         Light light;
         for(int X=0;X<lights.size();X++) {
             light = lights.get(X);
