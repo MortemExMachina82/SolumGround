@@ -21,8 +21,11 @@ import static org.lwjgl.opengl.GL21.*;
 
 public class Main {
     public static String jar_folder_path;
+    public static String RelativeSaveFolder;
     public static String SaveFolder;
+    public static String RelativeFontPath;
     public static String FontPath;
+    public static String SettingsPath = "assets/solumground/Settings.json";
 
     public static float FOV;
     public static float nearPlane;
@@ -164,7 +167,7 @@ public class Main {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        if(!texture_Path.equals("")) {
+        if(new File(texture_Path).isFile()) {
             BufferedImage img = null;
             try {
                 img = ImageIO.read(new File(texture_Path));
@@ -199,7 +202,8 @@ public class Main {
         try {
             JsonObject jsonObject = new JsonParser(Path).mainJsonObject;
 
-            SaveFolder = jar_folder_path+"/"+ jsonObject.Get("SaveFolder").GetString();
+            RelativeSaveFolder = jsonObject.Get("SaveFolder").GetString();
+            SaveFolder = jar_folder_path+"/"+ RelativeSaveFolder;
             FOV = jsonObject.Get("FOV").GetFloat();
             nearPlane = jsonObject.Get("NearClippingPlane").GetFloat();
             farPlane = jsonObject.Get("FarClippingPlane").GetFloat();
@@ -219,11 +223,37 @@ public class Main {
             playerRotateSpeedMouse = jsonObject.Get("playerRotateSpeedMouse").GetFloat();
             RenderDistance = jsonObject.Get("RenderDistance").GetInt();
 
-            FontPath = jar_folder_path+"/"+ jsonObject.Get("Font").GetString();
+            RelativeFontPath = jsonObject.Get("Font").GetString();
+            FontPath = jar_folder_path+"/"+ RelativeFontPath;
 
         } catch (Exception e) {
             System.out.print("Error While Parseing Settings: ");
             System.out.println(Path);
+            e.printStackTrace();
+        }
+    }
+    public static void SaveSettings(String Path){
+        JsonObject object = new JsonObject();
+        object.Add(new JsonItem("SaveFolder", RelativeSaveFolder));
+        object.Add(new JsonItem("FOV", FOV));
+        object.Add(new JsonItem("NearClippingPlane", nearPlane));
+        object.Add(new JsonItem("FarClippingPlane", farPlane));
+        object.Add(new JsonItem("WindowWidth", OriginalWinX));
+        object.Add(new JsonItem("WindowHight", OriginalWinY));
+        object.Add(new JsonItem("FullScreen", FullScreen));
+        object.Add(new JsonItem("DrawSkyBox", DrawSkyBox));
+        object.Add(new JsonItem("playerMoveSpeed", playerMoveSpeed));
+        object.Add(new JsonItem("playerRotateSpeedKey", playerRotateSpeedKey));
+        object.Add(new JsonItem("playerRotateSpeedMouse", playerRotateSpeedMouse));
+        object.Add(new JsonItem("RenderDistance", RenderDistance));
+        object.Add(new JsonItem("Font", RelativeFontPath));
+
+        try{
+            FileOutputStream Out = new FileOutputStream(Path);
+            object.write(Out);
+            Out.close();
+        }
+        catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -292,16 +322,15 @@ public class Main {
     public static void main(String[] args){
         try {
             //Use In InteliJ
-            //jar_folder_path = System.getProperty("user.dir");
+            jar_folder_path = System.getProperty("user.dir");
             //Use For Manual Compiling
-            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            //jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
-            System.out.println("Faile");
             e.printStackTrace();
             return;
         }
-        LoadSettings(jar_folder_path+"/assets/solumground/Settings.json");
+        LoadSettings(jar_folder_path+"/"+SettingsPath);
 
         File save_folder_file = new File(SaveFolder);
         if(!save_folder_file.exists()){

@@ -64,8 +64,15 @@ public class Page {
         }
         if(action == GLFW_PRESS){
             if(mods == 0){
-                if(key == GLFW_KEY_F10){
-                    Main.TakeScreenShot();
+                switch(key) {
+                    case GLFW_KEY_F10:
+                        Main.TakeScreenShot();
+                        break;
+                    case GLFW_KEY_ENTER:
+                        Player.place_block();
+                        break;
+                    case GLFW_KEY_BACKSPACE:
+                        Player.break_block();
                 }
             }
             if((mods & 0x0004) > 0) {
@@ -226,7 +233,7 @@ public class Page {
         catch(Exception e){
             e.printStackTrace();
         }
-        this.TextureBufferObject = Main.LoadTexture(this.BackGroundTexture, 0x7F7F7FFF);
+        this.TextureBufferObject = Main.LoadTexture(Main.jar_folder_path+"/"+this.BackGroundTexture, 0x7F7F7FFF);
     }
 
     public static void DrawGame(){
@@ -381,6 +388,7 @@ public class Page {
                 Main.ChunkArray[X].Save();
             }
             Player.Save();
+            Main.SaveSettings(Main.jar_folder_path+"/"+Main.SettingsPath);
             System.out.println("Saved");
             Console.Add("Saved");
             return;

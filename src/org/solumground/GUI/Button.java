@@ -28,7 +28,7 @@ public class Button {
         this.text.position.Y = this.PosY + this.SizeY*.1f;
         this.OnPress = OnPress;
         this.BackGroundTexture = BackTex;
-        this.TextureBufferObject = Main.LoadTexture(this.BackGroundTexture, 0x3F3F3FFF);
+        this.TextureBufferObject = Main.LoadTexture(Main.jar_folder_path+"/"+this.BackGroundTexture, 0x3F3F3FFF);
     }
     public boolean TestOver(){
         float NormalizedX = (float)((Main.win_X*.5 - Main.mouse_past_X)/Main.win_X*2);
