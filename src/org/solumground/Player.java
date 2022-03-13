@@ -63,7 +63,7 @@ public class Player{
         set_Projection();
     }
     public static void Load(){
-        String DataPath = Main.SaveFolder+"/Player.dat";
+        String DataPath = Main.jar_folder_path+"/"+Main.SaveFolder+"/Player.dat";
         File file = new File(DataPath);
         int bytesRead = 0;
         if(file.exists()){
@@ -350,7 +350,7 @@ public class Player{
     }
 
     public static void Save(){
-        String s = Main.SaveFolder+"/Player.dat";
+        String s = Main.jar_folder_path+"/"+Main.SaveFolder+"/Player.dat";
 
         byte[] data = new byte[28];
         ByteBuffer bb = ByteBuffer.wrap(data);

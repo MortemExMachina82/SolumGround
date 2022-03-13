@@ -198,7 +198,7 @@ public class Main {
     }
     public static void LoadSettings() {
         try {
-            JsonObject jsonObject = new JsonParser(SettingsPath).mainJsonObject;
+            JsonObject jsonObject = new JsonParser(jar_folder_path+"/"+SettingsPath).mainJsonObject;
 
             SaveFolder = jsonObject.Get("SaveFolder").GetString();
             FOV = jsonObject.Get("FOV").GetFloat();
@@ -245,7 +245,7 @@ public class Main {
         object.Add(new JsonItem("Font", FontPath));
 
         try{
-            FileOutputStream Out = new FileOutputStream(SettingsPath);
+            FileOutputStream Out = new FileOutputStream(jar_folder_path+"/"+SettingsPath);
             object.write(Out);
             Out.close();
         }
