@@ -76,7 +76,7 @@ public class Button {
         glVertexAttribPointer(Main.TwoDShader_Vertex, 2, GL_FLOAT, false, 16, 0);
         glVertexAttribPointer(Main.TwoDShader_TextureCords, 2, GL_FLOAT, false, 16, 8);
 
-        glUniform2f(Main.TwoDShader_TextPos, this.PosX-(this.SizeX/2), this.PosY-(this.SizeY/2));
+        glUniform2f(Main.TwoDShader_TextPos, (-this.PosX)-(this.SizeX/2), this.PosY-(this.SizeY/2));
         glUniform1f(Main.TwoDShader_Alpha, 1);
 
         glDrawArrays(GL_QUADS, 0, 4);

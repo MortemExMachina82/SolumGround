@@ -20,7 +20,7 @@
             "PosY":-0.3,
             "SizeX":0.25,
             "SizeY":0.1,
-            "Text":"Menu",
+            "Text":"Main Menu",
             "OnPress":"Page.SetPage(1);",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         }

@@ -1,27 +1,27 @@
 {
-    "ID":1,
-    "Name":"Main",
+    "ID":3,
+    "Name":"Settings",
     "GameBackground":false,
     "IsGame":false,
     "BackGroundTexture":"assets/solumground/textures/dirt.png",
-    "OnExit":"Page.SetPage(-1);",
+    "OnExit":"Main.SaveSettings();  Page.SetPage(1);",
     "Buttons":[
         {
-            "PosX":0.0,
+            "PosX":-0.5,
             "PosY":0.3,
-            "SizeX":0.25,
+            "SizeX":0.3,
             "SizeY":0.1,
-            "Text":"Play Game",
-            "OnPress":"Page.SetPage(0);",
+            "Text":"FullScreen Off",
+            "OnPress":"Main.FullScreen = false;  Main.update_fullscreen();",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         },
         {
-            "PosX":0.0,
-            "PosY":0.0,
-            "SizeX":0.25,
+            "PosX":0.5,
+            "PosY":0.3,
+            "SizeX":0.3,
             "SizeY":0.1,
-            "Text":"Settings",
-            "OnPress":"Page.SetPage(3);",
+            "Text":"FullScreen On",
+            "OnPress":"Main.FullScreen = true;  Main.update_fullscreen();",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         },
         {
@@ -29,8 +29,8 @@
             "PosY":-0.3,
             "SizeX":0.25,
             "SizeY":0.1,
-            "Text":"Quit",
-            "OnPress":"Page.SetPage(-1);",
+            "Text":"Main Menu",
+            "OnPress":"Main.SaveSettings();  Page.SetPage(1);",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         }
     ],
@@ -39,7 +39,7 @@
             "PosX":0.0,
             "PosY":0.8,
             "Size":0.05,
-            "Text":"SolumGround"
+            "Text":"Settings"
         }
     ]
 }
