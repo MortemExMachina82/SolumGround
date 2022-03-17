@@ -37,8 +37,8 @@ public class Chunk{
     public static Chunk FromPos(Vec3 pos){
         Chunk selected_chunk = null;
         IVec3 Ipos = convert_to_chunk_pos(pos);
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
+        for(int X=0;X<Main.ChunkArray.size();X++){
+            Chunk chunk = Main.ChunkArray.get(X);
             if(IVec3.Equal(chunk.chunkPosition, Ipos)){
                 selected_chunk = chunk;
                 break;
@@ -55,8 +55,8 @@ public class Chunk{
     
         Chunk selected_chunk = null;
         IVec3 Ipos = convert_to_chunk_pos(pos);
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
+        for(int X=0;X<Main.ChunkArray.size();X++){
+            Chunk chunk = Main.ChunkArray.get(X);
             if(IVec3.Equal(chunk.chunkPosition, Ipos)){
                 selected_chunk = chunk;
                 break;
@@ -66,8 +66,7 @@ public class Chunk{
     }
     public static Chunk FromChunkPos(IVec3 Pos){
         Chunk selected_chunk = null;
-        for(int X=0;X<Main.ChunkCount;X++){
-            Chunk chunk = Main.ChunkArray[X];
+        for(Chunk chunk : Main.ChunkArray){
             if(IVec3.Equal(chunk.chunkPosition, Pos)){
                 selected_chunk = chunk;
                 break;
@@ -163,9 +162,7 @@ public class Chunk{
         if(this.is_empty){
             blocks = null;
         }
-        Main.ChunkArray[Main.ChunkCount] = this;
-        Main.ChunkCount++;
-
+        Main.ChunkArray.add(this);
     }
     public void GetNear(){
         Chunk NextTo;
@@ -470,17 +467,6 @@ public class Chunk{
     }
     public void Unload(){
         Save();
-        int index = -1;
-        for(int X=0;X<Main.ChunkCount;X++){
-            if(Main.ChunkArray[X] == this){
-                index = X;
-                break;
-            }
-        }
-        if(index != -1) {
-            System.arraycopy(Main.ChunkArray, index + 1, Main.ChunkArray, index, Main.ChunkCount - index);
-            Main.ChunkCount--;
-        }
         this.blocks = null;
         if(this.main_mesh != null) {
             this.main_mesh.Remove();

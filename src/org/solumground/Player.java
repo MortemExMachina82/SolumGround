@@ -60,7 +60,7 @@ public class Player{
         wireframe.ScaleData(.504f,.504f,.504f);
         wireframe.setColor(0x0000FFFF);
 
-        set_Projection();
+        set_Projection(((float)Main.win_Y/Main.win_X), Main.FOV, Main.nearPlane, Main.farPlane);
     }
     public static void Load(){
         String DataPath = Main.jar_folder_path+"/"+Main.SaveFolder+"/Player.dat";
@@ -98,15 +98,16 @@ public class Player{
         }
         fall_time = (float)glfwGetTime();
     }
-    public static void set_Projection(){
+    public static void set_Projection(float AspectRatio, float FOV, float NearPlane, float FarPlane){
         float [] projection_mat = new float[4*4];
 
-        projection_mat[0] = ((float)Main.win_Y/(float)Main.win_X) / (float)Math.tan(Main.FOV*.5*3.1415/180);
-        projection_mat[5] = 1 / (float)Math.tan(Main.FOV*.5*3.1415/180);
-        projection_mat[10] = ((Main.farPlane+Main.nearPlane) / (Main.nearPlane-Main.farPlane));
+        projection_mat[0] = AspectRatio / (float)Math.tan(FOV*.5*3.1415/180);
+        projection_mat[5] = 1 / (float)Math.tan(FOV*.5*3.1415/180);
+        projection_mat[10] = ((FarPlane+NearPlane) / (NearPlane-FarPlane));
         projection_mat[11] = -1;
-        projection_mat[14] = ((Main.farPlane*Main.nearPlane) / (Main.nearPlane-Main.farPlane))*2;
+        projection_mat[14] = ((FarPlane*NearPlane) / (NearPlane-FarPlane))*2;
 
+        glUseProgram(Main.MainShaderProgram);
         glUniformMatrix4fv(Main.MainShader_Projection, false, projection_mat);
     }
 

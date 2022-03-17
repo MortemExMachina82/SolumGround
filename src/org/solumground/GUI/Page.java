@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL20.glUniform1f;
 
 public class Page {
     public static Page[] Pages;
-    public static int SelectedPage = 1;
+    public static int SelectedPage = 0;
     public static boolean Interrupt = false;
     public static int VertexBufferObject = glGenBuffers();
 
@@ -42,7 +42,7 @@ public class Page {
         Main.win_Y = Y;
         Main.aspectRatio = (float)X/(float)Y;
         glViewport(0,0, X, Y);
-        Player.set_Projection();
+        Player.set_Projection(((float)Main.win_Y/Main.win_X), Main.FOV, Main.nearPlane, Main.farPlane);
     }
     public static void GameMouseMoveCallback(long window, double X, double Y){
         float distX = (float)(Main.mouse_past_X-X);
@@ -114,18 +114,22 @@ public class Page {
             if(key == GLFW_KEY_P){Player.move_hotbar(1);}
             if((mods & 0x0002) > 0){
                 if(key == GLFW_KEY_S){
-                    System.out.print("Saving...");
-                    Console.Print("Saving...");
-                    for(int X=0;X<Main.ChunkCount;X++){
-                        Main.ChunkArray[X].Save();
-                    }
-                    Player.Save();
-                    System.out.println("Saved");
-                    Console.Add("Saved");
+                    Main.SaveWorld();
                 }
             }
+            if(key == GLFW_KEY_Z){
+                Main.playerRotateSpeedMouse *= 1.0/3;
+                Main.playerRotateSpeedKey *= 1.0/3;
+                Player.set_Projection(((float)Main.win_Y/Main.win_X), 15, Main.nearPlane, Main.farPlane);
+            }
         }
-
+        if(action == GLFW_RELEASE){
+            if(key == GLFW_KEY_Z){
+                Main.playerRotateSpeedMouse *= 3;
+                Main.playerRotateSpeedKey *= 3;
+                Player.set_Projection(((float)Main.win_Y/Main.win_X), Main.FOV, Main.nearPlane, Main.farPlane);
+            }
+        }
     }
 
     public static void MenuMouseMoveCallback(long win, double X, double Y){
@@ -241,10 +245,11 @@ public class Page {
             glEnable(GL_DEPTH_TEST);
         }
         Player.Draw();
-        for(int X=0;X<Main.ChunkCount;X++){
-            if(Main.ChunkArray[X] != null) {
-                if(Main.ChunkArray[X].status == Chunk.Status.Complete) {
-                    Main.ChunkArray[X].main_mesh.draw();
+        for(int X=0;X<Main.ChunkArray.size();X++){
+            Chunk chunk = Main.ChunkArray.get(X);
+            if(chunk != null) {
+                if(chunk.status == Chunk.Status.Complete) {
+                    chunk.main_mesh.draw();
                 }
             }
         }
@@ -370,8 +375,6 @@ public class Page {
 
             Main.chunkLoader.close();
             Main.meshBuilder.close();
-            System.out.print("Saving...");
-            Console.Print("Saving...");
             while(Main.chunkLoader.isAlive()){
                 try{
                     Thread.sleep(1);
@@ -380,16 +383,8 @@ public class Page {
                     e.printStackTrace();
                 }
             }
-            for(int X=0;X<Main.ChunkCount;X++){
-                Main.ChunkArray[X].Save();
-            }
-            Player.Save();
-            Main.SaveSettings();
-            System.out.println("Saved");
-            Console.Add("Saved");
+            Main.SaveWorld();
             return;
-
-
         }
         else{
             glfwSetInputMode(Main.win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

@@ -4,7 +4,7 @@
     "GameBackground":true,
     "IsGame":false,
     "BackGroundTexture":"assets/solumground/textures/dirt.png",
-    "OnExit":"Page.SetPage(1);",
+    "OnExit":"Main.UnloadWorld();  Page.SetPage(1);",
     "Buttons":[
         {
             "PosX":0.0,
@@ -21,7 +21,7 @@
             "SizeX":0.25,
             "SizeY":0.1,
             "Text":"Main Menu",
-            "OnPress":"Page.SetPage(1);",
+            "OnPress":"Main.UnloadWorld();  Page.SetPage(1);",
             "BackGroundTexture":"assets/solumground/textures/stone.png",
         }
     ],

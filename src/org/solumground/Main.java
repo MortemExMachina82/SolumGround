@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
@@ -26,6 +28,7 @@ public class Main {
     public static String SettingsPath = "assets/solumground/Settings.json";
 
     public static float FOV;
+    public static float ZoomFOV = 15;
     public static float nearPlane;
     public static float farPlane;
     public static int win_X;
@@ -69,9 +72,7 @@ public class Main {
     public static float playerRotateSpeedKey;
     public static float playerRotateSpeedMouse;
 
-    public static int MaxChunks = 10000;
-    public static int ChunkCount = 0;
-    public static Chunk [] ChunkArray = new Chunk[MaxChunks];
+    public static List<Chunk> ChunkArray = new ArrayList<>(0);
 
     public static CollisionBox unit_cube_collisionBox;
 
@@ -313,6 +314,27 @@ public class Main {
         }
         System.out.println("Saved ScreenShot as: "+TimeString+".png");
         Console.Print("Saved ScreenShot as: "+TimeString+".png");
+    }
+
+    public static void SaveWorld(){
+        System.out.print("Saving...");
+        Console.Print("Saving...");
+        for(int X=0;X<ChunkArray.size();X++){
+            ChunkArray.get(X).Save();
+        }
+        Player.Save();
+        SaveSettings();
+        System.out.println("Saved");
+        Console.Add("Saved");
+    }
+    public static void UnloadWorld(){
+        while(ChunkArray.size() > 0){
+            Chunk chunk = ChunkArray.remove(0);
+            chunk.Unload();
+        }
+        MeshBuilder.Genbuffer = new ArrayList<>(0);
+        MeshBuilder.ReGenBuffer = new ArrayList<>(0);
+        MeshBuilder.LightUpdateBuffer = new ArrayList<>(0);
     }
 
     public static void main(String[] args){

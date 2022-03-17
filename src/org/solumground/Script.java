@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Script {
-    public List<String> Lines = new ArrayList<>(0);
+    public List<Object> Lines = new ArrayList<>(0);
     public static void SetVar(String name, Object value) {
         switch (name) {
             case "Main.jar_folder_path":
@@ -83,7 +83,60 @@ public class Script {
                 System.out.println("Variable Not Found: "+name);
         }
     }
-    public static void CallFunc(String name, Object... params){
+    public static Object GetVar(String name){
+        switch (name) {
+            case "Main.jar_folder_path":
+                return Main.jar_folder_path;
+            case "Main.SaveFolder":
+                return Main.SaveFolder;
+            case "Main.FontPath":
+                return Main.FontPath;
+            case "Main.FOV":
+                return Main.FOV;
+            case "Main.nearPlane":
+                return Main.nearPlane;
+            case "Main.farPlane":
+                return Main.farPlane;
+            case "Main.win_X":
+                return Main.win_X;
+            case "Main.win_Y":
+                return Main.win_Y;
+            case "Main.OriginalWinX":
+                return Main.OriginalWinX;
+            case "Main.OriginalWinY":
+                return Main.OriginalWinY;
+            case "Main.aspectRatio":
+                return Main.aspectRatio;
+            case "Main.FullScreen":
+                return Main.FullScreen;
+            case "Main.Time":
+                return Main.Time;
+            case "Main.TimeElapsed":
+                return Main.TimeElapsed;
+            case "Main.AvgTimeElapsed":
+                return Main.AvgTimeElapsed;
+            case "Main.fps":
+                return Main.fps;
+            case "Main.RenderDistance":
+                return Main.RenderDistance;
+            case "Main.showCollisionBox":
+                return Main.showCollisionBox;
+            case "Main.DrawSkyBox":
+                return Main.DrawSkyBox;
+            case "Main.playerMoveSpeed":
+                return Main.playerMoveSpeed;
+            case "Main.playerMoveSpeedSprint":
+                return Main.playerMoveSpeedSprint;
+            case "Main.playerRotateSpeedKey":
+                return Main.playerRotateSpeedKey;
+            case "Main.playerRotateSpeedMouse":
+                return Main.playerRotateSpeedMouse;
+            default:
+                System.out.println("Variable Not Found: " + name);
+        }
+        return null;
+    }
+    public static void CallFunc(String name, String [] params){
         switch(name){
             case "Main.update_fullscreen()":
                 Main.update_fullscreen();
@@ -101,15 +154,21 @@ public class Script {
                 Main.TakeScreenShot();
                 break;
             case "Page.SetPage()":
-                Page.SetPage(Integer.parseInt((String)params[0]));
+                Page.SetPage(Integer.parseInt(params[0]));
                 break;
+            case "Main.UnloadWorld()":
+                Main.UnloadWorld();
+                break;
+            case "Console.Print()":
+                Console.Print(params[0]);
+            default:
+                System.out.println("Function Not Found: "+name);
         }
     }
     public Script(String sc){
         String [] lines = sc.split(";");
         for(String Line : lines){
             String first = "";
-            String second = "";
             boolean VarSet = false;
             boolean FuncSet = false;
             int offset = 0;
@@ -131,45 +190,49 @@ public class Script {
                 }
             }
             if(VarSet){
+                String second = "";
                 for(int X=offset;X<Line.length();X++) {
                     char C = Line.charAt(X);
                     if(C != ' ' && C != '\n' && C != '\t'){
                         second += C;
                     }
                 }
-            }
-            if(FuncSet){
-                for(int X=offset;X<Line.length();X++) {
-                    char C = Line.charAt(X);
-                    if(C != ' ' && C != '\n' && C != '\t'){
-                        if(C == ')'){
-                            break;
-                        }
-                        second += C;
-                    }
-                }
-            }
-            if(VarSet){
                 Lines.add(first);
                 Lines.add(second);
                 Lines.add("VarSet");
             }
-            else{
+            if(FuncSet){
+                String [] array = new String[10];
+                int arrayCount = 0;
+                array[arrayCount] = "";
+                for(int X=offset;X<Line.length();X++) {
+                    char C = Line.charAt(X);
+                    if(C == ','){
+                        arrayCount++;
+                        array[arrayCount] = "";
+                        continue;
+                    }
+                    if(C != ' ' && C != '\n' && C != '\t'){
+                        if(C == ')'){
+                            break;
+                        }
+                        array[arrayCount] += C;
+                    }
+                }
                 Lines.add(first);
-                Lines.add(second);
+                Lines.add(array);
                 Lines.add("FuncCall");
             }
         }
     }
     public void Run(){
         for(int X = 0; X< Lines.size(); X+=3){
-            String first = Lines.get(X);
-            String second = Lines.get(X + 1);
+            String first = (String)Lines.get(X);
             if(Lines.get(X + 2).equals("VarSet")) {
-                SetVar(first, second);
+                SetVar(first, Lines.get(X + 1));
             }
             else{
-                CallFunc(first, second);
+                CallFunc(first, (String[])Lines.get(X + 1));
             }
         }
     }
