@@ -74,13 +74,16 @@ public class JsonItem {
 
     }
     public boolean GetBoolean() throws Exception{
-        if(this.type == Type.Bool){
-            return this.ValueBoolean;
+        switch (this.type){
+            case Bool:
+                return this.ValueBoolean;
+            case String:
+                return Boolean.parseBoolean(this.ValueString);
+            case Null:
+                return false;
+            default:
+                throw new Exception("Tried To Get Boolean But Incompatible Type Found: "+this.Parent.Parent.jsonParser.FilePath+"."+this.Parent.GetParentTree());
         }
-        if(this.type == Type.String){
-            return Boolean.parseBoolean(this.ValueString);
-        }
-        throw new Exception("Tried To Get Boolean But Incompatible Type Found: "+this.Parent.Parent.jsonParser.FilePath+"."+this.Parent.GetParentTree());
     }
     public JsonArray GetArray(){
         return this.valueJsonArray;

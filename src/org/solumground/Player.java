@@ -209,11 +209,12 @@ public class Player{
         Chunk selected_chunk = Chunk.FromPos(LookingAt.ToFloat());
         boolean Broke = false;
         if(selected_chunk != null){
-            Broke = selected_chunk.Delete(LookingAt);
+            Broke = selected_chunk.Break(LookingAt);
         }
         if(Broke){
             StartAnimation(LookingAtBlock);
             AnimationBreak = true;
+            selected_chunk.ReBuildMesh();
         }
     }
 

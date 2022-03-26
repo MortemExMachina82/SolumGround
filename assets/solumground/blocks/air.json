@@ -5,6 +5,8 @@
     "DirectoryModelPath":"assets/solumground/models/Standard",
     "DirectoryTexturePath":"assets/solumground/textures",
     "Illuminated":false,
+    "Replaceable":true,
+    "UnBreakable":true,
     "Model":null,
     "HasCollisionBox":false,
     "CollisionBoxSizes":[]

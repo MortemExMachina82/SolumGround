@@ -362,7 +362,7 @@ public class Chunk{
     public boolean Place(int BlockID, IVec3 blockpos){
         GetNear();
         IVec3 Lpos = ConvertToLocal(blockpos);
-        if(GetLocal(Lpos) == 0) {
+        if(Block.Blocks[GetLocal(Lpos)].Replaceable) {
             if(this.is_empty){
                 blocks = new byte[Size*Size*Size];
                 main_mesh = new Mesh(Block.TextureBufferObject);
@@ -370,15 +370,16 @@ public class Chunk{
                 this.is_empty = false;
             }
             Set(Lpos, BlockID);
+            Block.Blocks[BlockID].OnPlace.Run();
             //ReBuildMesh();
             return true;
         }
         return false;
     }
-    public boolean Delete(IVec3 blockpos){
+    public boolean Break(IVec3 blockpos){
         GetNear();
         IVec3 Lpos = ConvertToLocal(blockpos);
-        if(GetLocal(Lpos) != 0) {
+        if(!Block.Blocks[GetLocal(Lpos)].UnBreakable) {
             this.blocks[Lpos.Y * Size * Size + Lpos.X * Size + Lpos.Z] = 0;
             for(int X=0;X<Light.lights.size();X++){
                 Light light = Light.lights.get(X);
@@ -393,7 +394,8 @@ public class Chunk{
                     }
                 }
             }
-            ReBuildMesh();
+            Block.Blocks[GetLocal(Lpos)].OnBreak.Run();
+            //ReBuildMesh();
             return true;
         }
         return false;

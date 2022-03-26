@@ -29,6 +29,10 @@ public class Block {
     public Mesh [] Sides;
     public Mesh mesh;
     public CollisionBox collisionBox;
+    public boolean Replaceable;
+    public boolean UnBreakable;
+    public Script OnPlace;
+    public Script OnBreak;
 
     public static int Number;
     public static List<String> Textures = new ArrayList<>(1);
@@ -191,7 +195,10 @@ public class Block {
             this.DirectoryTexturePath = jsonObject.Get("DirectoryTexturePath").GetString();
             this.HasCollisionBox = jsonObject.Get("HasCollisionBox").GetBoolean();
             this.Illuminated = jsonObject.Get("Illuminated").GetBoolean();
-
+            this.Replaceable = jsonObject.Get("Replaceable").GetBoolean();
+            this.UnBreakable = jsonObject.Get("UnBreakable").GetBoolean();
+            this.OnPlace = new Script(jsonObject.Get("OnPlace").GetString());
+            this.OnBreak = new Script(jsonObject.Get("OnBreak").GetString());
 
             if(Full) {
                 Models = new String[6];
