@@ -7,24 +7,6 @@
     "OnExit":"Main.SaveSettings();  Page.SetPage(1);",
     "Buttons":[
         {
-            "PosX":-0.5,
-            "PosY":0.3,
-            "SizeX":0.3,
-            "SizeY":0.1,
-            "Text":"FullScreen Off",
-            "OnPress":"Main.FullScreen = false;  Main.update_fullscreen();",
-            "BackGroundTexture":"assets/solumground/textures/stone.png",
-        },
-        {
-            "PosX":0.5,
-            "PosY":0.3,
-            "SizeX":0.3,
-            "SizeY":0.1,
-            "Text":"FullScreen On",
-            "OnPress":"Main.FullScreen = true;  Main.update_fullscreen();",
-            "BackGroundTexture":"assets/solumground/textures/stone.png",
-        },
-        {
             "PosX":0.0,
             "PosY":-0.3,
             "SizeX":0.25,
@@ -40,6 +22,19 @@
             "PosY":0.8,
             "Size":0.05,
             "Text":"Settings"
+        }
+    ],
+    "Switches":[
+        {
+            "PosX":0.5,
+            "PosY":0.3,
+            "SizeX":0.25,
+            "SizeY":0.1,
+            "TrueText":"FullScreen",
+            "FalseText":"FullScreen",
+            "BackGroundTexture":"assets/solumground/textures/stone.png",
+            "OnTrueScript":"Main.FullScreen = true;  Main.update_fullscreen();",
+            "OnFalseScript":"Main.FullScreen = false;  Main.update_fullscreen();"
         }
     ]
 }

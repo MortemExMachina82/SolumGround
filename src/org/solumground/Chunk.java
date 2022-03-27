@@ -352,7 +352,7 @@ public class Chunk{
             for(Chunk NextTo : NearChunks) {
                 if(NextTo != null){
                     if(NextTo.main_mesh != null){
-                        MeshBuilder.LightUpdateBuffer.add(NextTo);
+                        NextTo.LightUpdate();
                     }
                 }
             }
@@ -371,7 +371,7 @@ public class Chunk{
             }
             Set(Lpos, BlockID);
             Block.Blocks[BlockID].OnPlace.Run();
-            //ReBuildMesh();
+            ReBuildMesh();
             return true;
         }
         return false;
@@ -388,7 +388,7 @@ public class Chunk{
                     for(Chunk NextTo : NearChunks) {
                         if(NextTo != null){
                             if(NextTo.main_mesh != null){
-                                MeshBuilder.LightUpdateBuffer.add(NextTo);
+                                NextTo.LightUpdate();
                             }
                         }
                     }

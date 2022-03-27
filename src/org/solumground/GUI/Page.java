@@ -26,6 +26,7 @@ public class Page {
     public String Name;
     public TextObject[] Texts = new TextObject[0];
     public Button[] Buttons = new Button[0];
+    public Switch[] Switches = new Switch[0];
     public boolean GameBackground;
     public boolean IsGame;
     public Script OnExit;
@@ -144,6 +145,11 @@ public class Page {
                         button1.OnPress.Run();
                     }
                 }
+                for(Switch s : Pages[SelectedPage].Switches){
+                    if(s.TestOver()){
+                        s.Toggle();
+                    }
+                }
             }
         }
     }
@@ -213,6 +219,25 @@ public class Page {
 
                     );
                     Buttons[X] = button;
+                }
+            }
+            array = object.Get("Switches").GetArray();
+            if(array != null) {
+                Switches = new Switch[array.Size];
+                for (int X = 0; X < array.Size; X++) {
+                    JsonObject object1 = array.Get(X).GetObject();
+                    Switch s = new Switch(
+                            object1.Get("PosX").GetFloat(),
+                            object1.Get("PosY").GetFloat(),
+                            object1.Get("SizeX").GetFloat(),
+                            object1.Get("SizeY").GetFloat(),
+                            object1.Get("TrueText").GetString(),
+                            object1.Get("FalseText").GetString(),
+                            object1.Get("BackGroundTexture").GetString(),
+                            object1.Get("OnTrueScript").GetString(),
+                            object1.Get("OnFalseScript").GetString()
+                    );
+                    Switches[X] = s;
                 }
             }
             array = object.Get("Text").GetArray();
@@ -412,6 +437,9 @@ public class Page {
                 glUseProgram(Main.TwoDShaderProgram);
                 for(Button button : Buttons){
                     button.Draw();
+                }
+                for(Switch s : Switches){
+                    s.Draw();
                 }
                 for(TextObject text : Texts){
                     text.Draw();

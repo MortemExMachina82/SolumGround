@@ -29,6 +29,7 @@ public class Player{
     public static boolean AnimationPlace = false;
     public static float AnimationStartTime;
     public static IVec3 AnimationPos;
+    public static Block AnimationBlock;
     public static boolean ChunkReload = false;
 
 
@@ -188,7 +189,7 @@ public class Player{
         AnimationStartTime = Main.Time;
         AnimationPos = new IVec3(LookingAt);
         AnimationMesh.position = AnimationPos.ToFloat();
-
+        AnimationBlock = block;
         AnimationMesh.upload_Vertex_data();
     }
     public static void place_block(){
@@ -197,9 +198,7 @@ public class Player{
             if (selected_chunk == null) {
                 return;
             }
-            boolean Placed = false;
-            Placed = selected_chunk.Place(hotbar_selected, LookingAt);
-            if(Placed){
+            if(Block.Blocks[selected_chunk.GetGlobal(LookingAt.ToFloat())].Replaceable){
                 StartAnimation(Block.Blocks[hotbar_selected]);
                 AnimationPlace = true;
             }
@@ -344,7 +343,7 @@ public class Player{
             }
             else{
                 Chunk selected_chunk = Chunk.FromPos(AnimationPos.ToFloat());
-                selected_chunk.ReBuildMesh();
+                selected_chunk.Place(AnimationBlock.ID, AnimationPos);
                 AnimationPlace = false;
             }
             AnimationMesh.draw();
