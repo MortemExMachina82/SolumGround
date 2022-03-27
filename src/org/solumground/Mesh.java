@@ -174,7 +174,7 @@ public class Mesh{
 
         for (int VTC = 0; VTC < this.Number_of_vtcords; VTC++) {
             this.VTcords_array[VTC * 2] = (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4)))) / 65535.0f;
-            this.VTcords_array[VTC * 2 + 1] = 1 - (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4) + 2))) / 65535.0f;
+            this.VTcords_array[VTC * 2 + 1] = (float) (Short.toUnsignedInt(bb.getShort(position + (VTC * 4) + 2))) / 65535.0f;
         }
 
         count = position + (this.Number_of_vtcords * 2 * 2);

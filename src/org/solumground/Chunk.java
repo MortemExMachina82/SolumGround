@@ -66,7 +66,8 @@ public class Chunk{
     }
     public static Chunk FromChunkPos(IVec3 Pos){
         Chunk selected_chunk = null;
-        for(Chunk chunk : Main.ChunkArray){
+        for(int X=0;X<Main.ChunkArray.size();X++){
+            Chunk chunk = Main.ChunkArray.get(X);
             if(IVec3.Equal(chunk.chunkPosition, Pos)){
                 selected_chunk = chunk;
                 break;

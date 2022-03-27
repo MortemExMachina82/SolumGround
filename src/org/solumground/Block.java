@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -65,13 +66,17 @@ public class Block {
         int Pos = TexPos[index];
         int SizeX = TexSizeX[index];
         int SizeY = TexSizeY[index];
-
+        System.out.print(block.Name);
+        System.out.println(index);
         for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
             float U = mesh.VTcords_array[Z*2];
             float V = mesh.VTcords_array[Z*2 + 1];
-            U = U * ((float)SizeX/CompTextureSizeX);
-            V = V * ((float)SizeY/CompTextureSizeY);
+            U = (1-U) * ((float)SizeX/CompTextureSizeX);
+            V = V * -1 * ((float)SizeY/CompTextureSizeY);
             U += ((float)Pos/CompTextureSizeX);
+            System.out.print(U);
+            System.out.print("    ");
+            System.out.println(V);
             mesh.VTcords_array[Z*2] = U;
             mesh.VTcords_array[Z*2 + 1] = V;
         }
@@ -181,7 +186,6 @@ public class Block {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CompTextureSizeX, CompTextureSizeY, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, CompTexture);
-
 
     }
 
