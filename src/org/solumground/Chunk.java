@@ -10,7 +10,7 @@ public class Chunk{
     public static int Size = 16;
     public static byte [] noisemap;
     public static Random RNG = new Random();
-    public static int GenHeight = 64;
+    public static int GenHeight = 80;
 
     public boolean is_empty;
     public String FilePath;

@@ -121,7 +121,7 @@ public class Page {
             if(key == GLFW_KEY_Z){
                 Main.playerRotateSpeedMouse *= 1.0/3;
                 Main.playerRotateSpeedKey *= 1.0/3;
-                Player.set_Projection(((float)Main.win_Y/Main.win_X), 15, Main.nearPlane, Main.farPlane);
+                Player.set_Projection(((float)Main.win_Y/Main.win_X), Main.ZoomFOV, Main.nearPlane, Main.farPlane);
             }
         }
         if(action == GLFW_RELEASE){

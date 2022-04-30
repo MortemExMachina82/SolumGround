@@ -13,7 +13,7 @@
             "SizeY":0.1,
             "Text":"Main Menu",
             "OnPress":"Main.SaveSettings();  Page.SetPage(1);",
-            "BackGroundTexture":"assets/solumground/textures/stone.png",
+            "BackGroundTexture":"assets/solumground/textures/stone.png"
         }
     ],
     "Text":[

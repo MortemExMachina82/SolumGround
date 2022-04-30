@@ -33,7 +33,7 @@ public class Mesh{
     Vec3 position = new Vec3(0,0,0);
     Vec3 Roation = new Vec3(0,0,0);
     Vec3 Scale = new Vec3(1,1,1);
-    boolean is_skyBox;
+    boolean is_skyBox = false;
     boolean FullLight = false;
 
     public int VertexStart;
@@ -357,8 +357,38 @@ public class Mesh{
 
         LoadSMOBJ(this.modelPath);
         this.TBO_gen = false;
+    }
+    public Mesh(Mesh mesh){
+        this.modelPath = mesh.modelPath;
+        this.texturePath = mesh.texturePath;
+        this.Texture_Buffer_Object = mesh.Texture_Buffer_Object;
+        this.has_tex = mesh.has_tex;
+        this.has_quads = mesh.has_quads;
+        this.has_triangles = mesh.has_triangles;
+        this.TBO_gen = false;
+        Init_VBO();
+        this.Number_of_Verts = mesh.Number_of_Verts;
+        this.Original_VertexArray = new float[this.Number_of_Verts*3];
+        for(int X=0;X<this.Number_of_Verts*3;X++){
+            this.Original_VertexArray[X] = mesh.Original_VertexArray[X];
+        }
+        this.Number_of_vtcords = mesh.Number_of_vtcords;
+        this.VTcords_array = new float[this.Number_of_vtcords*2];
+        for(int X=0;X<this.Number_of_vtcords*2;X++){
+            this.VTcords_array[X] = mesh.VTcords_array[X];
+        }
+        this.Number_of_QuadFaces = mesh.Number_of_QuadFaces;
+        this.QuadFaceArray = new int[this.Number_of_QuadFaces*(4 + (this.has_tex? 0 : 4))];
+        for(int X=0;X<this.Number_of_QuadFaces*(4 + (this.has_tex? 0 : 4));X++){
+            this.QuadFaceArray[X] = mesh.QuadFaceArray[X];
+        }
+        this.Number_of_TriFaces = mesh.Number_of_TriFaces;
+        this.TriFaceArray = new int[this.Number_of_TriFaces*(3 + (this.has_tex? 0 : 3))];
+        for(int X=0;X<this.Number_of_TriFaces*(3 + (this.has_tex? 0 : 3));X++){
+            this.TriFaceArray[X] = mesh.TriFaceArray[X];
+        }
 
-        this.is_skyBox = false;
+
     }
 
     public void Init_VBO(){

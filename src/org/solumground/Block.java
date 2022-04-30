@@ -24,16 +24,16 @@ public class Block {
     public boolean Illuminated;
     public float LightStrength;
     public float [] LightColor;
+    public boolean Replaceable;
+    public boolean UnBreakable;
+    public Script OnPlace;
+    public Script OnBreak;
 
     public String [] Models;
     public String [] Texture;
     public Mesh [] Sides;
     public Mesh mesh;
     public CollisionBox collisionBox;
-    public boolean Replaceable;
-    public boolean UnBreakable;
-    public Script OnPlace;
-    public Script OnBreak;
 
     public static int Number;
     public static List<String> Textures = new ArrayList<>(1);
@@ -66,17 +66,12 @@ public class Block {
         int Pos = TexPos[index];
         int SizeX = TexSizeX[index];
         int SizeY = TexSizeY[index];
-        System.out.print(block.Name);
-        System.out.println(index);
         for(int Z=0;Z<mesh.Number_of_vtcords;Z++){
             float U = mesh.VTcords_array[Z*2];
             float V = mesh.VTcords_array[Z*2 + 1];
             U = (1-U) * ((float)SizeX/CompTextureSizeX);
             V = V * -1 * ((float)SizeY/CompTextureSizeY);
             U += ((float)Pos/CompTextureSizeX);
-            System.out.print(U);
-            System.out.print("    ");
-            System.out.println(V);
             mesh.VTcords_array[Z*2] = U;
             mesh.VTcords_array[Z*2 + 1] = V;
         }
