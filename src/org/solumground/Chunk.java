@@ -234,7 +234,7 @@ public class Chunk{
     public void Put_side(int cubeID, int side, IVec3 Position){
         Mesh mesh = Block.Blocks[cubeID].Sides[side];
         mesh.position = Position.ToFloat();
-        main_mesh.add(mesh);
+        main_mesh.addNoUpload(mesh);
     }
     public void Put(int BlockID, IVec3 Position){
         if(Block.Blocks[BlockID].Full) {
@@ -339,7 +339,7 @@ public class Chunk{
         else{
             Mesh mesh = Block.Blocks[BlockID].mesh;
             mesh.position = Position.ToFloat();
-            main_mesh.add(mesh);
+            main_mesh.addNoUpload(mesh);
         }
     }
     public void Set(IVec3 Position, int BlockID){

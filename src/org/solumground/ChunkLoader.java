@@ -3,7 +3,7 @@ package org.solumground;
 public class ChunkLoader extends Thread{
     public boolean ShouldClose = false;
 
-    public void close(){
+    public void kill(){
         ShouldClose = true;
     }
     public ChunkLoader(){

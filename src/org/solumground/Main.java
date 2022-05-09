@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
+import org.solumground.Universe.Star;
 
 import javax.imageio.ImageIO;
 
@@ -78,6 +79,7 @@ public class Main {
 
     public static ChunkLoader chunkLoader;
     public static MeshBuilder meshBuilder;
+    public static SkyBox skyBox;
 
     public static Font DefaultFont;
 
@@ -105,6 +107,18 @@ public class Main {
     public static float [] glBufferSubData_In3;
     public static GLStatus glDeleteBuffersStatus = GLStatus.Done;
     public static int glDeleteBuffers_In1;
+    public static GLStatus glTexImage2DStatus = GLStatus.Done;
+    public static int glBindTexture_In1;
+    public static int glBindTexture_In2;
+    public static int glTexImage2D_In1;
+    public static int glTexImage2D_In2;
+    public static int glTexImage2D_In3;
+    public static int glTexImage2D_In4;
+    public static int glTexImage2D_In5;
+    public static int glTexImage2D_In6;
+    public static int glTexImage2D_In7;
+    public static int glTexImage2D_In8;
+    public static int [] glTexImage2D_In9;
 
 
     public static int LoadShader(String Path){
@@ -289,6 +303,12 @@ public class Main {
             glDeleteBuffers(glDeleteBuffers_In1);
             glDeleteBuffersStatus = GLStatus.Done;
         }
+        if(glTexImage2DStatus == GLStatus.Ready){
+            glTexImage2DStatus = GLStatus.Working;
+            glBindTexture(glBindTexture_In1, glBindTexture_In2);
+            glTexImage2D(glTexImage2D_In1,glTexImage2D_In2,glTexImage2D_In3,glTexImage2D_In4,glTexImage2D_In5,glTexImage2D_In6,glTexImage2D_In7,glTexImage2D_In8,glTexImage2D_In9);
+            glTexImage2DStatus = GLStatus.Done;
+        }
     }
     public static void TakeScreenShot(){
         int [] RawScreenData = new int[Main.win_X*Main.win_Y*3];
@@ -420,6 +440,7 @@ public class Main {
         Chunk.Init();
         Console.Init();
         Page.Init();
+
 
         Page.Run();
     }

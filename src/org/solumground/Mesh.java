@@ -30,11 +30,11 @@ public class Mesh{
     int VertexBufferObject;
     int Texture_Buffer_Object;
     boolean TBO_gen;
-    Vec3 position = new Vec3(0,0,0);
-    Vec3 Roation = new Vec3(0,0,0);
-    Vec3 Scale = new Vec3(1,1,1);
+    public Vec3 position = new Vec3(0,0,0);
+    public Vec3 Roation = new Vec3(0,0,0);
+    public Vec3 Scale = new Vec3(1,1,1);
     boolean is_skyBox = false;
-    boolean FullLight = false;
+    public boolean FullLight = false;
 
     public int VertexStart;
     public int TextureCordsStart;
@@ -392,7 +392,7 @@ public class Mesh{
     }
 
     public void Init_VBO(){
-        if(Thread.currentThread().getName().equals("main")){
+        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
             this.VertexBufferObject = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
             glEnableVertexAttribArray(Main.MainShader_Vertex);
@@ -474,7 +474,7 @@ public class Mesh{
 
         }
     }
-    public void add(Mesh mesh){
+    public void addNoUpload(Mesh mesh){
         if(this.Number_of_Verts*3 + mesh.Number_of_Verts*3 > this.Original_VertexArray.length){
             float [] New_VertexArray = new float[(this.Original_VertexArray.length + mesh.Original_VertexArray.length)*2];
             System.arraycopy(this.Original_VertexArray, 0, New_VertexArray, 0, this.Original_VertexArray.length);
@@ -554,91 +554,89 @@ public class Mesh{
 
     }
     public void upload_Vertex_data(){
-        float [] VertexArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
+        float [] DataArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
         VertexStart = 0;
         TextureCordsStart = this.Number_of_TriFaces*3*3 + this.Number_of_QuadFaces*4*3;
         LightStart = this.Number_of_TriFaces*3*5 + this.Number_of_QuadFaces*4*5;
         int vert_count = 0;
 
 
-        if(this.has_triangles) {
-            for (int F = 0; F < this.Number_of_TriFaces; F++) {
-                for (int V = 0; V < 3; V++) {
-                    int VPos = VertexStart + vert_count * 3;
-                    int TPos = TextureCordsStart + vert_count * 2;
-                    int LPos = LightStart + vert_count * 3;
-                    if (this.has_tex) {
-                        VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
-                        VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
-                        VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
-                        VertexArray[TPos] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2];
-                        VertexArray[TPos + 1] = 1 - this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 1];
-                    } else {
-                        VertexArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
-                        VertexArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
-                        VertexArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
-                        VertexArray[TPos] = .5f;
-                        VertexArray[TPos + 1] = .5f;
-                    }
-                    if(FullLight){
-                        VertexArray[LPos] = 1.0f;
-                        VertexArray[LPos + 1] = 1.0f;
-                        VertexArray[LPos + 2] = 1.0f;
-                    }
-                    else {
-                        Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
-                                VertexArray[VPos + 1]+this.position.Y,
-                                VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[LPos] = light.X;
-                        VertexArray[LPos + 1] = light.Y;
-                        VertexArray[LPos + 2] = light.Z;
-                    }
-                    vert_count++;
+
+        for (int F = 0; F < this.Number_of_TriFaces; F++) {
+            for (int V = 0; V < 3; V++) {
+                int VPos = VertexStart + vert_count * 3;
+                int TPos = TextureCordsStart + vert_count * 2;
+                int LPos = LightStart + vert_count * 3;
+                if (this.has_tex) {
+                    DataArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
+                    DataArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
+                    DataArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
+                    DataArray[TPos] = this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2];
+                    DataArray[TPos + 1] = 1 - this.VTcords_array[this.TriFaceArray[F * 6 + V * 2 + 1] * 2 + 1];
+                } else {
+                    DataArray[VPos] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
+                    DataArray[VPos + 1] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
+                    DataArray[VPos + 2] = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
+                    DataArray[TPos] = .5f;
+                    DataArray[TPos + 1] = .5f;
                 }
-            }
-        }
-        //vert_count = 0;
-        if(this.has_quads){
-            for(int F=0;F<this.Number_of_QuadFaces;F++){
-                for(int V=0;V<4;V++){
-                    int VPos = VertexStart + vert_count * 3;
-                    int TPos = TextureCordsStart + vert_count * 2;
-                    int LPos = LightStart + vert_count * 3;
-                    if(this.has_tex){
-                        VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
-                        VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
-                        VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
-                        VertexArray[TPos] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2];
-                        VertexArray[TPos + 1] = 1-this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 1];
-                    }
-                    else{
-                        VertexArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
-                        VertexArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
-                        VertexArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
-                        VertexArray[TPos] = .5f;
-                        VertexArray[TPos + 1] = .5f;
-                    }
-                    if(FullLight){
-                        VertexArray[LPos] = 1.0f;
-                        VertexArray[LPos + 1] = 1.0f;
-                        VertexArray[LPos + 2] = 1.0f;
-                    }
-                    else {
-                        Vec3 light = Light.getLight(new Vec3(VertexArray[VPos]+this.position.X,
-                                VertexArray[VPos + 1]+this.position.Y,
-                                VertexArray[VPos + 2]+this.position.Z));
-                        VertexArray[LPos] = light.X;
-                        VertexArray[LPos + 1] = light.Y;
-                        VertexArray[LPos + 2] = light.Z;
-                    }
-                    vert_count++;
+                if(FullLight){
+                    DataArray[LPos] = 1.0f;
+                    DataArray[LPos + 1] = 1.0f;
+                    DataArray[LPos + 2] = 1.0f;
                 }
+                else {
+                    Vec3 light = Light.getLight(new Vec3(DataArray[VPos]+this.position.X,
+                            DataArray[VPos + 1]+this.position.Y,
+                            DataArray[VPos + 2]+this.position.Z));
+                    DataArray[LPos] = light.X;
+                    DataArray[LPos + 1] = light.Y;
+                    DataArray[LPos + 2] = light.Z;
+                }
+                vert_count++;
             }
         }
 
-        if(Thread.currentThread().getName().equals("main")){
+        for(int F=0;F<this.Number_of_QuadFaces;F++){
+            for(int V=0;V<4;V++){
+                int VPos = VertexStart + vert_count * 3;
+                int TPos = TextureCordsStart + vert_count * 2;
+                int LPos = LightStart + vert_count * 3;
+                if(this.has_tex){
+                    DataArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
+                    DataArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
+                    DataArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
+                    DataArray[TPos] = this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2];
+                    DataArray[TPos + 1] = 1-this.VTcords_array[this.QuadFaceArray[F * 8 + V * 2 + 1] * 2 + 1];
+                }
+                else{
+                    DataArray[VPos] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
+                    DataArray[VPos + 1] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
+                    DataArray[VPos + 2] = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
+                    DataArray[TPos] = .5f;
+                    DataArray[TPos + 1] = .5f;
+                }
+                if(FullLight){
+                    DataArray[LPos] = 1.0f;
+                    DataArray[LPos + 1] = 1.0f;
+                    DataArray[LPos + 2] = 1.0f;
+                }
+                else {
+                    Vec3 light = Light.getLight(new Vec3(DataArray[VPos]+this.position.X,
+                            DataArray[VPos + 1]+this.position.Y,
+                            DataArray[VPos + 2]+this.position.Z));
+                    DataArray[LPos] = light.X;
+                    DataArray[LPos + 1] = light.Y;
+                    DataArray[LPos + 2] = light.Z;
+                }
+                vert_count++;
+            }
+        }
+
+
+        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glBufferData(GL_ARRAY_BUFFER, VertexArray, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, DataArray, GL_STATIC_DRAW);
         }
         else{
 
@@ -655,7 +653,7 @@ public class Mesh{
             Main.glBindBuffer_In2 = this.VertexBufferObject;
 
             Main.glBufferData_In1 = GL_ARRAY_BUFFER;
-            Main.glBufferData_In2 = VertexArray;
+            Main.glBufferData_In2 = DataArray;
             Main.glBufferData_In3 = GL_STATIC_DRAW;
             Main.glBufferDataStatus = Main.GLStatus.Ready;
             while(Main.glBufferDataStatus != Main.GLStatus.Done){
@@ -738,7 +736,7 @@ public class Mesh{
             }
         }
         status = MeshStatus.NotDone;
-        if(Thread.currentThread().getName().equals("main")){
+        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
             glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
             glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
         }
@@ -786,6 +784,11 @@ public class Mesh{
         }
         upload_Vertex_data();
     }
+    public void Scale(float X,float Y,float Z){
+        this.Scale.X = X;
+        this.Scale.Y = Y;
+        this.Scale.Z = Z;
+    }
     public void setIs_skyBox(){
         this.is_skyBox = true;
         this.FullLight = true;
@@ -800,47 +803,48 @@ public class Mesh{
         float [] RotationMat = new float[4*4];
         float [] ScaleMat = new float[16];
         float [] TransMat = new float[16];
+
+        ScaleMat[0] = this.Scale.X;
+        ScaleMat[5] = this.Scale.Y;
+        ScaleMat[10] = this.Scale.Z;
+        ScaleMat[15] = 1;
+        Math3D.Make3DRotationMatrix44(this.Roation, RotationMat);
+        float [] ScaleRot = new float[16];
+        Math3D.Matrix44_Multiply(ScaleMat, RotationMat, ScaleRot);
+        TransMat[0] = 1;
+        TransMat[5] = 1;
+        TransMat[10] = 1;
+        TransMat[15] = 1;
         if(this.is_skyBox){
-            TransMat[0]=1;TransMat[5]=1;TransMat[10]=1;TransMat[15]=1;
-            glUniformMatrix4fv(Main.MainShader_ModelMat, false, TransMat);
+            Math3D.Matrix44_Multiply(ScaleRot, TransMat, FinalMat);
             Math3D.Make3DRotationMatrix44(Player.Rotation, RotationMat);
             glUniformMatrix4fv(Main.MainShader_WorldMat, false, RotationMat);
         }
         else {
-            TransMat[0] = 1;
-            TransMat[5] = 1;
-            TransMat[10] = 1;
             TransMat[12] = this.position.X;
             TransMat[13] = this.position.Y;
             TransMat[14] = this.position.Z;
-            TransMat[15] = 1;
-            ScaleMat[0] = this.Scale.X;
-            ScaleMat[5] = this.Scale.Y;
-            ScaleMat[10] = this.Scale.Z;
-            ScaleMat[15] = 1;
-            Math3D.Make3DRotationMatrix44(this.Roation, RotationMat);
-            float [] ScaleRot = new float[16];
-            Math3D.Matrix44_Multiply(ScaleMat, RotationMat, ScaleRot);
             Math3D.Matrix44_Multiply(ScaleRot, TransMat, FinalMat);
-            glUniformMatrix4fv(Main.MainShader_ModelMat, false, FinalMat);
         }
+        glUniformMatrix4fv(Main.MainShader_ModelMat, false, FinalMat);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
         glBindTexture(GL_TEXTURE_2D, this.Texture_Buffer_Object);
 
 
-        if(this.has_triangles) {
+        if(this.Number_of_TriFaces > 0) {
             glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, VertexStart*4);
             glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, TextureCordsStart*4);
             glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 12, LightStart*4);
             glDrawArrays(GL_TRIANGLES, 0, this.Number_of_TriFaces * 3);
         }
-        if(this.has_quads) {
-            glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, VertexStart*4 + this.Number_of_TriFaces*3*4);
-            glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, TextureCordsStart*4 + this.Number_of_TriFaces*3*4);
-            glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 12, LightStart*4 + this.Number_of_TriFaces*3*4);
+        if(this.Number_of_QuadFaces > 0) {
+            glVertexAttribPointer(Main.MainShader_Vertex, 3, GL_FLOAT, false, 12, (VertexStart + this.Number_of_TriFaces*3)*4);
+            glVertexAttribPointer(Main.MainShader_TextureCords, 2, GL_FLOAT, false, 8, (TextureCordsStart + this.Number_of_TriFaces*2)*4);
+            glVertexAttribPointer(Main.MainShader_light, 3, GL_FLOAT, false, 12, (LightStart + this.Number_of_TriFaces*3)*4);
             glDrawArrays(GL_QUADS, this.Number_of_TriFaces * 3, this.Number_of_QuadFaces * 4);
-        }
+        }//TVTVTV*X TTTT*X TLTLTL*X   QVQVQV*X QTQT*X QLQLQL*X
+         //TVTVTVQVQVQV TTTTQTQT TLTLTLQLQLQL
         if(this.is_skyBox){
             glUniformMatrix4fv(Main.MainShader_WorldMat, false, Player.WorldMatrix);
         }
@@ -859,7 +863,7 @@ public class Mesh{
         //upload_Vertex_data();
 
 
-        if(Thread.currentThread().getName().equals("main")){
+        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
             glDeleteBuffers(this.VertexBufferObject);
             if (TBO_gen) {
                 glDeleteBuffers(this.Texture_Buffer_Object);

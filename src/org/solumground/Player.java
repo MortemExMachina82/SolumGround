@@ -177,13 +177,13 @@ public class Player{
             for(int X=0;X<6;X++) {
                 Mesh mesh = block.Sides[X];
                 mesh.position = new Vec3(0,0,0);
-                AnimationMesh.add(mesh);
+                AnimationMesh.addNoUpload(mesh);
             }
         }
         else{
             Mesh mesh = block.mesh;
             mesh.position = new Vec3(0,0,0);
-            AnimationMesh.add(mesh);
+            AnimationMesh.addNoUpload(mesh);
         }
 
         AnimationStartTime = Main.Time;

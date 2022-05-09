@@ -9,7 +9,7 @@ public class MeshBuilder extends Thread{
     public static List<Chunk> LightUpdateBuffer = new ArrayList<>(10);
 
     public boolean shouldClose = false;
-    public void close(){
+    public void kill(){
         shouldClose = true;
     }
     public void Build(){

@@ -2,7 +2,10 @@ import sys
 import os
 
 inpath = sys.argv[1]
-outpath = sys.argv[2]
+if len(sys.argv) == 2:
+    outpath = inpath[0:len(inpath)-3]+"smobj"
+else:
+    outpath = sys.argv[2]
 
 
 def load_OBJ(filename):

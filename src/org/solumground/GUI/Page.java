@@ -265,9 +265,8 @@ public class Page {
         glUseProgram(Main.MainShaderProgram);
 
         if(Main.DrawSkyBox) {
-            glDisable(GL_DEPTH_TEST);
-            SkyBox.draw();
-            glEnable(GL_DEPTH_TEST);
+            SkyBox.Draw();
+            glClear(GL_DEPTH_BUFFER_BIT);
         }
         Player.Draw();
         for(int X=0;X<Main.ChunkArray.size();X++){
@@ -331,7 +330,9 @@ public class Page {
             Player.Load();
             Player.is_flying = false;
 
+
             glfwSetInputMode(Main.win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            //Comment Out When Debugging ^
             if (glfwRawMouseMotionSupported()) {
                 glfwSetInputMode(Main.win, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
             }
@@ -347,6 +348,11 @@ public class Page {
             Main.meshBuilder = new MeshBuilder();
             Main.meshBuilder.setDaemon(true);
             Main.meshBuilder.start();
+
+            Main.skyBox = new SkyBox();
+            Main.skyBox.setDaemon(true);
+            Main.skyBox.setName("SkyBox");
+            Main.skyBox.start();
 
             double PastTime = glfwGetTime();
             while (!Interrupt && !glfwWindowShouldClose(Main.win)){
@@ -398,8 +404,9 @@ public class Page {
                 glfwSwapBuffers(Main.win);
             }
 
-            Main.chunkLoader.close();
-            Main.meshBuilder.close();
+            Main.chunkLoader.kill();
+            Main.meshBuilder.kill();
+            Main.skyBox.kill();
             while(Main.chunkLoader.isAlive()){
                 try{
                     Thread.sleep(1);
