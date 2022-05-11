@@ -1,5 +1,9 @@
 package org.solumground;
 
+import org.lwjgl.opengl.GL;
+
+import static org.lwjgl.glfw.GLFW.*;
+
 public class ChunkLoader extends Thread{
     public boolean ShouldClose = false;
 

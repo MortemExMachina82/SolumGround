@@ -42,6 +42,8 @@ public class SkyBox extends Thread{
     public static boolean [] CornerMask;
 
     public static Sector [] sectors;
+    public static long contextWindow;
+    public static boolean StarNeedsInit;
 
     public static void Init(){
         CamAngles = new float[]{
@@ -278,10 +280,11 @@ public class SkyBox extends Thread{
         sectors[6] = new Sector(0,-1,-1);
         sectors[7] = new Sector(-1,-1,-1);
 
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        contextWindow = glfwCreateWindow(TileSize, TileSize, "", 0, 0);
+        StarNeedsInit = true;
     }
     public void run(){
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        long contextWindow = glfwCreateWindow(TileSize, TileSize, "", 0, 0);
         glfwMakeContextCurrent(contextWindow);
         GL.createCapabilities();
 
@@ -320,8 +323,10 @@ public class SkyBox extends Thread{
         TransMat[10] = 1;
         TransMat[15] = 1;
 
-
-        Star.Init();
+        if(StarNeedsInit) {
+            Star.Init();
+            StarNeedsInit = false;
+        }
 
         PlayerPos = new Vec3();
         inturupt = false;
@@ -366,11 +371,11 @@ public class SkyBox extends Thread{
             }
             if(ShellOneNeedsUpdate){
                 UpdateShell(ShellOneTBO, ShellOneTexture);
-                //ShellOneNeedsUpdate = false;
+                ShellOneNeedsUpdate = false;
             }
             if(ShellTwoNeedsUpdate){
                 UpdateShell(ShellTwoTBO, ShellTwoTexture);
-                //ShellTwoNeedsUpdate = false;
+                ShellTwoNeedsUpdate = false;
             }
             if(ShellThreeNeedsUpdate){
                 UpdateShell(ShellThreeTBO, ShellThreeTexture);
@@ -379,7 +384,6 @@ public class SkyBox extends Thread{
 
         }
         glDeleteProgram(shader);
-        glfwDestroyWindow(contextWindow);
 
     }
     public void DrawShellOne(int side){

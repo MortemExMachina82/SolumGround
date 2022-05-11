@@ -409,6 +409,7 @@ public class Page {
             Main.skyBox.kill();
             while(Main.chunkLoader.isAlive()){
                 try{
+                    Main.MakeGLCalls();
                     Thread.sleep(1);
                 }
                 catch(Exception e){

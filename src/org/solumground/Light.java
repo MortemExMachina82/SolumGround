@@ -29,6 +29,7 @@ class Light{
         Light light;
         for(int X=0;X<lights.size();X++) {
             light = lights.get(X);
+            if(light == null){continue;}
             float dist = (light.position.X - pos.X) * (light.position.X - pos.X) +
                     (light.position.Y - pos.Y) * (light.position.Y - pos.Y) +
                     (light.position.Z - pos.Z) * (light.position.Z - pos.Z);

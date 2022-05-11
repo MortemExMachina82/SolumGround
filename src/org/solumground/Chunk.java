@@ -245,6 +245,7 @@ public class Chunk{
                         Put_side(BlockID, Block.LEFT, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.LEFT, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X + 1, Position.Y, Position.Z))].Full) {
                     Put_side(BlockID, Block.RIGHT, Position);
                 }
@@ -256,6 +257,7 @@ public class Chunk{
                         Put_side(BlockID, Block.RIGHT, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.RIGHT, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X - 1, Position.Y, Position.Z))].Full) {
                     Put_side(BlockID, Block.LEFT, Position);
                 }
@@ -277,6 +279,7 @@ public class Chunk{
                         Put_side(BlockID, Block.BOTTOM, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.BOTTOM, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y + 1, Position.Z))].Full) {
                     Put_side(BlockID, Block.TOP, Position);
                 }
@@ -288,6 +291,7 @@ public class Chunk{
                         Put_side(BlockID, Block.TOP, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.TOP, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y - 1, Position.Z))].Full) {
                     Put_side(BlockID, Block.BOTTOM, Position);
                 }
@@ -309,6 +313,7 @@ public class Chunk{
                         Put_side(BlockID, Block.FRONT, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.FRONT, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z+1))].Full) {
                     Put_side(BlockID, Block.BACK, Position);
                 }
@@ -320,6 +325,7 @@ public class Chunk{
                         Put_side(BlockID, Block.BACK, Position);
                     }
                 }
+                else{Put_side(BlockID, Block.BACK, Position);}
                 if (!Block.Blocks[GetLocal(new IVec3(Position.X, Position.Y, Position.Z - 1))].Full) {
                     Put_side(BlockID, Block.FRONT, Position);
                 }
@@ -334,8 +340,6 @@ public class Chunk{
             }
 
         }
-
-
         else{
             Mesh mesh = Block.Blocks[BlockID].mesh;
             mesh.position = Position.ToFloat();
@@ -353,7 +357,7 @@ public class Chunk{
             for(Chunk NextTo : NearChunks) {
                 if(NextTo != null){
                     if(NextTo.main_mesh != null){
-                        NextTo.LightUpdate();
+                        MeshBuilder.LightUpdateBuffer.add(NextTo);
                     }
                 }
             }

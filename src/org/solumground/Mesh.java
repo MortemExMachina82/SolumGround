@@ -392,86 +392,13 @@ public class Mesh{
     }
 
     public void Init_VBO(){
-        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
-            this.VertexBufferObject = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glEnableVertexAttribArray(Main.MainShader_Vertex);
-            if (this.has_tex) {
-                glEnableVertexAttribArray(Main.MainShader_TextureCords);
-            } else {
-                glDisableVertexAttribArray(Main.MainShader_TextureCords);
-            }
-        }
-        else{
-            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            Main.glGenBuffersStatus = Main.GLStatus.Ready;
-            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            this.VertexBufferObject = Main.glGenBuffers_Out;
-
-
-            while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
-            Main.glBindBuffer_In2 = this.VertexBufferObject;
-            Main.glEnableVertexAttribArray_In1 = Main.MainShader_Vertex;
-            Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
-
-
-            if (this.has_tex) {
-                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
-                    try {
-                        Thread.sleep(1);
-                    }
-                    catch(Exception e1){
-                        e1.printStackTrace();
-                        return;
-                    }
-                }
-                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
-                Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glEnableVertexAttribArray_In1 = Main.MainShader_TextureCords;
-                Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
-            }
-            else{
-                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
-                    try {
-                        Thread.sleep(1);
-                    }
-                    catch(Exception e1){
-                        e1.printStackTrace();
-                        return;
-                    }
-                }
-                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
-                Main.glBindBuffer_In2 = this.VertexBufferObject;
-                Main.glDisableVertexAttribArray_In1 = Main.MainShader_TextureCords;
-                Main.glDisableVertexAttribArrayStatus = Main.GLStatus.Ready;
-            }
-
-
+        this.VertexBufferObject = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+        glEnableVertexAttribArray(Main.MainShader_Vertex);
+        if (this.has_tex) {
+            glEnableVertexAttribArray(Main.MainShader_TextureCords);
+        } else {
+            glDisableVertexAttribArray(Main.MainShader_TextureCords);
         }
     }
     public void addNoUpload(Mesh mesh){
@@ -634,140 +561,84 @@ public class Mesh{
         }
 
 
-        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
-            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glBufferData(GL_ARRAY_BUFFER, DataArray, GL_STATIC_DRAW);
-        }
-        else{
 
-            while(Main.glBufferDataStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
-            Main.glBindBuffer_In2 = this.VertexBufferObject;
+        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+        glBufferData(GL_ARRAY_BUFFER, DataArray, GL_STATIC_DRAW);
 
-            Main.glBufferData_In1 = GL_ARRAY_BUFFER;
-            Main.glBufferData_In2 = DataArray;
-            Main.glBufferData_In3 = GL_STATIC_DRAW;
-            Main.glBufferDataStatus = Main.GLStatus.Ready;
-            while(Main.glBufferDataStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-        }
         status = MeshStatus.Completed;
     }
     public void LightUpdate(){
-        float [] VertexArray = new float[this.Number_of_TriFaces*3*3 + this.Number_of_QuadFaces*4*3];
+        int SetNumberOfTriFaces = this.Number_of_TriFaces;
+        int SetNumberOfQuadFaces = this.Number_of_QuadFaces;
+        float [] VertexArray = new float[SetNumberOfTriFaces*3*3 + SetNumberOfQuadFaces*4*3];
         int vert_count = 0;
-        if(this.has_triangles) {
-            for (int F = 0; F < this.Number_of_TriFaces; F++) {
-                for (int V = 0; V < 3; V++) {
-                    int LPos = vert_count * 3;
-                    Vec3 VertPos = new Vec3();
-                    if (this.has_tex) {
-                        VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
-                        VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
-                        VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
-                    } else {
-                        VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
-                        VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
-                        VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
-                    }
-                    if(FullLight){
-                        VertexArray[LPos] = 1.0f;
-                        VertexArray[LPos + 1] = 1.0f;
-                        VertexArray[LPos + 2] = 1.0f;
-                    }
-                    else {
-                        Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
-                                VertPos.Y+this.position.Y,
-                                VertPos.Z+this.position.Z));
-                        VertexArray[LPos] = light.X;
-                        VertexArray[LPos + 1] = light.Y;
-                        VertexArray[LPos + 2] = light.Z;
-                    }
-                    vert_count++;
+
+        for (int F = 0; F < SetNumberOfTriFaces; F++) {
+            for (int V = 0; V < 3; V++) {
+                int LPos = vert_count * 3;
+                Vec3 VertPos = new Vec3();
+                if (this.has_tex) {
+                    VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 ];
+                    VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 1];
+                    VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 6 + V * 2] * 3 + 2];
+                } else {
+                    VertPos.X = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3];
+                    VertPos.Y = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 1];
+                    VertPos.Z = this.Original_VertexArray[this.TriFaceArray[F * 3 + V] * 3 + 2];
                 }
+                if(FullLight){
+                    VertexArray[LPos] = 1.0f;
+                    VertexArray[LPos + 1] = 1.0f;
+                    VertexArray[LPos + 2] = 1.0f;
+                }
+                else {
+                    Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
+                            VertPos.Y+this.position.Y,
+                            VertPos.Z+this.position.Z));
+                    VertexArray[LPos] = light.X;
+                    VertexArray[LPos + 1] = light.Y;
+                    VertexArray[LPos + 2] = light.Z;
+                }
+                vert_count++;
             }
         }
-        //vert_count = 0;
-        if(this.has_quads){
-            for(int F=0;F<this.Number_of_QuadFaces;F++){
-                for(int V=0;V<4;V++){
-                    int LPos = vert_count * 3;
-                    Vec3 VertPos = new Vec3();
-                    if(this.has_tex){
-                        VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
-                        VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
-                        VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
-                    }
-                    else{
-                        VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
-                        VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
-                        VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
-                    }
-                    if(FullLight){
-                        VertexArray[LPos] = 1.0f;
-                        VertexArray[LPos + 1] = 1.0f;
-                        VertexArray[LPos + 2] = 1.0f;
-                    }
-                    else {
-                        Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
-                                VertPos.Y+this.position.Y,
-                                VertPos.Z+this.position.Z));
-                        VertexArray[LPos] = light.X;
-                        VertexArray[LPos + 1] = light.Y;
-                        VertexArray[LPos + 2] = light.Z;
-                    }
-                    vert_count++;
+
+        for(int F=0;F<SetNumberOfQuadFaces;F++){
+            for(int V=0;V<4;V++){
+                int LPos = vert_count * 3;
+                Vec3 VertPos = new Vec3();
+                if(this.has_tex){
+                    VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3];
+                    VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 1];
+                    VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 8 + V * 2] * 3 + 2];
                 }
+                else{
+                    VertPos.X = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3];
+                    VertPos.Y = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 1];
+                    VertPos.Z = this.Original_VertexArray[this.QuadFaceArray[F * 4 + V] * 3 + 2];
+                }
+                if(FullLight){
+                    VertexArray[LPos] = 1.0f;
+                    VertexArray[LPos + 1] = 1.0f;
+                    VertexArray[LPos + 2] = 1.0f;
+                }
+                else {
+                    Vec3 light = Light.getLight(new Vec3(VertPos.X+this.position.X,
+                            VertPos.Y+this.position.Y,
+                            VertPos.Z+this.position.Z));
+                    VertexArray[LPos] = light.X;
+                    VertexArray[LPos + 1] = light.Y;
+                    VertexArray[LPos + 2] = light.Z;
+                }
+                vert_count++;
             }
         }
+
         status = MeshStatus.NotDone;
-        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
-            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-            glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
-        }
-        else{
 
-            while(Main.glBufferDataStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
-            Main.glBindBuffer_In2 = this.VertexBufferObject;
+        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+        glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
 
-            Main.glBufferSubData_In1 = GL_ARRAY_BUFFER;
-            Main.glBufferSubData_In2 = LightStart*4;
-            Main.glBufferSubData_In3 = VertexArray;
-            Main.glBufferSubDataStatus = Main.GLStatus.Ready;
-            while(Main.glBufferSubDataStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-        }
         status = MeshStatus.Completed;
     }
     public void setColor(int color){
@@ -862,37 +733,9 @@ public class Mesh{
 
         //upload_Vertex_data();
 
-
-        if(Thread.currentThread().getName().equals("main") | Thread.currentThread().getName().equals("SkyBox")){
-            glDeleteBuffers(this.VertexBufferObject);
-            if (TBO_gen) {
-                glDeleteBuffers(this.Texture_Buffer_Object);
-            }
-        }
-        else{
-            while(Main.glDeleteBuffersStatus != Main.GLStatus.Done){
-                try {
-                    Thread.sleep(1);
-                }
-                catch(Exception e1){
-                    e1.printStackTrace();
-                    return;
-                }
-            }
-            Main.glDeleteBuffers_In1 = this.VertexBufferObject;
-            Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
-            if (TBO_gen) {
-                while (Main.glDeleteBuffersStatus != Main.GLStatus.Done) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
-                        return;
-                    }
-                }
-                Main.glDeleteBuffers_In1 = this.Texture_Buffer_Object;
-                Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
-            }
+        glDeleteBuffers(this.VertexBufferObject);
+        if (TBO_gen) {
+            glDeleteBuffers(this.Texture_Buffer_Object);
         }
 
     }

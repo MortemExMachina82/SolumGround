@@ -360,9 +360,9 @@ public class Main {
     public static void main(String[] args){
         try {
             //Use In InteliJ
-            //jar_folder_path = System.getProperty("user.dir");
+            jar_folder_path = System.getProperty("user.dir");
             //Use For Manual Compiling
-            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            //jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
             e.printStackTrace();

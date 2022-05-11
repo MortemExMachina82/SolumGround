@@ -5,11 +5,11 @@
 "FarClippingPlane":500.0,
 "WindowWidth":1000,
 "WindowHight":500,
-"FullScreen":false,
+"FullScreen":true,
 "DrawSkyBox":true,
 "playerMoveSpeed":6.0,
 "playerRotateSpeedKey":100.0,
 "playerRotateSpeedMouse":8.0,
-"RenderDistance":5,
+"RenderDistance":4,
 "Font":"assets/solumground/Fonts/Default.json"
 }

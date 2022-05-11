@@ -1,12 +1,18 @@
 package org.solumground;
 
+import org.lwjgl.opengl.GL;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class MeshBuilder extends Thread{
     public static List<Chunk> Genbuffer = new ArrayList<>(100);
     public static List<Chunk> ReGenBuffer = new ArrayList<>(10);
     public static List<Chunk> LightUpdateBuffer = new ArrayList<>(10);
+
+    public static int SleepTime = 1;
 
     public boolean shouldClose = false;
     public void kill(){
@@ -16,8 +22,10 @@ public class MeshBuilder extends Thread{
         Chunk chunk;
         if(Genbuffer.size() > 0) {
             chunk = Genbuffer.remove(0);
-            chunk.GetNear();
-            chunk.buildMesh();
+            if(chunk != null) {
+                chunk.GetNear();
+                chunk.buildMesh();
+            }
         }
         if(ReGenBuffer.size() > 0) {
             chunk = ReGenBuffer.remove(0);
@@ -30,14 +38,20 @@ public class MeshBuilder extends Thread{
         }
     }
     public void run(){
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        long SharedContextWindow = glfwCreateWindow(1, 1, "", 0, Main.win);
+        glfwMakeContextCurrent(SharedContextWindow);
+        GL.createCapabilities();
         while(!shouldClose){
+            SleepTime = 100 / (Genbuffer.size()+ReGenBuffer.size()+LightUpdateBuffer.size()+3);
             try{
-                Thread.sleep(1);
+                Thread.sleep(SleepTime);
+                Build();
             }
             catch(Exception e){
             e.printStackTrace();
             }
-            Build();
+
         }
     }
 }
