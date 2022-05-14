@@ -29,5 +29,6 @@ Key Bindings:
     
     • Increse Render Distance Press ALT And +
     • Decrese Render Distance Press CTRL And -
+    • To Zoom Press Z
     
     • Quit And Save Press Escape

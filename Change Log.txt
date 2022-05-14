@@ -1,14 +1,11 @@
-added player save infromation
-added colored lighting
-
-
-SolumGround Version 1.5.0 alpha
+SolumGround Version 1.6.0 alpha
 www.solumground.org
 github.com/MortemExMachina82/SolumGround
 
 Change Log:
-    • added player save infromation
-    • added colored lighting
-    • Added Menu
-    • New Blocks
-    • To Much To Remember
+    • Better Skybox
+    • Proformance Improvments
+    • Better Menus
+    • Settings Save On Exit
+    • Added Zoom: Use 'Z'
+    • Added Toggle Switches To Menus
