@@ -37,6 +37,10 @@ public class Page {
         SelectedPage = ID;
         Interrupt = true;
     }
+    public static Page GetPage(int ID){
+        if(ID < 0){return Pages[0];}
+        return Pages[ID];
+    }
 
     public static void Wincallback(long window, int X, int Y){
         Main.win_X = X;
@@ -65,7 +69,7 @@ public class Page {
     }
     public static void GameKeyCallback(long window, int key, int scancode, int action, int mods){
         if (key == GLFW_KEY_ESCAPE) {
-            Pages[SelectedPage].OnExit.Run();
+            GetPage(SelectedPage).OnExit.Run();
         }
         if(action == GLFW_PRESS){
             if(mods == 0){
@@ -140,12 +144,12 @@ public class Page {
     public static void MenuMouseButtonCallback(long win, int button, int action, int mods){
         if(action == GLFW_PRESS){
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
-                for (Button button1 : Pages[SelectedPage].Buttons) {
+                for (Button button1 : GetPage(SelectedPage).Buttons) {
                     if (button1.TestOver()) {
                         button1.OnPress.Run();
                     }
                 }
-                for(Switch s : Pages[SelectedPage].Switches){
+                for(Switch s : GetPage(SelectedPage).Switches){
                     if(s.TestOver()){
                         s.Toggle();
                     }
@@ -156,7 +160,7 @@ public class Page {
     public static void MenuKeyCallback(long win, int key, int scancode, int action, int mods){
         if(action == GLFW_PRESS) {
             if (key == GLFW_KEY_ESCAPE) {
-                Pages[SelectedPage].OnExit.Run();
+                GetPage(SelectedPage).OnExit.Run();
             }
             if(key == GLFW_KEY_F){
                 Main.FullScreen = !Main.FullScreen;
@@ -187,7 +191,7 @@ public class Page {
                 glfwSetWindowShouldClose(Main.win, true);
                 continue;
             }
-            Page page = Pages[SelectedPage];
+            Page page = GetPage(SelectedPage);
             page.DO();
         }
         glfwDestroyWindow(Main.win);
@@ -313,7 +317,7 @@ public class Page {
         glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
         glBufferData(GL_ARRAY_BUFFER, VertexArray, GL_DYNAMIC_DRAW);
 
-        glBindTexture(GL_TEXTURE_2D, Pages[SelectedPage].TextureBufferObject);
+        glBindTexture(GL_TEXTURE_2D, GetPage(SelectedPage).TextureBufferObject);
 
 
         glVertexAttribPointer(Main.TwoDShader_Vertex, 2, GL_FLOAT, false, 16, 0);
@@ -364,7 +368,7 @@ public class Page {
                 Main.AvgTimeElapsed += (Main.TimeElapsed-Main.AvgTimeElapsed)/20;
                 Main.fps = 1/Main.AvgTimeElapsed;
 
-                //Main.MakeGLCalls();
+                Main.MakeGLCalls();
                 glfwPollEvents();
 
                 Main.playerMoveSpeedSprint = 1.0f;

@@ -5,7 +5,7 @@
 "FarClippingPlane":500.0,
 "WindowWidth":1000,
 "WindowHight":500,
-"FullScreen":true,
+"FullScreen":false,
 "DrawSkyBox":true,
 "playerMoveSpeed":6.0,
 "playerRotateSpeedKey":100.0,
