@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL20.glUniform1f;
 
 public class Page {
     public static Page[] Pages;
-    public static int SelectedPage = 0;
+    public static int SelectedPage = 1;
     public static boolean Interrupt = false;
     public static int VertexBufferObject = glGenBuffers();
 
@@ -364,7 +364,7 @@ public class Page {
                 Main.AvgTimeElapsed += (Main.TimeElapsed-Main.AvgTimeElapsed)/20;
                 Main.fps = 1/Main.AvgTimeElapsed;
 
-                Main.MakeGLCalls();
+                //Main.MakeGLCalls();
                 glfwPollEvents();
 
                 Main.playerMoveSpeedSprint = 1.0f;
@@ -409,7 +409,7 @@ public class Page {
             Main.skyBox.kill();
             while(Main.chunkLoader.isAlive()){
                 try{
-                    Main.MakeGLCalls();
+                    //Main.MakeGLCalls();
                     Thread.sleep(1);
                 }
                 catch(Exception e){
@@ -431,7 +431,7 @@ public class Page {
                 double CurentTime = glfwGetTime();
                 Main.Time = (float)CurentTime;
 
-                Main.MakeGLCalls();
+                //Main.MakeGLCalls();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 if(GameBackground){

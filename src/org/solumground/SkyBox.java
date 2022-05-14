@@ -452,7 +452,6 @@ public class SkyBox extends Thread{
             ShellMesh.Texture_Buffer_Object = ShellOneTBO;
             ShellMesh.Scale(1,1,1);
             ShellMesh.draw();
-            ShellMesh.Roation.X += .5f*Main.TimeElapsed;
         }
         if(ShellTwoActive){
             ShellMesh.Texture_Buffer_Object = ShellTwoTBO;
