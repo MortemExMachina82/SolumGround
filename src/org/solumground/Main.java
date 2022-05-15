@@ -207,6 +207,8 @@ public class Main {
     public static void update_fullscreen(){
         if(FullScreen) {
             glfwSetWindowMonitor(win, monitor, 0,0, monitor_W,monitor_H, 0);
+            win_X = monitor_W;
+            win_Y = monitor_H;
         }
         else{
             glfwSetWindowMonitor(win, 0, (monitor_W/2)-(OriginalWinX/2), (monitor_H/2)-(OriginalWinY/2), OriginalWinX, OriginalWinY, 0);
