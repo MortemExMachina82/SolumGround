@@ -330,8 +330,8 @@ public class Main {
             }
         }
         Calendar Time = Calendar.getInstance();
-        String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
-                Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
+        String TimeString = Time.get(YEAR)+"_"+Time.get(MONTH)+"_"+Time.get(DAY_OF_MONTH)+"_"+
+                Time.get(HOUR)+"_"+Time.get(MINUTE)+"_"+Time.get(SECOND);
         File ScreenShotFile = new File(Main.RootDir +"/screenshots/"+TimeString+".png");
         ScreenShotFile.mkdirs();
         try {

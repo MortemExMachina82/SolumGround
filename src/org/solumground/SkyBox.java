@@ -357,9 +357,6 @@ public class SkyBox extends Thread{
                 glUniformMatrix4fv(Main.MainShader_WorldMat, false, WorldMatrix);
 
                 if(ShellOneNeedsUpdate){
-                    //glClearColor((Rotation.X < 0 ? -Rotation.X : Rotation.X)/360f,
-                    //        (Rotation.Y < 0 ? -Rotation.Y : Rotation.Y)/360f,
-                    //        0,.5f);
                     DrawShellOne(X);
                 }
                 if(ShellTwoNeedsUpdate){

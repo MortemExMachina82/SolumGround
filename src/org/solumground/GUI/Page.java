@@ -413,7 +413,7 @@ public class Page {
             Main.skyBox.kill();
             while(Main.chunkLoader.isAlive()){
                 try{
-                    //Main.MakeGLCalls();
+                    Main.MakeGLCalls();
                     Thread.sleep(1);
                 }
                 catch(Exception e){
@@ -435,7 +435,7 @@ public class Page {
                 double CurentTime = glfwGetTime();
                 Main.Time = (float)CurentTime;
 
-                //Main.MakeGLCalls();
+                Main.MakeGLCalls();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 if(GameBackground){
