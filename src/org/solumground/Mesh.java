@@ -392,13 +392,82 @@ public class Mesh{
     }
 
     public void Init_VBO(){
-        this.VertexBufferObject = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-        glEnableVertexAttribArray(Main.MainShader_Vertex);
-        if (this.has_tex) {
-            glEnableVertexAttribArray(Main.MainShader_TextureCords);
-        } else {
-            glDisableVertexAttribArray(Main.MainShader_TextureCords);
+        if(Thread.currentThread().getName().equals("main") || Thread.currentThread().getName().equals("SkyBox") || !Main.PlatformMac){
+            this.VertexBufferObject = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+            glEnableVertexAttribArray(Main.MainShader_Vertex);
+            if (this.has_tex) {
+                glEnableVertexAttribArray(Main.MainShader_TextureCords);
+            } else {
+                glDisableVertexAttribArray(Main.MainShader_TextureCords);
+            }
+        }
+        else{
+            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glGenBuffersStatus = Main.GLStatus.Ready;
+            while(Main.glGenBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            this.VertexBufferObject = Main.glGenBuffers_Out;
+
+            while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+            Main.glBindBuffer_In2 = this.VertexBufferObject;
+            Main.glEnableVertexAttribArray_In1 = Main.MainShader_Vertex;
+            Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
+
+            if (this.has_tex) {
+                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                    try {
+                        Thread.sleep(1);
+                    }
+                    catch(Exception e1){
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+                Main.glBindBuffer_In2 = this.VertexBufferObject;
+                Main.glEnableVertexAttribArray_In1 = Main.MainShader_TextureCords;
+                Main.glEnableVertexAttribArrayStatus = Main.GLStatus.Ready;
+            }
+            else{
+                while(Main.glEnableVertexAttribArrayStatus != Main.GLStatus.Done){
+                    try {
+                        Thread.sleep(1);
+                    }
+                    catch(Exception e1){
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+                Main.glBindBuffer_In2 = this.VertexBufferObject;
+                Main.glDisableVertexAttribArray_In1 = Main.MainShader_TextureCords;
+                Main.glDisableVertexAttribArrayStatus = Main.GLStatus.Ready;
+            }
         }
     }
     public void addNoUpload(Mesh mesh){
@@ -562,8 +631,38 @@ public class Mesh{
 
 
 
-        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-        glBufferData(GL_ARRAY_BUFFER, DataArray, GL_STATIC_DRAW);
+        if(Thread.currentThread().getName().equals("main") || Thread.currentThread().getName().equals("SkyBox") || !Main.PlatformMac){
+            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+            glBufferData(GL_ARRAY_BUFFER, DataArray, GL_STATIC_DRAW);
+        }
+        else{
+
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+            Main.glBindBuffer_In2 = this.VertexBufferObject;
+
+            Main.glBufferData_In1 = GL_ARRAY_BUFFER;
+            Main.glBufferData_In2 = DataArray;
+            Main.glBufferData_In3 = GL_STATIC_DRAW;
+            Main.glBufferDataStatus = Main.GLStatus.Ready;
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+        }
 
         status = MeshStatus.Completed;
     }
@@ -636,8 +735,38 @@ public class Mesh{
 
         status = MeshStatus.NotDone;
 
-        glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
-        glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
+        if(Thread.currentThread().getName().equals("main") || Thread.currentThread().getName().equals("SkyBox") || !Main.PlatformMac){
+            glBindBuffer(GL_ARRAY_BUFFER, this.VertexBufferObject);
+            glBufferSubData(GL_ARRAY_BUFFER, LightStart*4, VertexArray);
+        }
+        else{
+
+            while(Main.glBufferDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glBindBuffer_In1 = GL_ARRAY_BUFFER;
+            Main.glBindBuffer_In2 = this.VertexBufferObject;
+
+            Main.glBufferSubData_In1 = GL_ARRAY_BUFFER;
+            Main.glBufferSubData_In2 = LightStart*4;
+            Main.glBufferSubData_In3 = VertexArray;
+            Main.glBufferSubDataStatus = Main.GLStatus.Ready;
+            while(Main.glBufferSubDataStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+        }
 
         status = MeshStatus.Completed;
     }
@@ -733,10 +862,38 @@ public class Mesh{
 
         //upload_Vertex_data();
 
-        glDeleteBuffers(this.VertexBufferObject);
-        if (TBO_gen) {
-            glDeleteBuffers(this.Texture_Buffer_Object);
+        if(Thread.currentThread().getName().equals("main") || Thread.currentThread().getName().equals("SkyBox") || !Main.PlatformMac){
+            glDeleteBuffers(this.VertexBufferObject);
+            if (TBO_gen) {
+                glDeleteBuffers(this.Texture_Buffer_Object);
+            }
         }
+        else{
+            while(Main.glDeleteBuffersStatus != Main.GLStatus.Done){
+                try {
+                    Thread.sleep(1);
+                }
+                catch(Exception e1){
+                    e1.printStackTrace();
+                    return;
+                }
+            }
+            Main.glDeleteBuffers_In1 = this.VertexBufferObject;
+            Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
+            if (TBO_gen) {
+                while (Main.glDeleteBuffersStatus != Main.GLStatus.Done) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        return;
+                    }
+                }
+                Main.glDeleteBuffers_In1 = this.Texture_Buffer_Object;
+                Main.glDeleteBuffersStatus = Main.GLStatus.Ready;
+            }
+        }
+
 
     }
 }

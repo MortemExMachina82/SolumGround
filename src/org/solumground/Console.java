@@ -13,7 +13,7 @@ public class Console {
     public static List<Float> TimeBuffer = new ArrayList<>(BufferSize+1);
 
     public static void Init(){
-        DefaultFont = new Font(Main.jar_folder_path+"/"+Main.FontPath);
+        DefaultFont = new Font(Main.RootDir +"/"+Main.FontPath);
     }
 
     public static void Print(String text){

@@ -32,7 +32,7 @@ public class CollisionBox {
         this.BondNY = BNY;
         this.BondNZ = BNZ;
 
-        this.wiremesh = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
+        this.wiremesh = new Mesh(Main.RootDir +"/assets/solumground/models/wireFrame.smobj", "");
         this.wiremesh.setWireFrame();
         wiremesh.setColor(0xFF0000FF);
         this.wiremesh.ScaleData((this.BondPX-this.BondNX)*.501f, (this.BondPY-this.BondNY)*.501f, (this.BondPZ-this.BondNZ)*.501f);

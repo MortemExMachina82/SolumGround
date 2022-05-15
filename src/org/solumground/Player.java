@@ -56,7 +56,7 @@ public class Player{
 
 
 
-        wireframe = new Mesh(Main.jar_folder_path+"/assets/solumground/models/wireFrame.smobj", "");
+        wireframe = new Mesh(Main.RootDir +"/assets/solumground/models/wireFrame.smobj", "");
         wireframe.setWireFrame();
         wireframe.ScaleData(.504f,.504f,.504f);
         wireframe.setColor(0x0000FFFF);
@@ -64,7 +64,7 @@ public class Player{
         set_Projection(((float)Main.win_Y/Main.win_X), Main.FOV, Main.nearPlane, Main.farPlane);
     }
     public static void Load(){
-        String DataPath = Main.jar_folder_path+"/"+Main.SaveFolder+"/Player.dat";
+        String DataPath = Main.RootDir +"/"+Main.SaveFolder+"/Player.dat";
         File file = new File(DataPath);
         int bytesRead = 0;
         if(file.exists()){
@@ -351,7 +351,7 @@ public class Player{
     }
 
     public static void Save(){
-        String s = Main.jar_folder_path+"/"+Main.SaveFolder+"/Player.dat";
+        String s = Main.RootDir +"/"+Main.SaveFolder+"/Player.dat";
 
         byte[] data = new byte[28];
         ByteBuffer bb = ByteBuffer.wrap(data);

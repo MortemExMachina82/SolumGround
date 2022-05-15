@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
-import org.solumground.Universe.Star;
 
 import javax.imageio.ImageIO;
 
@@ -23,7 +22,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL21.*;
 
 public class Main {
-    public static String jar_folder_path;
+    public static String RootDir;
     public static String SaveFolder;
     public static String FontPath;
     public static String SettingsPath = "assets/solumground/Settings.json";
@@ -120,6 +119,8 @@ public class Main {
     public static int glTexImage2D_In8;
     public static int [] glTexImage2D_In9;
 
+    public static boolean PlatformMac;
+
 
     public static int LoadShader(String Path){
         String vertex_shader_source_path = Path+"/Vertex.vsh";
@@ -213,7 +214,7 @@ public class Main {
     }
     public static void LoadSettings() {
         try {
-            JsonObject jsonObject = new JsonParser(jar_folder_path+"/"+SettingsPath).mainJsonObject;
+            JsonObject jsonObject = new JsonParser(RootDir +"/"+SettingsPath).mainJsonObject;
 
             SaveFolder = jsonObject.Get("SaveFolder").GetString();
             FOV = jsonObject.Get("FOV").GetFloat();
@@ -260,7 +261,7 @@ public class Main {
         object.Add(new JsonItem("Font", FontPath));
 
         try{
-            FileOutputStream Out = new FileOutputStream(jar_folder_path+"/"+SettingsPath);
+            FileOutputStream Out = new FileOutputStream(RootDir +"/"+SettingsPath);
             object.write(Out);
             Out.close();
         }
@@ -324,7 +325,7 @@ public class Main {
         Calendar Time = Calendar.getInstance();
         String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
                 Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
-        File ScreenShotFile = new File(Main.jar_folder_path+"/screenshots/"+TimeString+".png");
+        File ScreenShotFile = new File(Main.RootDir +"/screenshots/"+TimeString+".png");
         ScreenShotFile.mkdirs();
         try {
             ImageIO.write(img, "png", ScreenShotFile);
@@ -360,9 +361,9 @@ public class Main {
     public static void main(String[] args){
         try {
             //Use In InteliJ
-            //jar_folder_path = System.getProperty("user.dir");
+            //RootDir = System.getProperty("user.dir");
             //Use For Manual Compiling
-            jar_folder_path = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            RootDir = new File(org.solumground.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
         }
         catch(Exception e){
             e.printStackTrace();
@@ -370,11 +371,11 @@ public class Main {
         }
         LoadSettings();
 
-        File save_folder_file = new File(jar_folder_path+"/"+SaveFolder);
+        File save_folder_file = new File(RootDir +"/"+SaveFolder);
         if(!save_folder_file.exists()){
             save_folder_file.mkdirs(); // create file path if it doesn't exist
         }
-        File playerData = new File(jar_folder_path+"/"+Main.SaveFolder+"/Player.dat");
+        File playerData = new File(RootDir +"/"+Main.SaveFolder+"/Player.dat");
         try {
             playerData.createNewFile();
         }
@@ -396,6 +397,9 @@ public class Main {
         win = glfwCreateWindow(win_X, win_Y, "SolumGround", 0, 0);
         glfwMakeContextCurrent(win);
         GL.createCapabilities();
+        if(glfwGetPlatform() != GLFW_PLATFORM_X11) {
+            PlatformMac = true;
+        }
 
         update_fullscreen();
 
@@ -407,7 +411,7 @@ public class Main {
         glCullFace(GL_FRONT);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        MainShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/Main");
+        MainShaderProgram = LoadShader(RootDir +"/assets/solumground/shaders/Main");
         glUseProgram(MainShaderProgram);
         MainShader_Vertex = glGetAttribLocation(MainShaderProgram, "a_position");
         MainShader_TextureCords = glGetAttribLocation(MainShaderProgram, "a_texcord");
@@ -419,7 +423,7 @@ public class Main {
         glEnableVertexAttribArray(MainShader_TextureCords);
         glEnableVertexAttribArray(MainShader_light);
 
-        TwoDShaderProgram = LoadShader(jar_folder_path +"/assets/solumground/shaders/2D");
+        TwoDShaderProgram = LoadShader(RootDir +"/assets/solumground/shaders/2D");
         glUseProgram(TwoDShaderProgram);
         TwoDShader_Vertex = glGetAttribLocation(TwoDShaderProgram, "a_position");
         TwoDShader_TextureCords = glGetAttribLocation(TwoDShaderProgram, "a_texcord");
@@ -432,7 +436,7 @@ public class Main {
 
         unit_cube_collisionBox = new CollisionBox(new Vec3(0,0,0), .5f,.5f,.5f, -.5f,-.5f,-.5f);
 
-        DefaultFont = new Font(Main.jar_folder_path+"/"+Main.FontPath);
+        DefaultFont = new Font(Main.RootDir +"/"+Main.FontPath);
 
         Player.Init();
         SkyBox.Init();

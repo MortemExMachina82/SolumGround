@@ -13,6 +13,7 @@ public class MeshBuilder extends Thread{
     public static List<Chunk> LightUpdateBuffer = new ArrayList<>(10);
 
     public static int SleepTime = 1;
+    public static boolean MAC = false;
 
     public boolean shouldClose = false;
     public void kill(){
@@ -38,10 +39,12 @@ public class MeshBuilder extends Thread{
         }
     }
     public void run(){
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        long SharedContextWindow = glfwCreateWindow(1, 1, "", 0, Main.win);
-        glfwMakeContextCurrent(SharedContextWindow);
-        GL.createCapabilities();
+        if(!Main.PlatformMac) {
+            glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+            long SharedContextWindow = glfwCreateWindow(1, 1, "", 0, Main.win);
+            glfwMakeContextCurrent(SharedContextWindow);
+            GL.createCapabilities();
+        }
         while(!shouldClose){
             SleepTime = 100 / (Genbuffer.size()+ReGenBuffer.size()+LightUpdateBuffer.size()+3);
             try{

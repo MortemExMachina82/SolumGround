@@ -1,9 +1,5 @@
 package org.solumground;
 
-import org.lwjgl.opengl.GL;
-
-import static org.lwjgl.glfw.GLFW.*;
-
 public class ChunkLoader extends Thread{
     public boolean ShouldClose = false;
 
@@ -32,7 +28,7 @@ public class ChunkLoader extends Thread{
     public Chunk makeChunk(IVec3 pos){
         Chunk chunk = Chunk.FromChunkPos(pos);
         if(chunk == null) {
-            chunk = new Chunk(Main.jar_folder_path+"/"+Main.SaveFolder, pos);
+            chunk = new Chunk(Main.RootDir +"/"+Main.SaveFolder, pos);
             if(chunk.status == Chunk.Status.Loaded) {
                 MeshBuilder.Genbuffer.add(chunk);
             }

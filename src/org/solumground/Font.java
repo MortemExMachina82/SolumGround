@@ -30,7 +30,7 @@ public class Font {
             JsonObject jsonObject = new JsonParser(Path).mainJsonObject;
 
             this.name = jsonObject.Get("name").GetString();
-            this.texpath = Main.jar_folder_path+"/"+ jsonObject.Get("texturePath").GetString();
+            this.texpath = Main.RootDir +"/"+ jsonObject.Get("texturePath").GetString();
             boolean fixedWidth = jsonObject.Get("fixed-width").GetBoolean();
             if(fixedWidth){
                 int width = jsonObject.Get("widths").GetInt();

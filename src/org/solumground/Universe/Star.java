@@ -20,7 +20,7 @@ public class Star {
 
     public static void Init(){
         int RTBO = Main.LoadTexture("", 0x7F0000FF);
-        Mesh mesh = new Mesh(Main.jar_folder_path+"/assets/solumground/models/Star.smobj", Mesh.MESH_SMOBJ);
+        Mesh mesh = new Mesh(Main.RootDir +"/assets/solumground/models/Star.smobj", Mesh.MESH_SMOBJ);
         RedMesh = new Mesh(RTBO);
         RedMesh.addNoUpload(mesh);
         RedMesh.FullLight = true;

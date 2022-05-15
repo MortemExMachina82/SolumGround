@@ -298,7 +298,7 @@ public class SkyBox extends Thread{
         projection_mat[11] = -1;
         projection_mat[14] = ((FarPlane*NearPlane) / (NearPlane-FarPlane))*2;
 
-        int shader = Main.LoadShader(Main.jar_folder_path +"/assets/solumground/shaders/Main");
+        int shader = Main.LoadShader(Main.RootDir +"/assets/solumground/shaders/Main");
         glUseProgram(shader);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);

@@ -172,12 +172,12 @@ public class Page {
     }
 
     public static void Init(){
-        File Pages_dir = new File(Main.jar_folder_path+"/assets/solumground/Pages");
+        File Pages_dir = new File(Main.RootDir +"/assets/solumground/Pages");
         String [] filenames = Pages_dir.list();
         assert filenames != null;
         Pages = new Page[filenames.length];
         for (String filename : filenames) {
-            Page page = new Page(Main.jar_folder_path + "/assets/solumground/Pages/" + filename);
+            Page page = new Page(Main.RootDir + "/assets/solumground/Pages/" + filename);
             Pages[page.ID] = page;
         }
     }
@@ -262,7 +262,7 @@ public class Page {
         catch(Exception e){
             e.printStackTrace();
         }
-        this.TextureBufferObject = Main.LoadTexture(Main.jar_folder_path+"/"+this.BackGroundTexture, 0x7F7F7FFF);
+        this.TextureBufferObject = Main.LoadTexture(Main.RootDir +"/"+this.BackGroundTexture, 0x7F7F7FFF);
     }
 
     public static void DrawGame(){

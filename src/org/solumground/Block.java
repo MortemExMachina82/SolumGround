@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.lwjgl.opengl.GL21.*;
 
@@ -78,12 +77,12 @@ public class Block {
     }
 
     public static void Init() {
-        File blocks_dir = new File(Main.jar_folder_path+"/assets/solumground/blocks");
+        File blocks_dir = new File(Main.RootDir +"/assets/solumground/blocks");
         String [] filenames = blocks_dir.list();
         assert filenames != null;
         Blocks = new Block[filenames.length];
         for (String filename : filenames) {
-            Block block = new Block(Main.jar_folder_path + "/assets/solumground/blocks/" + filename);
+            Block block = new Block(Main.RootDir + "/assets/solumground/blocks/" + filename);
             Blocks[block.ID] = block;
             Number++;
         }
@@ -214,34 +213,34 @@ public class Block {
                     String TexturePath = sidearray.Get(2).GetString();
 
                     if(Side.equals("Right")){
-                        Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[0] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[0] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[0] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[0]);
                     }
 
                     if(Side.equals("Left")){
-                        Models[1] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[1] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[1] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[1] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[1]);
                     }
                     if(Side.equals("Top")){
-                        Models[2] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[2] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[2] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[2] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[2]);
                     }
                     if(Side.equals("Bottom")){
-                        Models[3] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[3] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[3] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[3] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[3]);
                     }
                     if(Side.equals("Front")){
-                        Models[4] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[4] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[4] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[4] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[4]);
                     }
                     if(Side.equals("Back")){
-                        Models[5] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+FileName;
-                        Texture[5] = Main.jar_folder_path+"/"+this.DirectoryTexturePath+"/"+TexturePath;
+                        Models[5] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+FileName;
+                        Texture[5] = Main.RootDir +"/"+this.DirectoryTexturePath+"/"+TexturePath;
                         Textures.add(Texture[5]);
                     }
                 }
@@ -252,8 +251,8 @@ public class Block {
 
                 JsonArray modelarray = jsonObject.Get("Model").GetArray();
                 if(modelarray != null) {
-                    Models[0] = Main.jar_folder_path+"/"+this.DirectoryModelPath+"/"+modelarray.Get(0).GetString();
-                    Texture[0] = Main.jar_folder_path + "/" + this.DirectoryTexturePath + "/" + modelarray.Get(1).GetString();
+                    Models[0] = Main.RootDir +"/"+this.DirectoryModelPath+"/"+modelarray.Get(0).GetString();
+                    Texture[0] = Main.RootDir + "/" + this.DirectoryTexturePath + "/" + modelarray.Get(1).GetString();
                     Textures.add(Texture[0]);
                 }
                 if(HasCollisionBox){

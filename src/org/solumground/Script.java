@@ -11,7 +11,7 @@ public class Script {
     public static void SetVar(String name, Object value) {
         switch (name) {
             case "Main.jar_folder_path":
-                Main.jar_folder_path = (String) value;
+                Main.RootDir = (String) value;
                 break;
             case "Main.SaveFolder":
                 Main.SaveFolder = (String) value;
@@ -86,7 +86,7 @@ public class Script {
     public static Object GetVar(String name){
         switch (name) {
             case "Main.jar_folder_path":
-                return Main.jar_folder_path;
+                return Main.RootDir;
             case "Main.SaveFolder":
                 return Main.SaveFolder;
             case "Main.FontPath":
