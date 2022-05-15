@@ -6,6 +6,8 @@ import org.solumground.GUI.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -314,16 +316,19 @@ public class Main {
         }
     }
     public static void TakeScreenShot(){
-        int [] RawScreenData = new int[Main.win_X*Main.win_Y*3];
-        glReadBuffer(GL_BACK);
-        glReadPixels(0,0, Main.win_X,Main.win_Y, GL_RGB, GL_UNSIGNED_INT, RawScreenData);
-        int [] FlipedScreenData = new int[RawScreenData.length];
+        glReadBuffer(GL_FRONT);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(win_X*win_Y*4).order(ByteOrder.nativeOrder());
+        glReadPixels(0,0, Main.win_X,Main.win_Y, GL_RGBA, GL_UNSIGNED_BYTE, byteBuffer);
+        BufferedImage img = new BufferedImage(Main.win_X, Main.win_Y, BufferedImage.TYPE_INT_ARGB);
         for(int Y=0;Y<Main.win_Y;Y++){
-            System.arraycopy(RawScreenData, (Main.win_Y-(Y+1))*Main.win_X*3, FlipedScreenData, Y*Main.win_X*3, Main.win_X*3);
+            for(int X=0;X<Main.win_X;X++){
+                int val = 0xFF << 24; //alpha
+                val = val | Byte.toUnsignedInt(byteBuffer.get((Y*win_X + X)*4)) << 16; //red
+                val = val | Byte.toUnsignedInt(byteBuffer.get((Y*win_X + X)*4 + 1)) << 8; //green
+                val = val | Byte.toUnsignedInt(byteBuffer.get((Y*win_X + X)*4 + 2)); //blue
+                img.setRGB(X,(win_Y-Y)-1, val);
+            }
         }
-        BufferedImage img = new BufferedImage(Main.win_X, Main.win_Y, BufferedImage.TYPE_INT_RGB);
-        WritableRaster wr  = img.getRaster();
-        wr.setPixels(0,0,Main.win_X,Main.win_Y, FlipedScreenData);
         Calendar Time = Calendar.getInstance();
         String TimeString = Time.get(YEAR)+"."+Time.get(MONTH)+"."+Time.get(DAY_OF_MONTH)+":"+
                 Time.get(HOUR)+"."+Time.get(MINUTE)+"."+Time.get(SECOND);
