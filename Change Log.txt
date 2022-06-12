@@ -1,11 +1,6 @@
-SolumGround Version 1.6.0 alpha
+SolumGround Version 1.6.1 alpha
 www.solumground.org
 github.com/MortemExMachina82/SolumGround
 
 Change Log:
-    • Better Skybox
-    • Proformance Improvments
-    • Better Menus
-    • Settings Save On Exit
-    • Added Zoom: Use 'Z'
-    • Added Toggle Switches To Menus
+    • Critical Bug Fixes

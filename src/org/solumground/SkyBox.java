@@ -12,12 +12,17 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 
 public class SkyBox extends Thread{
+    public static boolean Simple;
     public static boolean ShellOneActive;
     public static boolean ShellTwoActive;
     public static boolean ShellThreeActive;
 
-    public static Mesh ShellMesh;
-    public static int TileSize = 200;
+    public static Mesh ShellOneMesh;
+    public static Mesh ShellTwoMesh;
+    public static Mesh ShellThreeMesh;
+    public static int FancyVBO;
+    public static int SimpleVBO;
+    public static int TileSize = 200; //if !Simple TileSize Must Be >= 200
     public static int ShellTextureY = TileSize;
     public static int ShellTextureX = TileSize*26;
 
@@ -39,14 +44,20 @@ public class SkyBox extends Thread{
     public static float f3 = 0;
     public static float f4 = 0.541196f;
     public static float [] CamAngles;
-    public static boolean [] CornerMask;
+    public static float [] SimpleCamAngles;
+    public static float [] FancyCamAngles;
+    public static float CamFOV;
+    public static float FarPlane = 10000000;
+    public static float NearPlane = 1000;
+    public static float [] projection_mat = new float[16];
+    public static int [] CornerMask;
 
     public static Sector [] sectors;
     public static long contextWindow;
     public static boolean StarNeedsInit;
 
     public static void Init(){
-        CamAngles = new float[]{
+        FancyCamAngles = new float[]{
                 0,0,0, //front
                 0,180,0, //back
                 0,-90,0, //right
@@ -80,6 +91,16 @@ public class SkyBox extends Thread{
                 90,0,0, //top
                 -90,0,0, //bottom
         };
+        SimpleCamAngles = new float[]{
+                0,0,0, //front
+                0,180,0, //back
+                0,-90,0, //right
+                0,90,0, //left
+                90,0,0, //top
+                -90,0,0 //bottom
+        };
+        CamAngles = FancyCamAngles;
+        CamFOV = 45;
         ShellOneActive = true;
         ShellTwoActive = true;
         ShellThreeActive = false;
@@ -99,8 +120,8 @@ public class SkyBox extends Thread{
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        ShellMesh = new Mesh(ShellOneTBO);
-        ShellMesh.Original_VertexArray = new float[]{
+        ShellOneMesh = new Mesh(ShellOneTBO);
+        ShellOneMesh.Original_VertexArray = new float[]{
                 -f1, f1, -f2, //front
                 f1, f1, -f2,
                 f1, -f1, -f2,
@@ -231,41 +252,120 @@ public class SkyBox extends Thread{
                 f1, -f2, f1,
                 -f1, -f2, f1,
         };
-        ShellMesh.VTcords_array = new float[26*8];
+        ShellOneMesh.VTcords_array = new float[26*8];
         for(int X=0;X<26;X++){
-            ShellMesh.VTcords_array[X*8] = (float)X/26.0f;
-            ShellMesh.VTcords_array[X*8 + 1] = 0;
-            ShellMesh.VTcords_array[X*8 + 2] = (1.0f+X)/26.0f;
-            ShellMesh.VTcords_array[X*8 + 3] = 0;
-            ShellMesh.VTcords_array[X*8 + 4] = (1.0f+X)/26.0f;
-            ShellMesh.VTcords_array[X*8 + 5] = 1;
-            ShellMesh.VTcords_array[X*8 + 6] = (float)X/26.0f;
-            ShellMesh.VTcords_array[X*8 + 7] = 1;
+            ShellOneMesh.VTcords_array[X*8] = (float)X/26.0f;
+            ShellOneMesh.VTcords_array[X*8 + 1] = 0;
+            ShellOneMesh.VTcords_array[X*8 + 2] = (1.0f+X)/26.0f;
+            ShellOneMesh.VTcords_array[X*8 + 3] = 0;
+            ShellOneMesh.VTcords_array[X*8 + 4] = (1.0f+X)/26.0f;
+            ShellOneMesh.VTcords_array[X*8 + 5] = 1;
+            ShellOneMesh.VTcords_array[X*8 + 6] = (float)X/26.0f;
+            ShellOneMesh.VTcords_array[X*8 + 7] = 1;
         }
 
-        ShellMesh.QuadFaceArray = new int[26*4*2];
+        ShellOneMesh.QuadFaceArray = new int[26*4*2];
         for(int X=0;X<26*4;X++){
-            ShellMesh.QuadFaceArray[X*2] = X;
-            ShellMesh.QuadFaceArray[X*2 + 1] = X;
+            ShellOneMesh.QuadFaceArray[X*2] = X;
+            ShellOneMesh.QuadFaceArray[X*2 + 1] = X;
         }
 
-        ShellMesh.Number_of_Verts = 26*4;
-        ShellMesh.Number_of_vtcords = 26*4;
-        ShellMesh.Number_of_QuadFaces = 26;
+        ShellOneMesh.Number_of_Verts = 26*4;
+        ShellOneMesh.Number_of_vtcords = 26*4;
+        ShellOneMesh.Number_of_QuadFaces = 26;
 
-        ShellMesh.setIs_skyBox();
-        ShellMesh.FullLight = true;
-        ShellMesh.position = new Vec3(-10, 200, -10);
-        ShellMesh.upload_Vertex_data();
+        ShellOneMesh.setIs_skyBox();
+        ShellOneMesh.position = new Vec3(-10,145.3f,-10);
+        ShellOneMesh.FullLight = true;
+        ShellOneMesh.upload_Vertex_data();
 
-        CornerMask = new boolean[TileSize*TileSize];
+        FancyVBO = ShellOneMesh.VertexBufferObject;
+        ShellTwoMesh = new Mesh(ShellOneMesh);
+        ShellTwoMesh.Texture_Buffer_Object = ShellTwoTBO;
+        glDeleteBuffers(ShellTwoMesh.VertexBufferObject);
+        ShellTwoMesh.VertexBufferObject = FancyVBO;
+        ShellTwoMesh.upload_Vertex_data();
+        ShellThreeMesh = new Mesh(ShellOneMesh);
+        ShellThreeMesh.Texture_Buffer_Object = ShellThreeTBO;
+        glDeleteBuffers(ShellThreeMesh.VertexBufferObject);
+        ShellThreeMesh.VertexBufferObject = FancyVBO;
+
+        ShellOneMesh.Scale(1,1,1);
+        ShellTwoMesh.Scale(.9f,.9f,.9f);
+        ShellThreeMesh.Scale(.8f,.8f,.8f);
+
+
+
+        ShellOneMesh.Init_VBO();
+        ShellOneMesh.Original_VertexArray = new float[]{
+                -1,1,-1, //front
+                1,1,-1,
+                1,-1,-1,
+                -1,-1,-1,
+
+                1,1,1, //back
+                -1,1,1,
+                -1,-1,1,
+                1,-1,1,
+
+                1,1,-1,
+                1,1,1, //right
+                1,-1,1,
+                1,-1,-1,
+
+                -1,1,1, //left
+                -1,1,-1,
+                -1,-1,-1,
+                -1,-1,1,
+
+                -1,1,1, //top
+                1,1,1,
+                1,1,-1,
+                -1,1,-1,
+
+                -1,-1,-1, //bottom
+                1,-1,-1,
+                1,-1,1,
+                -1,-1,1,
+        };
+        ShellOneMesh.VTcords_array = new float[48];
+        for(int X=0;X<6;X++){
+            ShellOneMesh.VTcords_array[X*8] = (float)X/6.0f;
+            ShellOneMesh.VTcords_array[X*8 + 1] = 0;
+            ShellOneMesh.VTcords_array[X*8 + 2] = (1.0f+X)/6.0f;
+            ShellOneMesh.VTcords_array[X*8 + 3] = 0;
+            ShellOneMesh.VTcords_array[X*8 + 4] = (1.0f+X)/6.0f;
+            ShellOneMesh.VTcords_array[X*8 + 5] = 1;
+            ShellOneMesh.VTcords_array[X*8 + 6] = (float)X/6.0f;
+            ShellOneMesh.VTcords_array[X*8 + 7] = 1;
+        }
+        ShellOneMesh.QuadFaceArray = new int[48];
+        for(int X=0;X<24;X++){
+            ShellOneMesh.QuadFaceArray[X*2] = X;
+            ShellOneMesh.QuadFaceArray[X*2 + 1] = X;
+        }
+
+
+        ShellOneMesh.Number_of_QuadFaces = 6;
+        ShellOneMesh.FullLight = true;
+        ShellOneMesh.upload_Vertex_data();
+        SimpleVBO = ShellOneMesh.VertexBufferObject;
+
+        ShellOneMesh.VertexBufferObject = FancyVBO;
+        ShellOneMesh.Number_of_QuadFaces = 26;
+        ShellOneMesh.Calculate_Data_Positions();
+
+        CornerMask = new int[TileSize*TileSize];
         for(int Y=0;Y<TileSize;Y++){
             for(int X=0;X<TileSize;X++){
                 if((float)(X) / Y < 0.35f){
-                    CornerMask[Y*TileSize + X] = true;
+                    CornerMask[Y*TileSize + X] = 0x00000000;
                 }
-                if((float)(TileSize-(X)) / Y < 0.35f){
-                    CornerMask[Y*TileSize + X] = true;
+                else if((float)(TileSize-(X)) / Y < 0.6f){
+                    CornerMask[Y*TileSize + X] = 0x00000000;
+                }
+                else{
+                    CornerMask[Y*TileSize + X] = 0xFFFFFFFF;
                 }
             }
         }
@@ -284,16 +384,51 @@ public class SkyBox extends Thread{
         contextWindow = glfwCreateWindow(TileSize, TileSize, "", 0, 0);
         StarNeedsInit = true;
     }
+    public static void SetSimple(boolean value){
+        Simple = value;
+        if(Simple){
+            ShellTextureX = TileSize*6;
+            CamAngles = SimpleCamAngles;
+            CamFOV = 90;
+            ShellOneMesh.VertexBufferObject = SimpleVBO;
+            ShellOneMesh.Number_of_QuadFaces = 6;
+            ShellTwoMesh.VertexBufferObject = SimpleVBO;
+            ShellTwoMesh.Number_of_QuadFaces = 6;
+            ShellThreeMesh.VertexBufferObject = SimpleVBO;
+            ShellThreeMesh.Number_of_QuadFaces = 6;
+        }
+        else{
+            ShellTextureX = TileSize*26;
+            CamAngles = FancyCamAngles;
+            CamFOV = 45;
+            ShellOneMesh.VertexBufferObject = FancyVBO;
+            ShellOneMesh.Number_of_QuadFaces = 26;
+            ShellTwoMesh.VertexBufferObject = FancyVBO;
+            ShellTwoMesh.Number_of_QuadFaces = 26;
+            ShellThreeMesh.VertexBufferObject = FancyVBO;
+            ShellThreeMesh.Number_of_QuadFaces = 26;
+        }
+        ShellOneMesh.Calculate_Data_Positions();
+        ShellTwoMesh.Calculate_Data_Positions();
+        ShellThreeMesh.Calculate_Data_Positions();
+        ShellOneTexture = new int[ShellTextureX*ShellTextureY];
+        ShellTwoTexture = new int[ShellTextureX*ShellTextureY];
+        ShellThreeTexture = new int[ShellTextureX*ShellTextureY];
+        ShellOneNeedsUpdate = true;
+        ShellTwoNeedsUpdate = true;
+        ShellThreeNeedsUpdate = true;
+        projection_mat[0] = 1 / (float)Math.tan(CamFOV*.5*3.1415/180);
+        projection_mat[5] = 1 / (float)Math.tan(CamFOV*.5*3.1415/180);
+        projection_mat[10] = ((FarPlane+NearPlane) / (NearPlane-FarPlane));
+        projection_mat[11] = -1;
+        projection_mat[14] = ((FarPlane*NearPlane) / (NearPlane-FarPlane))*2;
+    }
     public void run(){
         glfwMakeContextCurrent(contextWindow);
         GL.createCapabilities();
 
-        float FarPlane = 10000000;
-        float NearPlane = 1000;
-        float [] projection_mat = new float[4*4];
-
-        projection_mat[0] = 1 / (float)Math.tan(45*.5*3.1415/180);
-        projection_mat[5] = 1 / (float)Math.tan(45*.5*3.1415/180);
+        projection_mat[0] = 1 / (float)Math.tan(CamFOV*.5*3.1415/180);
+        projection_mat[5] = 1 / (float)Math.tan(CamFOV*.5*3.1415/180);
         projection_mat[10] = ((FarPlane+NearPlane) / (NearPlane-FarPlane));
         projection_mat[11] = -1;
         projection_mat[14] = ((FarPlane*NearPlane) / (NearPlane-FarPlane))*2;
@@ -348,7 +483,7 @@ public class SkyBox extends Thread{
             TransMat[13] = -PlayerPos.Y;
             TransMat[14] = -PlayerPos.Z;
 
-            for(int X=0;X<26;X++){
+            for(int X=0;X<CamAngles.length/3;X++){
                 Rotation.X = CamAngles[X*3];
                 Rotation.Y = CamAngles[X*3 + 1];
                 Rotation.Z = CamAngles[X*3 + 2];
@@ -393,7 +528,7 @@ public class SkyBox extends Thread{
         CopyTile(side, ShellOneTexture);
     }
     public void DrawShellTwo(int side){
-        glClearColor(0,.2f,.3f, .1f);
+        glClearColor(0,.2f,.3f, .3f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         CopyTile(side, ShellTwoTexture);
@@ -407,11 +542,10 @@ public class SkyBox extends Thread{
         if(side > 7 && side < 16) {
             for(int Y=0;Y<TileSize;Y++){
                 for(int X=0;X<TileSize;X++){
-                    if(CornerMask[Y*TileSize + X]){
-                        RawScreenData[Y*TileSize + X] = 0x00000000; //make alpha
-                    }
+                    TBO[Y * ShellTextureX + side * TileSize + X] = RawScreenData[Y*TileSize + X]&CornerMask[Y*TileSize + X];
                 }
             }
+            return;
         }
         for (int Y = 0; Y < TileSize; Y++) {
             System.arraycopy(RawScreenData, Y * TileSize, TBO, Y * ShellTextureX + side * TileSize, TileSize);
@@ -445,20 +579,14 @@ public class SkyBox extends Thread{
     }
 
     public static void Draw(){
-        if(ShellOneActive){
-            ShellMesh.Texture_Buffer_Object = ShellOneTBO;
-            ShellMesh.Scale(1,1,1);
-            ShellMesh.draw();
+        if (ShellOneActive) {
+            ShellOneMesh.draw();
         }
-        if(ShellTwoActive){
-            ShellMesh.Texture_Buffer_Object = ShellTwoTBO;
-            ShellMesh.Scale(.9f,.9f,.9f);
-            ShellMesh.draw();
+        if (ShellTwoActive) {
+            ShellTwoMesh.draw();
         }
-        if(ShellThreeActive){
-            ShellMesh.Texture_Buffer_Object = ShellThreeTBO;
-            ShellMesh.Scale(.8f,.8f,.8f);
-            ShellMesh.draw();
+        if (ShellThreeActive) {
+            ShellThreeMesh.draw();
         }
     }
 }

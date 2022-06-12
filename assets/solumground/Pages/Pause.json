@@ -17,6 +17,15 @@
         },
         {
             "PosX":0.0,
+            "PosY":0.0,
+            "SizeX":0.25,
+            "SizeY":0.1,
+            "Text":"Settings",
+            "OnPress":"Page.SetPage(4);",
+            "BackGroundTexture":"assets/solumground/textures/stone.png",
+        },
+        {
+            "PosX":0.0,
             "PosY":-0.3,
             "SizeX":0.25,
             "SizeY":0.1,

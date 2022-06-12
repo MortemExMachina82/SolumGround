@@ -366,29 +366,18 @@ public class Mesh{
         this.has_quads = mesh.has_quads;
         this.has_triangles = mesh.has_triangles;
         this.TBO_gen = false;
+        this.FullLight = mesh.FullLight;
+        this.is_skyBox = mesh.is_skyBox;
         Init_VBO();
         this.Number_of_Verts = mesh.Number_of_Verts;
-        this.Original_VertexArray = new float[this.Number_of_Verts*3];
-        for(int X=0;X<this.Number_of_Verts*3;X++){
-            this.Original_VertexArray[X] = mesh.Original_VertexArray[X];
-        }
+        this.Original_VertexArray = mesh.Original_VertexArray.clone();
         this.Number_of_vtcords = mesh.Number_of_vtcords;
-        this.VTcords_array = new float[this.Number_of_vtcords*2];
-        for(int X=0;X<this.Number_of_vtcords*2;X++){
-            this.VTcords_array[X] = mesh.VTcords_array[X];
-        }
+        this.VTcords_array = mesh.VTcords_array.clone();
         this.Number_of_QuadFaces = mesh.Number_of_QuadFaces;
-        this.QuadFaceArray = new int[this.Number_of_QuadFaces*(4 + (this.has_tex? 0 : 4))];
-        for(int X=0;X<this.Number_of_QuadFaces*(4 + (this.has_tex? 0 : 4));X++){
-            this.QuadFaceArray[X] = mesh.QuadFaceArray[X];
-        }
+        this.QuadFaceArray = mesh.QuadFaceArray.clone();
         this.Number_of_TriFaces = mesh.Number_of_TriFaces;
-        this.TriFaceArray = new int[this.Number_of_TriFaces*(3 + (this.has_tex? 0 : 3))];
-        for(int X=0;X<this.Number_of_TriFaces*(3 + (this.has_tex? 0 : 3));X++){
-            this.TriFaceArray[X] = mesh.TriFaceArray[X];
-        }
-
-
+        this.TriFaceArray = mesh.TriFaceArray.clone();
+        this.upload_Vertex_data();
     }
 
     public void Init_VBO(){
@@ -549,11 +538,14 @@ public class Mesh{
         }
 
     }
-    public void upload_Vertex_data(){
-        float [] DataArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
+    public void Calculate_Data_Positions(){
         VertexStart = 0;
         TextureCordsStart = this.Number_of_TriFaces*3*3 + this.Number_of_QuadFaces*4*3;
         LightStart = this.Number_of_TriFaces*3*5 + this.Number_of_QuadFaces*4*5;
+    }
+    public void upload_Vertex_data(){
+        float [] DataArray = new float[this.Number_of_TriFaces * 3 * 8 + this.Number_of_QuadFaces*4*8];
+        Calculate_Data_Positions();
         int vert_count = 0;
 
 

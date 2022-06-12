@@ -4,6 +4,7 @@
       <root url="file://$PROJECT_DIR$/lib/lwjgl" />
       <root url="file://$PROJECT_DIR$/lib/lwjgl-glfw" />
       <root url="file://$PROJECT_DIR$/lib/lwjgl-opengl" />
+      <root url="file://$PROJECT_DIR$/lib/lwjgl-openal" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
@@ -13,6 +14,7 @@
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl-glfw" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl-openal" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl-opengl" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl" recursive="false" type="SOURCES" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/lwjgl-glfw" recursive="false" type="SOURCES" />

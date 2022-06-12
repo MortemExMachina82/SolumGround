@@ -161,6 +161,13 @@ public class Script {
                 break;
             case "Console.Print()":
                 Console.Print(params[0]);
+                break;
+            case "Main.SetSkyBoxSimple()":
+                Main.SetSkyBoxSimple();
+                break;
+            case "Main.SetSkyBoxFancy()":
+                Main.SetSkyBoxFancy();
+                break;
             default:
                 System.out.println("Function Not Found: "+name);
         }

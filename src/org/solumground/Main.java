@@ -4,7 +4,6 @@ import org.solumground.Json.*;
 import org.solumground.GUI.*;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -48,6 +47,7 @@ public class Main {
     public static float AvgTimeElapsed;
     public static float fps;
     public static int RenderDistance;
+    public static boolean SkyBoxSimple;
 
     public static boolean showCollisionBox;
     public static boolean DrawSkyBox;
@@ -59,6 +59,7 @@ public class Main {
     public static int MainShader_Projection;
     public static int MainShader_ModelMat;
     public static int MainShader_WorldMat;
+    public static int MainShader_U_MinLight;
 
     public static int TwoDShaderProgram;
     public static int TwoDShader_Vertex;
@@ -241,6 +242,8 @@ public class Main {
             RenderDistance = jsonObject.Get("RenderDistance").GetInt();
 
             FontPath = jsonObject.Get("Font").GetString();
+            SkyBoxSimple = jsonObject.Get("SkyBoxSimple").GetBoolean();
+
 
         } catch (Exception e) {
             System.out.print("Error While Parseing Settings: ");
@@ -263,6 +266,7 @@ public class Main {
         object.Add(new JsonItem("playerRotateSpeedMouse", playerRotateSpeedMouse));
         object.Add(new JsonItem("RenderDistance", RenderDistance));
         object.Add(new JsonItem("Font", FontPath));
+        object.Add(new JsonItem("SkyBoxSimple", SkyBoxSimple));
 
         try{
             FileOutputStream Out = new FileOutputStream(RootDir +"/"+SettingsPath);
@@ -343,7 +347,14 @@ public class Main {
         System.out.println("Saved ScreenShot as: "+TimeString+".png");
         Console.Print("Saved ScreenShot as: "+TimeString+".png");
     }
-
+    public static void SetSkyBoxSimple(){
+        SkyBoxSimple = true;
+        SkyBox.SetSimple(SkyBoxSimple);
+    }
+    public static void SetSkyBoxFancy(){
+        SkyBoxSimple = false;
+        SkyBox.SetSimple(SkyBoxSimple);
+    }
     public static void SaveWorld(){
         System.out.print("Saving...");
         Console.Print("Saving...");
@@ -426,6 +437,7 @@ public class Main {
         MainShader_Projection = glGetUniformLocation(MainShaderProgram, "ProjectionMat");
         MainShader_ModelMat = glGetUniformLocation(MainShaderProgram, "ModelMat");
         MainShader_WorldMat = glGetUniformLocation(MainShaderProgram, "WorldMat");
+        MainShader_U_MinLight = glGetUniformLocation(MainShaderProgram, "U_MinLight");
         glEnableVertexAttribArray(MainShader_Vertex);
         glEnableVertexAttribArray(MainShader_TextureCords);
         glEnableVertexAttribArray(MainShader_light);

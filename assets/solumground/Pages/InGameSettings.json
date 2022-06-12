@@ -1,18 +1,16 @@
 {
-    "ID":3,
-    "Name":"Settings",
-    "GameBackground":false,
-    "IsGame":false,
-    "BackGroundTexture":"assets/solumground/textures/dirt.png",
-    "OnExit":"Main.SaveSettings();  Page.SetPage(1);",
+    "ID":4,
+    "Name":"InGameSettings",
+    "GameBackground":true,
+    "OnExit":"Main.SaveSettings();  Page.SetPage(2);",
     "Buttons":[
         {
             "PosX":0.0,
             "PosY":-0.3,
             "SizeX":0.25,
             "SizeY":0.1,
-            "Text":"Main Menu",
-            "OnPress":"Main.SaveSettings();  Page.SetPage(1);",
+            "Text":"Pause Menu",
+            "OnPress":"Main.SaveSettings();  Page.SetPage(2);",
             "BackGroundTexture":"assets/solumground/textures/stone.png"
         }
     ],

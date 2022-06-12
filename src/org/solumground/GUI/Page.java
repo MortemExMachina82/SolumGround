@@ -267,11 +267,13 @@ public class Page {
 
     public static void DrawGame(){
         glUseProgram(Main.MainShaderProgram);
-
         if(Main.DrawSkyBox) {
+            glUniform3f(Main.MainShader_U_MinLight, 0,0,0);
             SkyBox.Draw();
             glClear(GL_DEPTH_BUFFER_BIT);
         }
+        glUniform3f(Main.MainShader_U_MinLight, .1f,.1f,.1f);
+
         Player.Draw();
         for(int X=0;X<Main.ChunkArray.size();X++){
             Chunk chunk = Main.ChunkArray.get(X);
@@ -353,10 +355,13 @@ public class Page {
             Main.meshBuilder.setDaemon(true);
             Main.meshBuilder.start();
 
+            SkyBox.SetSimple(Main.SkyBoxSimple);
             Main.skyBox = new SkyBox();
             Main.skyBox.setDaemon(true);
             Main.skyBox.setName("SkyBox");
             Main.skyBox.start();
+
+
 
             double PastTime = glfwGetTime();
             while (!Interrupt && !glfwWindowShouldClose(Main.win)){
